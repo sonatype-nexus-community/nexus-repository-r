@@ -51,7 +51,7 @@ good installation path if you are just testing or doing development on the plugi
   ```
   (look for org.sonatype:nexus-repository-r ID, should be the last one)
   ```
-  > bundle:start <org.sonatype:nexus-repository-r ID>
+  > bundle:start <org.sonatype.nexus.plugins:nexus-repository-r ID>
   ```
 
 #### (more) Permanent Install
