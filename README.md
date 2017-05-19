@@ -93,7 +93,7 @@ to the open source community (read: you!)
 
 Remember:
 
-* Use this contributions at the risk tolerance that you have
+* Use this contribution at the risk tolerance that you have
 * Do not file Sonatype support tickets related to R support
 * DO file issues here on GitHub, so that the community can pitch in
 
