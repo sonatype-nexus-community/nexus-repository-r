@@ -18,4 +18,14 @@
 
 ## Content
 
+https://cran.r-project.org/
+
+For a quick test of proxy:
+
+```
+> install.packages("ggplot2", repos="http://localhost:8081/repository/r-proxy")
+```
+
+TODO: Determine how to set this up in `.Rprofile` (or something else less-repetitive than the above) for end users.
+
 TBD
