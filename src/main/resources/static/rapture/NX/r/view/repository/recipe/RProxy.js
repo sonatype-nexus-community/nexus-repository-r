@@ -10,27 +10,34 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 /*global Ext, NX*/
 
 /**
- * R plugin strings.
+ * Repository "Settings" form for a R Proxy repository
  */
-Ext.define('NX.r.app.PluginStrings', {
-  '@aggregate_priority': 90,
-
-  singleton: true,
+Ext.define('NX.r.view.repository.recipe.RProxy', {
+  extend: 'NX.coreui.view.repository.RepositorySettingsForm',
+  alias: 'widget.nx-coreui-repository-r-proxy',
   requires: [
-    'NX.I18n'
+    'NX.coreui.view.repository.facet.ProxyFacet',
+    'NX.coreui.view.repository.facet.StorageFacet',
+    'NX.coreui.view.repository.facet.HttpClientFacet',
+    'NX.coreui.view.repository.facet.NegativeCacheFacet'
   ],
 
-  keys: {
-    Repository_Facet_RFacet_Title: 'R Settings',
-    SearchR_Group: 'R Repositories',
-    SearchR_License_FieldLabel: 'License',
-    SearchR_Text: 'R',
-    SearchR_Description: 'Search for components in R repositories',
+  /**
+   * @override
+   */
+  initComponent: function () {
+    var me = this;
+
+    me.items = [
+      {xtype: 'nx-coreui-repository-proxy-facet'},
+      {xtype: 'nx-coreui-repository-storage-facet'},
+      {xtype: 'nx-coreui-repository-negativecache-facet'},
+      {xtype: 'nx-coreui-repository-httpclient-facet'}
+    ];
+
+    me.callParent();
   }
-}, function(self) {
-  NX.I18n.register(self);
 });
