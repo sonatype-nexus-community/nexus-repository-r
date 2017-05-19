@@ -16,23 +16,29 @@
 
 [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-## Content
+# Table Of Contents
+* [Developing](#developing)
+* [Using R with Nexus Repository Manger 3](#using-r-with-nexus-repository-manager-3)
+* [Installing the plugin](#installing-the-plugin)
+   * [Temporary Install](#temporary-install)
+   * [(more) Permanent Install](#more-permanent-install)
+   * [(most) Permament Install](#most-permanent-install)
+* [The Fine Print](#the-fine-print)
+* [Getting Help](#getting-help)
 
-https://cran.r-project.org/
+## Developing
 
-For a quick test of proxy:
+TBD
 
-```
-> install.packages("ggplot2", repos="http://localhost:8081/repository/r-proxy")
-```
+## Using R With Nexus Repository Manager 3
 
-TODO: Determine how to set this up in `.Rprofile` (or something else less-repetitive than the above) for end users.
+[We have detailed instructions on how to get started here!](docs/R_USER_DOCUMENTATION.md)
 
-### Installing the plugin
+## Installing the plugin
 
 There are a range of options for installing the R plugin, some options are shown below:
 
-#### Temporary Install
+### Temporary Install
 
 Installations done via the Karaf console will be wiped out with every restart of Nexus Repository. This is a
 good installation path if you are just testing or doing development on the plugin.
@@ -49,12 +55,12 @@ good installation path if you are just testing or doing development on the plugi
   > bundle:install file:///tmp/nexus-repository-r-1.0.0.jar
   > bundle:list
   ```
-  (look for org.sonatype:nexus-repository-r ID, should be the last one)
+  (look for org.sonatype.nexus.plugins:nexus-repository-r ID, should be the last one)
   ```
   > bundle:start <org.sonatype.nexus.plugins:nexus-repository-r ID>
   ```
 
-#### (more) Permanent Install
+### (more) Permanent Install
 
 For more permanent installs of the nexus-repository-r plugin, follow these instructions:
 
@@ -64,11 +70,11 @@ This will cause the plugin to be loaded with each restart of Nexus Repository. A
 by Nexus Repository and the plugin should load within 60 seconds of being copied there if Nexus Repository
 is running. You will still need to start the bundle using the karaf commands mentioned in the temporary install.
 
-#### (most) Permanent Install
+### (most) Permanent Install
 
 If you are trying to use the R plugin permanently, it likely makes more sense to do the following:
 
-* Copy the bundle into `<nexus_dir>/org/sonatype/nexus-repository-r/1.0.0/nexus-repository-r-1.0.0.jar`
+* Copy the bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.0.0/nexus-repository-r-1.0.0.jar`
 * Make the following additions marked with + to `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
    ```
          <feature prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
@@ -78,9 +84,9 @@ If you are trying to use the R plugin permanently, it likely makes more sense to
    ```
    And
    ```
-   + <feature name="nexus-repository-r" description="org.sonatype:nexus-repository-r" version="1.0.0">
-   +     <details>org.sonatype:nexus-repository-r</details>
-   +     <bundle>mvn:org.sonatype/nexus-repository-r/1.0.0</bundle>
+   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.0.0">
+   +     <details>org.sonatype.nexus.plugins:nexus-repository-r</details>
+   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.0.0</bundle>
    + </feature>
     </features>
    ```
