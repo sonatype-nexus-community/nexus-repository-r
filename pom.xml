@@ -29,6 +29,7 @@
   <packaging>bundle</packaging>
 
   <dependencies>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
@@ -42,9 +43,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rapture</artifactId>
-      <scope>provided</scope>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
     </dependency>
 
     <dependency>
@@ -54,8 +54,15 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
+      <groupId>org.spockframework</groupId>
+      <artifactId>spock-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rapture</artifactId>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
@@ -66,7 +73,7 @@
         <groupId>org.sonatype.nexus.buildsupport</groupId>
         <artifactId>extjs-maven-plugin</artifactId>
         <configuration>
-          <namespace>NX.cpanui</namespace>
+          <namespace>NX.r</namespace>
         </configuration>
       </plugin>
 
