@@ -40,7 +40,7 @@ Also, there is a good amount of information available at [Bundle Development](ht
 
 ### Building
 
-To build the project and generate the template assembly use Maven
+To build the project and generate the bundle use Maven
 
     mvn clean install
 
