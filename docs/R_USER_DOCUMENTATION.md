@@ -20,7 +20,7 @@ a hosted repository.
 
 ### Proxying R Repositories
 
-You can set up a R proxy repository to access a remote repository location, for example the official R
+You can set up an R proxy repository to access a remote repository location, for example the official R
 registry at [https://cran.r-project.org/](https://cran.r-project.org/) that is configured as the default in R.
 
 To proxy a R repository, you simply create a new 'r (proxy)' as documented in [admin repositories](http://books.sonatype.com/nexus-book/reference3/admin.html#admin-repositories) in
