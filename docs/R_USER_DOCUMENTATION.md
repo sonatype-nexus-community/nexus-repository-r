@@ -2,7 +2,7 @@
 
 ### Introduction
 
-[R](https://www.r-project.org/) is a language used for statistical analysis and many machine learning uses.
+[R](https://www.r-project.org/) is a language used for statistical analysis and machine learning.
 R and R Studio both allow you to install packages from repositories, allowing convenient access to a large amount of
 packages from the remote Comprehensive R Archive Network (CRAN). This reduces the complexity of their development
 efforts and improves the resulting applications.
