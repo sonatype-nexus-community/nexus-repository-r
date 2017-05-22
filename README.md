@@ -18,6 +18,8 @@
 
 # Table Of Contents
 * [Developing](#developing)
+   * [Requirements](#requirements)
+   * [Building](#building)
 * [Using R with Nexus Repository Manger 3](#using-r-with-nexus-repository-manager-3)
 * [Installing the plugin](#installing-the-plugin)
    * [Temporary Install](#temporary-install)
@@ -28,7 +30,21 @@
 
 ## Developing
 
-TBD
+### Requirements
+
+* [Apache Maven 3.3.3+](https://maven.apache.org/install.html)
+* [Java 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* Network access to https://repository.sonatype.org/content/groups/sonatype-public-grid
+
+Also, there is a good amount of information available at [Bundle Development](https://books.sonatype.com/nexus-book/reference3/bundle-development.html#bundle-development-overview)
+
+### Building
+
+To build the project and generate the bundle use Maven
+
+    mvn clean install
+
+If everything checks out, the bundle for R should be available in the `target` folder
 
 ## Using R With Nexus Repository Manager 3
 
@@ -36,7 +52,8 @@ TBD
 
 ## Installing the plugin
 
-There are a range of options for installing the R plugin, some options are shown below:
+There are a range of options for installing the R plugin. You'll need to build it first, and
+then install the plugin with the options shown below:
 
 ### Temporary Install
 
