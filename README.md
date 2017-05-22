@@ -32,7 +32,7 @@
 
 ### Requirements
 
-* Apache Maven 3.3.3+
+* [Apache Maven 3.3.3+](https://maven.apache.org/install.html)
 * Java 8+
 * Network access to https://repository.sonatype.org/content/groups/sonatype-public-grid
 
