@@ -10,26 +10,44 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 /*global Ext, NX*/
 
 /**
- * R plugin strings.
+ * R repository search contribution.
  */
-Ext.define('NX.r.app.PluginStrings', {
-  '@aggregate_priority': 90,
-
-  singleton: true,
+Ext.define('NX.r.controller.SearchR', {
+  extend: 'NX.app.Controller',
   requires: [
     'NX.I18n'
   ],
 
-  keys: {
-    SearchR_Group: 'R Repositories',
-    SearchR_License_FieldLabel: 'License',
-    SearchR_Text: 'R',
-    SearchR_Description: 'Search for components in R repositories',
+  /**
+   * @override
+   */
+  init: function() {
+    var me = this,
+        search = me.getController('NX.coreui.controller.Search');
+
+    search.registerCriteria([
+      {
+        id: 'assets.attributes.r.license',
+        group: NX.I18n.get('SearchR_Group'),
+        config: {
+          fieldLabel: NX.I18n.get('SearchR_License_FieldLabel'),
+          width: 250
+        }
+      }], me);
+
+    search.registerFilter({
+      id: 'r',
+      name: 'r',
+      text: NX.I18n.get('SearchR_Text'),
+      description: NX.I18n.get('SearchR_Description'),
+      readOnly: true,
+      criterias: [
+        { id: 'format', value: 'r', hidden: true },
+        { id: 'assets.attributes.r.license' }
+      ]
+    }, me);
   }
-}, function(self) {
-  NX.I18n.register(self);
 });
