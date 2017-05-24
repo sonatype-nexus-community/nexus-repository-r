@@ -16,5 +16,14 @@ Ext.define('NX.r.app.PluginConfig', {
   requires: [
     'NX.r.app.PluginStrings',
     'NX.r.util.RRepositoryUrls'
+  ],
+
+  controllers: [
+    {
+      id: 'NX.r.controller.SearchR',
+      active: function () {
+        return NX.app.Application.bundleActive('com.sonatype.nexus.plugins.nexus-repository-r');
+      }
+    }
   ]
 });
