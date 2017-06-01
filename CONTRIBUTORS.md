@@ -22,6 +22,7 @@ Sonatype internal people:
 * [@joedragons](https://github.com/joedragons/) (Joe Tom)
 * [@peterlynch](https://github.com/peterlynch/) (Peter Lynch)
 * [@mhansen-sonatype](https://github.com/mhansen-sonatype/) (Mike Hansen)
+* [@kellyrob99](https://github.com/kellyrob99/) (Kelly Robinson)
 * [@DarthHater](https://github.com/darthhater/) (Jeffry Hesse)
 
 External contributors:
