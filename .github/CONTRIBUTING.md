@@ -16,7 +16,7 @@
 
 ### Are you submitting a pull request?
 
-* Use (our codestyle)[https://github.com/sonatype/codestyle]. If we get a PR that doesn't match it, there will be
+* Use [our codestyle](https://github.com/sonatype/codestyle). If we get a PR that doesn't match it, there will be
 much shaming throughout the land. If you use an editor besides Eclipse or IntelliJ, adapt the codestyle and submit a PR
 there :)
 * Fill out a CLA for us, so we can sort out all the legal parts of contributing. You can get all the information for
