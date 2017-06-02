@@ -30,6 +30,11 @@
 
 ## Developing
 
+### Contribution Guidelines
+
+Go read [our contribution guidelines](/.github/CONTRIBUTING.md) to get a bit more familiar with how
+we would like things to flow.
+
 ### Requirements
 
 * [Apache Maven 3.3.3+](https://maven.apache.org/install.html)
