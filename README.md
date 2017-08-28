@@ -100,9 +100,9 @@ If you are trying to use the R plugin permanently, it likely makes more sense to
 * If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
 * If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
    ```
-         <feature prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
-   +     <feature prerequisite="false" dependency="false">nexus-repository-r</feature>
-         <feature prerequisite="false" dependency="false">nexus-repository-gitlfs</feature>
+         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
+   +     <feature version="1.0.0" prerequisite="false" dependency="false">nexus-repository-r</feature>
+         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-yum</feature>
      </feature>
    ```
    And
