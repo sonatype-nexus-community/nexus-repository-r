@@ -37,7 +37,7 @@ a hosted repository.
 You can set up an R proxy repository to access a remote repository location, for example the official R
 registry at [https://cran.r-project.org/](https://cran.r-project.org/) that is configured as the default in R.
 
-To proxy a R repository, you simply create a new 'r (proxy)' as documented in [admin repositories](http://books.sonatype.com/nexus-book/reference3/admin.html#admin-repositories) in
+To proxy a R repository, you simply create a new 'r (proxy)' as documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Configuration#Configuration-RepositoryManagement) in
 details. Minimal configuration steps are:
 
 - Define 'Name'
@@ -50,7 +50,7 @@ Creating a R hosted repository allows you to register packages in the repository
 repository acts as an authoritative location for these components.
 
 To add a hosted R repository, create a new repository with the recipe 'r (hosted)' as
-documented in [admin repositories](http://books.sonatype.com/nexus-book/reference3/admin.html#admin-repositories).
+documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Configuration#Configuration-RepositoryManagement).
 
 Minimal configuration steps are:
 
@@ -63,7 +63,7 @@ A repository group is the recommended way to expose all your R repositories from
 your users, with minimal additional client side configuration. A repository group allows you to expose the
 aggregated content of multiple proxy and hosted repositories as well as other repository groups with one URL in
 tool configuration. This is possible for R repositories by creating a new repository with the 'r (group)'
-recipe as documented in [admin repositories](http://books.sonatype.com/nexus-book/reference3/admin.html#admin-repositories).
+recipe as documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Configuration#Configuration-RepositoryManagement).
 
 Minimal configuration steps are:
 
@@ -104,7 +104,7 @@ inspected in the user interface.
 ### Browsing R Repositories and Searching Packages
 
 You can browse R repositories in the user interface inspecting the components and assets and their details, as
-described in [search-components](http://books.sonatype.com/nexus-book/reference3/using.html#search-components).
+described in [Search for Components](https://help.sonatype.com/display/NXRM3/User+Interface#UserInterface-SearchingforComponents).
 
 Searching for R packages can be performed in the user interface, too. It finds all packages that are currently
 stored in the repository manager, either because they have been pushed to a hosted repository or they have been
@@ -120,7 +120,6 @@ Authentication is managed in the same manner as for proxying with anonymous acce
 [r-download](#configuring-r-package-download).
 
 With this configuration you can run a command such as
-
 
 `curl -v --user 'user:pass' --upload-file example_1.0.0.tar.gz http://localhost:8081/repository/r-hosted/src/contrib/example_1.0.0.tar.gz`
 
