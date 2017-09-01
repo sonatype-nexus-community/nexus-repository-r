@@ -41,7 +41,7 @@ we would like things to flow.
 * [Java 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * Network access to https://repository.sonatype.org/content/groups/sonatype-public-grid
 
-Also, there is a good amount of information available at [Bundle Development](https://books.sonatype.com/nexus-book/reference3/bundle-development.html#bundle-development-overview)
+Also, there is a good amount of information available at [Bundle Development](https://help.sonatype.com/display/NXRM3/Bundle+Development#BundleDevelopment-BundleDevelopmentOverview)
 
 ### Building
 
@@ -67,7 +67,7 @@ good installation path if you are just testing or doing development on the plugi
 
 * Enable Nexus console: edit `<nexus_dir>/bin/nexus.vmoptions` and change `karaf.startLocalConsole`  to `true`.
 
-  More details here: http://books.sonatype.com/nexus-book/reference3/bundle-development.html
+  More details here: https://help.sonatype.com/display/NXRM3/Bundle+Development#BundleDevelopment-InstallingBundles
 
 * Run Nexus' console:
   ```
