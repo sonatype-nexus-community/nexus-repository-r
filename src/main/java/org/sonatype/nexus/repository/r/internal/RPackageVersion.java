@@ -20,13 +20,11 @@ import se.sawano.java.text.AlphanumericComparator;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Class representing a single valid R package version that can be compared to other versions. Specifically this class
- * is intended to be used to compare R version strings when merging group metadata.
+ * Class representing a single valid R package version that can be compared to other versions. Version formats
+ * explicitly supported/tested are those that include digits separated by dots or dashes, but this is not internally
+ * enforced (and using other version schemes will result in undefined behavior).
  *
- * Version formats explicitly supported/tested are those that include digits separated by dots or dashes per the R
- * documentation that is publicly available on the matter, but this is not internally enforced (and using other version
- * schemes will result in undefined behavior). Refer to R's {@code package_version} and {@code utils::compareVersions}
- * functions for implementation details.
+ * Refer to R's {@code package_version} and {@code utils::compareVersions} functions for implementation details.
  */
 public class RPackageVersion
     implements Comparable<RPackageVersion>
