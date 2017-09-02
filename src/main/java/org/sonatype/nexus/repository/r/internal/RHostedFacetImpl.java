@@ -17,10 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.inject.Named;
 import javax.mail.internet.InternetHeaders;
@@ -75,35 +73,35 @@ public class RHostedFacetImpl
   public Content getPackages(final String packagesPath) {
     checkNotNull(packagesPath);
     try {
+      // TODO: Do NOT do this on each request as there is at least some overhead, and memory usage is proportional to
+      // the number of packages contained in a particular path. We should be able to generate this when something has
+      // changed or via a scheduled task using an approach similar to the Yum implementation rather than this method.
       StorageTx tx = UnitOfWork.currentTx();
-      String base = basePath(packagesPath);
-      Set<String> packages = new HashSet<>();
+      RPackagesBuilder packagesBuilder = new RPackagesBuilder(packagesPath);
+      for (Asset asset : tx.browseAssets(tx.findBucket(getRepository()))) {
+        packagesBuilder.append(asset);
+      }
       CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       try (CompressorOutputStream cos = compressorStreamFactory.createCompressorOutputStream(GZIP, os)) {
         try (OutputStreamWriter writer = new OutputStreamWriter(cos, UTF_8)) {
-          // TODO: Come up with a more efficient way than walking all assets (or perhaps just build the files once)
-          for (Asset asset : tx.browseAssets(tx.findBucket(getRepository()))) {
-            // Only include assets that would appear in this particular "directory"
-            String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
-            if (base.equals(basePath(asset.name())) && !packages.contains(packageName)) {
-              InternetHeaders headers = new InternetHeaders();
-              headers.addHeader(P_PACKAGE, asset.formatAttributes().get(P_PACKAGE, String.class));
-              headers.addHeader(P_VERSION, asset.formatAttributes().get(P_VERSION, String.class));
-              headers.addHeader(P_DEPENDS, asset.formatAttributes().get(P_DEPENDS, String.class));
-              headers.addHeader(P_IMPORTS, asset.formatAttributes().get(P_IMPORTS, String.class));
-              headers.addHeader(P_SUGGESTS, asset.formatAttributes().get(P_SUGGESTS, String.class));
-              headers.addHeader(P_LICENSE, asset.formatAttributes().get(P_LICENSE, String.class));
-              headers.addHeader(P_NEEDS_COMPILATION, asset.formatAttributes().get(P_NEEDS_COMPILATION, String.class));
-              Enumeration<String> headerLines = headers.getAllHeaderLines();
-              while (headerLines.hasMoreElements()) {
-                String line = headerLines.nextElement();
-                writer.write(line, 0, line.length());
-                writer.write('\n');
-              }
+          for (Entry<String, Map<String, String>> eachPackage : packagesBuilder.getPackageInformation().entrySet()) {
+            Map<String, String> packageInfo = eachPackage.getValue();
+            InternetHeaders headers = new InternetHeaders();
+            headers.addHeader(P_PACKAGE, packageInfo.get(P_PACKAGE));
+            headers.addHeader(P_VERSION, packageInfo.get(P_VERSION));
+            headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
+            headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
+            headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
+            headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
+            headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
+            Enumeration<String> headerLines = headers.getAllHeaderLines();
+            while (headerLines.hasMoreElements()) {
+              String line = headerLines.nextElement();
+              writer.write(line, 0, line.length());
               writer.write('\n');
-              packages.add(packageName);
             }
+            writer.write('\n');
           }
         }
       }
@@ -178,9 +176,5 @@ public class RHostedFacetImpl
     }
 
     saveAsset(tx, asset, archiveContent, payload);
-  }
-
-  private String basePath(final String path) {
-    return path.substring(0, path.lastIndexOf('/'));
   }
 }
