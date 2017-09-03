@@ -70,13 +70,12 @@ public class RPackagesBuilder
    * @param asset The asset to process.
    */
   public void append(final Asset asset) {
-    String base = basePath(packagesPath);
-    String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
-
     // is this asset at this particular path?
+    String base = basePath(packagesPath);
     if (base.equals(basePath(asset.name()))) {
 
-      // have we seen a greater version of this already?
+      // is this a newer (or equal) version of this asset's package than the one we currently have?
+      String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
       RPackageVersion newVersion = new RPackageVersion(asset.formatAttributes().get(P_VERSION, String.class));
       RPackageVersion oldVersion = packageVersions.getOrDefault(packageName, newVersion);
       if (newVersion.compareTo(oldVersion) >= 0) {
