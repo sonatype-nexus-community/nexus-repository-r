@@ -74,11 +74,11 @@ public class RPackagesBuilder
     String base = basePath(packagesPath);
     if (base.equals(basePath(asset.name()))) {
 
-      // is this a newer (or equal) version of this asset's package than the one we currently have?
+      // is this a newer version of this asset's package than the one we currently have (if we have one)?
       String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
+      RPackageVersion oldVersion = packageVersions.get(packageName);
       RPackageVersion newVersion = new RPackageVersion(asset.formatAttributes().get(P_VERSION, String.class));
-      RPackageVersion oldVersion = packageVersions.getOrDefault(packageName, newVersion);
-      if (newVersion.compareTo(oldVersion) >= 0) {
+      if (oldVersion == null || newVersion.compareTo(oldVersion) > 0) {
 
         // if so, use the most recent information instead and update the greatest version encountered
         Map<String, String> newInformation = new HashMap<>();
