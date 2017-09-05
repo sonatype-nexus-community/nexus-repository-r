@@ -113,7 +113,7 @@ abstract class RRecipeSupport
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
-            new TokenMatcher('/{path:.+}/PACKAGES.gz')
+            new TokenMatcher('/{path:.+}/PACKAGES{extension:.*}')
         ))
   }
 
