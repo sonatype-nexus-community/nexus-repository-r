@@ -13,6 +13,7 @@
 package org.sonatype.nexus.repository.r.internal;
 
 import org.sonatype.goodies.testsupport.TestSupport;
+import org.sonatype.nexus.common.collect.NestedAttributesMap;
 import org.sonatype.nexus.common.event.EventManager;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
@@ -33,6 +34,9 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 public class RHostedPackagesBuilderFacetImplTest
     extends TestSupport
@@ -73,6 +77,9 @@ public class RHostedPackagesBuilderFacetImplTest
   Asset asset;
 
   @Mock
+  NestedAttributesMap formatAttributes;
+
+  @Mock
   TempBlob tempBlob;
 
   @Mock
@@ -85,7 +92,10 @@ public class RHostedPackagesBuilderFacetImplTest
     when(repository.getName()).thenReturn(REPOSITORY_NAME);
     when(repository.facet(RHostedFacet.class)).thenReturn(hostedFacet);
     when(repository.facet(StorageFacet.class)).thenReturn(storageFacet);
+
     when(storageFacet.txSupplier()).thenReturn(() -> storageTx);
+
+    when(asset.formatAttributes()).thenReturn(formatAttributes);
 
     underTest = new RHostedPackagesBuilderFacetImpl(eventManager, 1L);
     underTest.attach(repository);
@@ -97,6 +107,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetDeletedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetDeletedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetDeletedEvent);
 
@@ -114,6 +125,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetDeletedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetDeletedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetDeletedEvent);
 
@@ -126,6 +138,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetDeletedEvent.getRepositoryName()).thenReturn("foo");
     when(assetDeletedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetDeletedEvent);
 
@@ -138,6 +151,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetDeletedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetDeletedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(PACKAGES_GZ_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(PACKAGES.name());
 
     underTest.on(assetDeletedEvent);
 
@@ -150,6 +164,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetCreatedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetCreatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetCreatedEvent);
 
@@ -167,6 +182,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetCreatedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetCreatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetCreatedEvent);
 
@@ -179,6 +195,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetCreatedEvent.getRepositoryName()).thenReturn("foo");
     when(assetCreatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetCreatedEvent);
 
@@ -191,6 +208,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetCreatedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetCreatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(PACKAGES_GZ_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(PACKAGES.name());
 
     underTest.on(assetCreatedEvent);
 
@@ -203,6 +221,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetUpdatedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetUpdatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetUpdatedEvent);
 
@@ -220,6 +239,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetUpdatedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetUpdatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetUpdatedEvent);
 
@@ -232,6 +252,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetUpdatedEvent.getRepositoryName()).thenReturn("foo");
     when(assetUpdatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(ASSET_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
 
     underTest.on(assetUpdatedEvent);
 
@@ -244,6 +265,7 @@ public class RHostedPackagesBuilderFacetImplTest
     when(assetUpdatedEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
     when(assetUpdatedEvent.getAsset()).thenReturn(asset);
     when(asset.name()).thenReturn(PACKAGES_GZ_PATH);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(PACKAGES.name());
 
     underTest.on(assetUpdatedEvent);
 
