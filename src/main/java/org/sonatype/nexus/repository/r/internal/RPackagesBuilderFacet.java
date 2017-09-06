@@ -25,5 +25,5 @@ public interface RPackagesBuilderFacet
    *
    * @param basePath The base path of the PACKAGES.gz file to invalidate.
    */
-  void invalidateMetadata(final String basePath);
+  void invalidateMetadata(String basePath);
 }
