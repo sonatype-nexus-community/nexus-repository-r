@@ -38,6 +38,8 @@ import com.google.common.collect.ImmutableList;
 
 import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
@@ -135,5 +137,14 @@ public final class RFacetUtils
     asset.markAsDownloaded();
     tx.saveAsset(asset);
     return toContent(asset, assetBlob.getBlob());
+  }
+
+  /**
+   * Returns whether or not this asset is of the ARCHIVE asset kind.
+   *
+   * @return true if ARCHIVE, otherwise false
+   */
+  static boolean isArchiveAssetKind(final Asset asset) {
+    return ARCHIVE.name().equals(asset.formatAttributes().get(P_ASSET_KIND, String.class));
   }
 }

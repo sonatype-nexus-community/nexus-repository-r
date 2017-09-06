@@ -132,13 +132,14 @@ public class RHostedFacetImpl
   }
 
   @Override
+  @TransactionalTouchMetadata
   public TempBlob buildMetadata(final String path) throws IOException {
     checkNotNull(path);
     try {
       // TODO: Change this to use a temp file or other alternative mechanism (at least until the blob store functions
       // are expanded to allow us to create a blob by writing into an output stream as well).
       StorageTx tx = UnitOfWork.currentTx();
-      RPackagesBuilder packagesBuilder = new RPackagesBuilder(path + "PACKAGES.gz");
+      RPackagesBuilder packagesBuilder = new RPackagesBuilder(path);
       for (Asset asset : tx.browseAssets(tx.findBucket(getRepository()))) {
         packagesBuilder.append(asset);
       }
