@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import org.sonatype.nexus.repository.Facet;
+
 /**
  * Facet implementing behavior for generating R PACKAGES metadata (not the actual R packages themselves). A typical
  * implementation will listen for changes to a repo and then rebuild the associated metadata.
  *
  * TODO: Update this to support other PACKAGES files (not just PACKAGES.gz) when this work is done across the project.
  */
+@Facet.Exposed
 public interface RPackagesBuilderFacet
 {
   /**

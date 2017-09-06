@@ -45,7 +45,6 @@ import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_K
  * to batch metadata updates.
  */
 @Named("hosted")
-@Facet.Exposed
 public class RHostedPackagesBuilderFacetImpl
     extends FacetSupport
     implements RPackagesBuilderFacet, Asynchronous
