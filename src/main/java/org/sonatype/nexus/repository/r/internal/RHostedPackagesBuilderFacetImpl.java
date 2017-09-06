@@ -28,7 +28,6 @@ import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.TempBlob;
-import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
