@@ -47,6 +47,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -137,6 +138,25 @@ public class RHostedFacetImpl
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
       doPutArchive(path, tempBlob, payload);
     }
+  }
+
+  @Override
+  @TransactionalStoreBlob
+  public void putPackages(final String path, final TempBlob content) throws IOException {
+    checkNotNull(path);
+    checkNotNull(content);
+
+    StorageTx tx = UnitOfWork.currentTx();
+    Bucket bucket = tx.findBucket(getRepository());
+
+    Asset asset = findAsset(tx, bucket, path);
+    if (asset == null) {
+      asset = tx.createAsset(bucket, getRepository().getFormat());
+      asset.name(path);
+      asset.formatAttributes().set(P_ASSET_KIND, PACKAGES.name());
+    }
+
+    saveAsset(tx, asset, content, "", null);
   }
 
   @Override
