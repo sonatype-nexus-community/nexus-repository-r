@@ -21,6 +21,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.event.EventAware.Asynchronous;
 import org.sonatype.nexus.common.event.EventManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
+import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
 import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
@@ -43,7 +44,8 @@ import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_K
  * ensure that we do not have race conditions when processing and rebuilding metadata, and also imposes a waiting period
  * to batch metadata updates.
  */
-@Named
+@Named("hosted")
+@Facet.Exposed
 public class RHostedPackagesBuilderFacetImpl
     extends FacetSupport
     implements RPackagesBuilderFacet, Asynchronous
