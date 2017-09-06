@@ -19,6 +19,9 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
 import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
 import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
+import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.StorageTx;
+import org.sonatype.nexus.repository.storage.TempBlob;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,17 +39,23 @@ public class RHostedPackagesBuilderFacetImplTest
 {
   static final String REPOSITORY_NAME = "repository-name";
 
-  static final String PACKAGES_GZ_PATH = "/some/path/PACKAGES.gz";
+  static final String BASE_PATH = "/some/path/";
 
-  static final String ASSET_PATH = "/some/path/asset.gz";
+  static final String PACKAGES_GZ_PATH = BASE_PATH + "PACKAGES.gz";
 
-  static final String ASSET_BASE_PATH = "/some/path/";
+  static final String ASSET_PATH = BASE_PATH + "asset.gz";
 
   @Mock
   Repository repository;
 
   @Mock
   EventManager eventManager;
+
+  @Mock
+  RHostedFacet hostedFacet;
+
+  @Mock
+  StorageFacet storageFacet;
 
   @Mock
   AssetCreatedEvent assetCreatedEvent;
@@ -58,13 +67,25 @@ public class RHostedPackagesBuilderFacetImplTest
   AssetUpdatedEvent assetUpdatedEvent;
 
   @Mock
+  RMetadataInvalidationEvent invalidationEvent;
+
+  @Mock
   Asset asset;
+
+  @Mock
+  TempBlob tempBlob;
+
+  @Mock
+  StorageTx storageTx;
 
   RHostedPackagesBuilderFacetImpl underTest;
 
   @Before
   public void setUp() throws Exception {
     when(repository.getName()).thenReturn(REPOSITORY_NAME);
+    when(repository.facet(RHostedFacet.class)).thenReturn(hostedFacet);
+    when(repository.facet(StorageFacet.class)).thenReturn(storageFacet);
+    when(storageFacet.txSupplier()).thenReturn(() -> storageTx);
 
     underTest = new RHostedPackagesBuilderFacetImpl(eventManager, 1L);
     underTest.attach(repository);
@@ -84,7 +105,7 @@ public class RHostedPackagesBuilderFacetImplTest
 
     RMetadataInvalidationEvent event = eventCaptor.getValue();
     assertThat(event.getRepositoryName(), is(REPOSITORY_NAME));
-    assertThat(event.getBasePath(), is(ASSET_BASE_PATH));
+    assertThat(event.getBasePath(), is(BASE_PATH));
   }
 
   @Test
@@ -137,7 +158,7 @@ public class RHostedPackagesBuilderFacetImplTest
 
     RMetadataInvalidationEvent event = eventCaptor.getValue();
     assertThat(event.getRepositoryName(), is(REPOSITORY_NAME));
-    assertThat(event.getBasePath(), is(ASSET_BASE_PATH));
+    assertThat(event.getBasePath(), is(BASE_PATH));
   }
 
   @Test
@@ -190,7 +211,7 @@ public class RHostedPackagesBuilderFacetImplTest
 
     RMetadataInvalidationEvent event = eventCaptor.getValue();
     assertThat(event.getRepositoryName(), is(REPOSITORY_NAME));
-    assertThat(event.getBasePath(), is(ASSET_BASE_PATH));
+    assertThat(event.getBasePath(), is(BASE_PATH));
   }
 
   @Test
@@ -227,5 +248,18 @@ public class RHostedPackagesBuilderFacetImplTest
     underTest.on(assetUpdatedEvent);
 
     verifyNoMoreInteractions(eventManager);
+  }
+
+  @Test
+  public void testRebuildMetadataOnEvent() throws Exception {
+    when(invalidationEvent.getBasePath()).thenReturn(BASE_PATH);
+    when(invalidationEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
+
+    when(hostedFacet.buildMetadata(BASE_PATH)).thenReturn(tempBlob);
+
+    underTest.on(invalidationEvent);
+
+    verify(hostedFacet).buildMetadata(BASE_PATH);
+    verify(hostedFacet).putPackages(PACKAGES_GZ_PATH, tempBlob);
   }
 }

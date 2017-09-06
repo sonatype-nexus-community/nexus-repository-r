@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -24,6 +27,7 @@ import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
+import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
@@ -43,6 +47,11 @@ public class RHostedPackagesBuilderFacetImpl
     extends FacetSupport
     implements RPackagesBuilderFacet, Asynchronous
 {
+  /**
+   * The name of the metadata file (PACKAGES.gz) that we generate on invalidation.
+   */
+  private static final String PACKAGES_GZ = "PACKAGES.gz";
+
   /**
    * The event manager to use when posting new events.
    */
@@ -165,9 +174,14 @@ public class RHostedPackagesBuilderFacetImpl
    *
    * @param basePath The base path to rebuild the metadata for.
    */
-  @TransactionalStoreBlob
   protected void rebuildMetadata(final String basePath) {
-    throw new UnsupportedOperationException("Method not implemented");
+    RHostedFacet hostedFacet = getRepository().facet(RHostedFacet.class);
+    try (TempBlob packagesContent = hostedFacet.buildMetadata(basePath)) {
+      hostedFacet.putPackages(basePath + PACKAGES_GZ, packagesContent);
+    }
+    catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   /**
