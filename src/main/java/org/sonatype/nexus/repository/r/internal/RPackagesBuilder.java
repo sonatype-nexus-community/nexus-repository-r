@@ -51,17 +51,17 @@ public class RPackagesBuilder
   private final Map<String, Map<String, String>> packageInformation = new TreeMap<>();
 
   /**
-   * The path to the PACKAGES file that is being generated.
+   * The base path to generate the packages metadata for.
    */
-  private final String packagesPath;
+  private final String basePath;
 
   /**
    * Constructor.
    *
-   * @param packagesPath The path to the PACKAGES file that is being generated.
+   * @param basePath The base path to generate the packages metadata for.
    */
-  public RPackagesBuilder(final String packagesPath) {
-    this.packagesPath = checkNotNull(packagesPath);
+  public RPackagesBuilder(final String basePath) {
+    this.basePath = checkNotNull(basePath);
   }
 
   /**
@@ -71,8 +71,7 @@ public class RPackagesBuilder
    */
   public void append(final Asset asset) {
     // is this asset at this particular path?
-    String base = basePath(packagesPath);
-    if (base.equals(basePath(asset.name()))) {
+    if (basePath.equals(basePath(asset.name())) && RFacetUtils.isArchiveAssetKind(asset)) {
 
       // is this a newer version of this asset's package than the one we currently have (if we have one)?
       String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
@@ -113,6 +112,6 @@ public class RPackagesBuilder
    * @return The base path.
    */
   private String basePath(final String path) {
-    return path.substring(0, path.lastIndexOf('/'));
+    return path.substring(0, path.lastIndexOf('/') + 1);
   }
 }

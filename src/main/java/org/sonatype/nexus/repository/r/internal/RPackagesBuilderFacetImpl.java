@@ -35,8 +35,6 @@ import com.google.common.eventbus.Subscribe;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
-import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
  * Implementation of {@link RPackagesBuilderFacet} targeted for use with hosted repositories. Uses event dispatching to
@@ -197,7 +195,7 @@ public class RPackagesBuilderFacetImpl
   private boolean shouldInvalidate(final AssetEvent assetEvent) {
     return assetEvent.isLocal() &&
         getRepository().getName().equals(assetEvent.getRepositoryName()) &&
-        ARCHIVE.name().equals(assetEvent.getAsset().formatAttributes().get(P_ASSET_KIND, String.class));
+        RFacetUtils.isArchiveAssetKind(assetEvent.getAsset());
   }
 
   /**

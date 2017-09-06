@@ -42,6 +42,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -50,6 +51,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 public class RHostedFacetImplTest
     extends RepositoryFacetTestSupport<RHostedFacetImpl>
@@ -205,6 +207,7 @@ public class RHostedFacetImplTest
 
   @Test
   public void buildMetadata() throws Exception {
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
     when(storageFacet.createTempBlob(any(InputStream.class), eq(RFacetUtils.HASH_ALGORITHMS))).thenAnswer(
         invocation -> {
           InputStream is = (InputStream) invocation.getArguments()[0];
