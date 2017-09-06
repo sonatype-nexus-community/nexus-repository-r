@@ -51,6 +51,14 @@ public interface RHostedFacet
   void upload(String path, Payload payload) throws IOException;
 
   /**
+   * Store a PACKAGES.gz file at a particular path.
+   *
+   * @param path     the upload path
+   * @param content  the temp blob containing the PACKAGES.gz content
+   */
+  void putPackages(String path, TempBlob content) throws IOException;
+
+  /**
    * Build metadata for path.
    *
    * @param path the path to build the metadata for

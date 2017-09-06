@@ -54,6 +54,7 @@ import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extract
 public class RHostedFacetImplTest
     extends RepositoryFacetTestSupport<RHostedFacetImpl>
 {
+  static final String PACKAGES_GZ = "PACKAGES.gz";
 
   static final String PACKAGE_NAME = "package.gz";
 
@@ -64,6 +65,8 @@ public class RHostedFacetImplTest
   static final String PACKAGE_PATH = BASE_PATH + PACKAGE_NAME;
 
   static final String REAL_PACKAGE_PATH = BASE_PATH + REAL_PACKAGE;
+
+  static final String PACKAGES_GZ_PATH = BASE_PATH + PACKAGES_GZ;
 
   static final String VERSION = "1.0.0";
 
@@ -209,5 +212,26 @@ public class RHostedFacetImplTest
         assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
       }
     }
+  }
+
+  @Test
+  public void putPackages() throws Exception {
+    List<Component> list = ImmutableList.of(component);
+    when(tempBlob.get()).thenReturn(getClass().getResourceAsStream(PACKAGES_GZ));
+    when(asset.name()).thenReturn(PACKAGES_GZ_PATH);
+    when(assetBlob.getBlob())
+        .thenReturn(blob);
+    doReturn(assetBlob)
+        .when(storageTx).setBlob(any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        anyBoolean());
+    when(storageTx.findComponents(any(), any()))
+        .thenReturn(list);
+    underTest.putPackages(PACKAGES_GZ_PATH, tempBlob);
+    verify(storageTx).saveAsset(asset);
   }
 }
