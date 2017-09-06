@@ -54,6 +54,8 @@ import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extract
 public class RHostedFacetImplTest
     extends RepositoryFacetTestSupport<RHostedFacetImpl>
 {
+  static final String PACKAGES_GZ_CONTENT_TYPE = "application/x-gzip";
+
   static final String PACKAGES_GZ = "PACKAGES.gz";
 
   static final String PACKAGE_NAME = "package.gz";
@@ -109,32 +111,43 @@ public class RHostedFacetImplTest
     when(asset.name()).thenReturn(PACKAGE_PATH);
   }
 
-
   @Test
   public void getPackagesReturnsPackage() throws Exception {
-    assets.add(asset);
-    Content packages = underTest.getPackages(PACKAGE_PATH);
-    try (InputStream in = packages.openInputStream()) {
-      Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
-      assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
-      assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
-      assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
-      assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
-      assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
-      assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
-      assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
-    }
+    Content archive = underTest.getArchive(PACKAGES_GZ_PATH);
+    assertThat(archive, is(notNullValue()));
   }
 
   @Test
   public void getPackagesReturnsCorrectContentType() throws Exception {
+    when(asset.requireContentType()).thenReturn(PACKAGES_GZ_CONTENT_TYPE);
     Content packages = underTest.getPackages(PACKAGE_PATH);
-    assertThat(packages.getContentType(), is(equalTo("application/x-gzip")));
+    assertThat(packages.getContentType(), is(equalTo(PACKAGES_GZ_CONTENT_TYPE)));
   }
 
   @Test(expected = NullPointerException.class)
   public void failFastOnGetPackagesWithNull() throws Exception {
     underTest.getPackages(null);
+  }
+
+  @Test
+  public void nullWhenAssetNullOnGetPackages() throws Exception {
+    when(storageTx.findAssetWithProperty(anyString(), anyString(), any(Bucket.class))).thenReturn(null);
+    Content archive = underTest.getArchive(PACKAGES_GZ_PATH);
+    assertThat(archive, is(nullValue()));
+  }
+
+  @Test
+  public void markAssetAsDownloadedAndSaveOnGetPackages() throws Exception {
+    when(asset.markAsDownloaded()).thenReturn(true);
+    underTest.getPackages(PACKAGES_GZ_PATH);
+    verify(storageTx).saveAsset(asset);
+  }
+
+  @Test
+  public void doNotSaveAssetWhenPackagesNotMarkedAsDownloaded() throws Exception {
+    when(asset.markAsDownloaded()).thenReturn(false);
+    underTest.getPackages(PACKAGES_GZ_PATH);
+    verify(storageTx, never()).saveAsset(asset);
   }
 
   @Test
@@ -163,7 +176,7 @@ public class RHostedFacetImplTest
   }
 
   @Test
-  public void doNotSaveWhenNotMarkedAsDownloaded() throws Exception {
+  public void doNotSaveAssetWhenArchiveNotMarkedAsDownloaded() throws Exception {
     when(asset.markAsDownloaded()).thenReturn(false);
     underTest.getArchive(PACKAGE_PATH);
     verify(storageTx, never()).saveAsset(asset);
