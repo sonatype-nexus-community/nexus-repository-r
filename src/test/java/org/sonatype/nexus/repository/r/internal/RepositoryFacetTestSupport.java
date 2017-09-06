@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
+import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
@@ -47,6 +48,9 @@ public abstract class RepositoryFacetTestSupport<T extends Facet>
 
   @Mock
   Repository repository;
+
+  @Mock
+  StorageFacet storageFacet;
 
   @Mock
   Asset asset;
@@ -77,6 +81,7 @@ public abstract class RepositoryFacetTestSupport<T extends Facet>
     when(attributes.get("cache_token", String.class)).thenReturn("test");
     when(attributes.child("content")).thenReturn(attributes);
     when(attributes.child("cache")).thenReturn(attributes);
+    when(repository.facet(StorageFacet.class)).thenReturn(storageFacet);
     underTest = initialiseSystemUnderTest();
     underTest.attach(repository);
   }

@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.ByteStreams;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -35,6 +37,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -182,5 +185,29 @@ public class RHostedFacetImplTest
         .thenReturn(list);
     underTest.doPutArchive(REAL_PACKAGE_PATH, tempBlob, payload);
     verify(storageTx).saveAsset(asset);
+  }
+
+  @Test
+  public void buildMetadata() throws Exception {
+    when(storageFacet.createTempBlob(any(InputStream.class), eq(RFacetUtils.HASH_ALGORITHMS))).thenAnswer(
+        invocation -> {
+          InputStream is = (InputStream) invocation.getArguments()[0];
+          byte[] content = ByteStreams.toByteArray(is);
+          when(tempBlob.get()).thenAnswer(i -> new ByteArrayInputStream(content));
+          return tempBlob;
+        });
+    assets.add(asset);
+    try (TempBlob metadataTempBlob = underTest.buildMetadata(BASE_PATH)) {
+      try (InputStream in = metadataTempBlob.get()) {
+        Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
+        assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
+        assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
+        assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
+        assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
+        assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
+        assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
+        assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
+      }
+    }
   }
 }
