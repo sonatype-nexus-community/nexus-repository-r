@@ -38,7 +38,7 @@ import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
-public class RHostedPackagesBuilderFacetImplTest
+public class RPackagesBuilderFacetImplTest
     extends TestSupport
 {
   static final String REPOSITORY_NAME = "repository-name";
@@ -85,7 +85,7 @@ public class RHostedPackagesBuilderFacetImplTest
   @Mock
   StorageTx storageTx;
 
-  RHostedPackagesBuilderFacetImpl underTest;
+  RPackagesBuilderFacetImpl underTest;
 
   @Before
   public void setUp() throws Exception {
@@ -97,7 +97,7 @@ public class RHostedPackagesBuilderFacetImplTest
 
     when(asset.formatAttributes()).thenReturn(formatAttributes);
 
-    underTest = new RHostedPackagesBuilderFacetImpl(eventManager, 1L);
+    underTest = new RPackagesBuilderFacetImpl(eventManager, 1L);
     underTest.attach(repository);
   }
 

@@ -21,7 +21,6 @@ import javax.inject.Named;
 import org.sonatype.nexus.common.event.EventAware.Asynchronous;
 import org.sonatype.nexus.common.event.EventManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
-import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
 import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
@@ -44,8 +43,8 @@ import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_K
  * ensure that we do not have race conditions when processing and rebuilding metadata, and also imposes a waiting period
  * to batch metadata updates.
  */
-@Named("hosted")
-public class RHostedPackagesBuilderFacetImpl
+@Named
+public class RPackagesBuilderFacetImpl
     extends FacetSupport
     implements RPackagesBuilderFacet, Asynchronous
 {
@@ -76,8 +75,8 @@ public class RHostedPackagesBuilderFacetImpl
    * @param interval The interval in milliseconds to wait between rebuilds.
    */
   @Inject
-  public RHostedPackagesBuilderFacetImpl(final EventManager eventManager,
-                                         @Named("${nexus.r.packagesBuilder.interval:-60000}") final long interval)
+  public RPackagesBuilderFacetImpl(final EventManager eventManager,
+                                   @Named("${nexus.r.packagesBuilder.interval:-60000}") final long interval)
   {
     this.eventManager = checkNotNull(eventManager);
     this.interval = interval;
