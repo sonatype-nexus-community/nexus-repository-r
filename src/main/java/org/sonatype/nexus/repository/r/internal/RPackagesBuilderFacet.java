@@ -22,6 +22,7 @@ import org.sonatype.nexus.repository.Facet;
  */
 @Facet.Exposed
 public interface RPackagesBuilderFacet
+    extends Facet
 {
   /**
    * Invalidates the metadata for this particular repository's PACKAGES.gz file at the specified path.

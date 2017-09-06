@@ -46,7 +46,6 @@ class RHostedRecipe
   Provider<RHostedFacet> hostedFacet
 
   @Inject
-  @Named("hosted")
   Provider<RPackagesBuilderFacet> packagesBuilderFacet
 
   @Inject
