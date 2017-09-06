@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -135,6 +136,51 @@ public class RHostedFacetImpl
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
       doPutArchive(path, tempBlob, payload);
+    }
+  }
+
+  @Override
+  public TempBlob buildMetadata(final String path) throws IOException {
+    checkNotNull(path);
+    try {
+      // TODO: Change this to use a temp file or other alternative mechanism (at least until the blob store functions
+      // are expanded to allow us to create a blob by writing into an output stream as well).
+      StorageTx tx = UnitOfWork.currentTx();
+      RPackagesBuilder packagesBuilder = new RPackagesBuilder(path + "PACKAGES.gz");
+      for (Asset asset : tx.browseAssets(tx.findBucket(getRepository()))) {
+        packagesBuilder.append(asset);
+      }
+      CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      try (CompressorOutputStream cos = compressorStreamFactory.createCompressorOutputStream(GZIP, os)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(cos, UTF_8)) {
+          for (Entry<String, Map<String, String>> eachPackage : packagesBuilder.getPackageInformation().entrySet()) {
+            Map<String, String> packageInfo = eachPackage.getValue();
+            InternetHeaders headers = new InternetHeaders();
+            headers.addHeader(P_PACKAGE, packageInfo.get(P_PACKAGE));
+            headers.addHeader(P_VERSION, packageInfo.get(P_VERSION));
+            headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
+            headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
+            headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
+            headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
+            headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
+            Enumeration<String> headerLines = headers.getAllHeaderLines();
+            while (headerLines.hasMoreElements()) {
+              String line = headerLines.nextElement();
+              writer.write(line, 0, line.length());
+              writer.write('\n');
+            }
+            writer.write('\n');
+          }
+        }
+      }
+      StorageFacet storageFacet = getRepository().facet(StorageFacet.class);
+      try (InputStream is = new ByteArrayInputStream(os.toByteArray())) {
+        return storageFacet.createTempBlob(is, RFacetUtils.HASH_ALGORITHMS);
+      }
+    }
+    catch (CompressorException e) {
+      throw new IOException("Error compressing metadata", e);
     }
   }
 

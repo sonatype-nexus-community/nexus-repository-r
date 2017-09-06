@@ -15,6 +15,7 @@ package org.sonatype.nexus.repository.r.internal;
 import java.io.IOException;
 
 import org.sonatype.nexus.repository.Facet;
+import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -48,4 +49,12 @@ public interface RHostedFacet
    * @param payload uploaded file content
    */
   void upload(String path, Payload payload) throws IOException;
+
+  /**
+   * Build metadata for path.
+   *
+   * @param path the path to build the metadata for
+   * @return the metadata as a {@code TempBlob}
+   */
+  TempBlob buildMetadata(String path) throws IOException;
 }
