@@ -46,6 +46,10 @@ class RHostedRecipe
   Provider<RHostedFacet> hostedFacet
 
   @Inject
+  @Named("hosted")
+  Provider<RPackagesBuilderFacet> packagesBuilderFacet
+
+  @Inject
   HostedHandlers hostedHandlers
 
   @Inject
@@ -60,6 +64,7 @@ class RHostedRecipe
     repository.attach(httpClientFacet.get())
     repository.attach(componentMaintenanceFacet.get())
     repository.attach(hostedFacet.get())
+    repository.attach(packagesBuilderFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(attributesFacet.get())
