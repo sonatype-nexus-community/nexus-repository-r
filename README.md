@@ -20,7 +20,7 @@
 * [Developing](#developing)
    * [Requirements](#requirements)
    * [Building](#building)
-* [Using R with Nexus Repository Manger 3](#using-r-with-nexus-repository-manager-3)
+* [Using R with Nexus Repository Manager 3](#using-r-with-nexus-repository-manager-3)
 * [Installing the plugin](#installing-the-plugin)
    * [Temporary Install](#temporary-install)
    * [(more) Permanent Install](#more-permanent-install)
