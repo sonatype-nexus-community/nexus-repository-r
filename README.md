@@ -53,7 +53,7 @@ If everything checks out, the bundle for R should be available in the `target` f
 
 ## Using R With Nexus Repository Manager 3
 
-[We have detailed instructions on how to get started here!](docs/R_USER_DOCUMENTATION.md)
+After installing the plugin, we have detailed instructions on [how to get started here!](docs/R_USER_DOCUMENTATION.md)
 
 ## Installing the plugin
 
