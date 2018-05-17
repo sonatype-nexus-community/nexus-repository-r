@@ -37,8 +37,8 @@ a hosted repository.
 You can set up an R proxy repository to access a remote repository location, for example the official R
 registry at [https://cran.r-project.org/](https://cran.r-project.org/) that is configured as the default in R.
 
-To proxy a R repository, you simply create a new 'r (proxy)' as documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-AddingaNewRepository) in
-detail. Minimal configuration steps are:
+To proxy a R repository, you simply create a new 'r (proxy)' as shown in the documented example in 
+[Repository Management](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-AddingaNewRepository) in detail. Minimal configuration steps for R proxy are:
 
 - Define 'Name'
 - Define URL for 'Remote storage' e.g. [https://cran.r-project.org/](https://cran.r-project.org/)
@@ -46,13 +46,11 @@ detail. Minimal configuration steps are:
 
 ### Hosting R Repositories
 
-Creating a R hosted repository allows you to register packages in the repository manager. The hosted
-repository acts as an authoritative location for these components.
+Creating a R hosted repository allows you to register packages in the repository manager. The hosted repository 
+acts as an authoritative location for these components.
 
-To add a hosted R repository, create a new repository with the recipe 'r (hosted)' as
-documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Configuration#Configuration-RepositoryManagement).
-
-Minimal configuration steps are:
+To add a hosted R repository, create a new repository with the recipe 'r (hosted)' as shown in the documented 
+example in [Repository Management](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-AddingaNewRepository). Minimal configuration steps for R hosted are:
 
 - Define 'Name' - e.g. `r-internal`
 - Select 'Blob store' for 'Storage'
@@ -63,9 +61,7 @@ A repository group is the recommended way to expose all your R repositories from
 your users, with minimal additional client side configuration. A repository group allows you to expose the
 aggregated content of multiple proxy and hosted repositories as well as other repository groups with one URL in
 tool configuration. This is possible for R repositories by creating a new repository with the 'r (group)'
-recipe as documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Configuration#Configuration-RepositoryManagement).
-
-Minimal configuration steps are:
+recipe as shown in the documented example in [Repository Management](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-AddingaNewRepository). Minimal configuration steps for R group are:
 
 - Define 'Name' - e.g. `r-all`
 - Select 'Blob store' for 'Storage'
