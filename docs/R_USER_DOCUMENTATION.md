@@ -100,7 +100,7 @@ inspected in the user interface.
 ### Browsing R Repositories and Searching Packages
 
 You can browse R repositories in the user interface inspecting the components and assets and their details, as
-described in [Search for Components](https://help.sonatype.com/display/NXRM3/User+Interface#UserInterface-SearchingforComponents).
+described in [Search for Components](https://help.sonatype.com/display/NXRM3/Searching+for+Components).
 
 Searching for R packages can be performed in the user interface, too. It finds all packages that are currently
 stored in the repository manager, either because they have been pushed to a hosted repository or they have been
