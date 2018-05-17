@@ -37,8 +37,8 @@ a hosted repository.
 You can set up an R proxy repository to access a remote repository location, for example the official R
 registry at [https://cran.r-project.org/](https://cran.r-project.org/) that is configured as the default in R.
 
-To proxy a R repository, you simply create a new 'r (proxy)' as documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Configuration#Configuration-RepositoryManagement) in
-details. Minimal configuration steps are:
+To proxy a R repository, you simply create a new 'r (proxy)' as documented in [Repository Management](https://help.sonatype.com/display/NXRM3/Repository+Management#RepositoryManagement-AddingaNewRepository) in
+detail. Minimal configuration steps are:
 
 - Define 'Name'
 - Define URL for 'Remote storage' e.g. [https://cran.r-project.org/](https://cran.r-project.org/)
