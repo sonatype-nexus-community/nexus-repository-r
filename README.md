@@ -41,7 +41,7 @@ we would like things to flow.
 * [Java 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 * Network access to https://repository.sonatype.org/content/groups/sonatype-public-grid
 
-Also, there is a good amount of information available at [Bundle Development](https://help.sonatype.com/display/NXRM3/Bundle+Development#BundleDevelopment-BundleDevelopmentOverview)
+Also, there is a good amount of information available at [Bundle Development](https://help.sonatype.com/display/NXRM3/Bundle+Development+Overview)
 
 ### Building
 
@@ -53,7 +53,7 @@ If everything checks out, the bundle for R should be available in the `target` f
 
 ## Using R With Nexus Repository Manager 3
 
-[We have detailed instructions on how to get started here!](docs/R_USER_DOCUMENTATION.md)
+After installing the plugin, we have detailed instructions on [how to get started here!](docs/R_USER_DOCUMENTATION.md)
 
 ## Installing the plugin
 
@@ -69,17 +69,19 @@ Of note, version 1.0.1 is for Nexus Repository 3.8.0-02 and above, please use 1.
 
 * Enable Nexus console: edit `<nexus_dir>/bin/nexus.vmoptions` and change `karaf.startLocalConsole`  to `true`.
 
-  More details here: https://help.sonatype.com/display/NXRM3/Bundle+Development#BundleDevelopment-InstallingBundles
+  More details here: https://help.sonatype.com/display/NXRM3/Installing+Bundles
 
-* Run Nexus' console:
+* Run NXRM console mode (the below assumes you are running as 'nexus' user as recommended in our documentation) 
+and enter the bundle command after it has started:
   ```
   # sudo su - nexus
   $ cd <nexus_dir>/bin
   $ ./nexus run
   > bundle:install file:///tmp/nexus-repository-r-1.0.1.jar
-  > bundle:list
   ```
-  (look for org.sonatype.nexus.plugins:nexus-repository-r ID, should be the last one)
+  This will return text similar to "Bundle ID: 282".  You can double check this ID using bundle:list 
+  (for org.sonatype.nexus.plugins:nexus-repository-r; it should be the last one).  Then start it using this 
+  bundle command:
   ```
   > bundle:start <org.sonatype.nexus.plugins:nexus-repository-r ID>
   ```
