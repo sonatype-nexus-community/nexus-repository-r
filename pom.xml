@@ -98,6 +98,15 @@
         <version>2.20</version>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>alphanumeric-comparator</Embed-Dependency>
+          </instructions>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
