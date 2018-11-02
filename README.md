@@ -55,6 +55,23 @@ If everything checks out, the bundle for R should be available in the `target` f
 
 After installing the plugin, we have detailed instructions on [how to get started here!](docs/R_USER_DOCUMENTATION.md)
 
+## Compatibility with Nexus Repository Manager 3 Versions
+
+The table below outlines what version of Nexus Repository the plugin was built against
+
+| Plugin Version | Nexus Repository Version |
+|----------------|--------------------------|
+| v1.0.0         | <3.8.0-02                |
+| v1.0.1         | >=3.8.0-02               |
+| v1.0.2         | >=3.14.0-04              |
+
+If a new version of Nexus Repository is released and the plugin needs changes, a new release will be made, and this
+table will be updated to indicate which version of Nexus Repository it will function against. This is done on a time 
+available basis, as this is community supported. If you see a new version of Nexus Repository, go ahead and update the
+plugin and send us a PR after testing it out!
+
+All released versions can be found [here](https://github.com/sonatype-nexus-community/nexus-repository-r/releases).
+
 ## Installing the plugin
 
 There are a range of options for installing the R plugin. You'll need to build it first, and
@@ -64,8 +81,6 @@ then install the plugin with the options shown below:
 
 Installations done via the Karaf console will be wiped out with every restart of Nexus Repository. This is a
 good installation path if you are just testing or doing development on the plugin.
-
-Of note, version 1.0.1 is for Nexus Repository 3.8.0-02 and above, please use 1.0.0 if you are using an older version.
 
 * Enable Nexus console: edit `<nexus_dir>/bin/nexus.vmoptions` and change `karaf.startLocalConsole`  to `true`.
 
@@ -77,7 +92,7 @@ and enter the bundle command after it has started:
   # sudo su - nexus
   $ cd <nexus_dir>/bin
   $ ./nexus run
-  > bundle:install file:///tmp/nexus-repository-r-1.0.1.jar
+  > bundle:install file:///tmp/nexus-repository-r-1.0.2.jar
   ```
   This will return text similar to "Bundle ID: 282".  You can double check this ID using bundle:list 
   (for org.sonatype.nexus.plugins:nexus-repository-r; it should be the last one).  Then start it using this 
@@ -90,7 +105,7 @@ and enter the bundle command after it has started:
 
 For more permanent installs of the nexus-repository-r plugin, follow these instructions:
 
-* Copy the bundle (nexus-repository-r-1.0.1.jar) into <nexus_dir>/deploy
+* Copy the bundle (nexus-repository-r-1.0.2.jar) into <nexus_dir>/deploy
 
 This will cause the plugin to be loaded with each restart of Nexus Repository. As well, this folder is monitored
 by Nexus Repository and the plugin should load within 60 seconds of being copied there if Nexus Repository
@@ -100,20 +115,20 @@ is running. You will still need to start the bundle using the karaf commands men
 
 If you are trying to use the R plugin permanently, it likely makes more sense to do the following:
 
-* Copy the bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.0.1/nexus-repository-r-1.0.1.jar`
+* Copy the bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.0.2/nexus-repository-r-1.0.2.jar`
 * If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
 * If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
    ```
          <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
-   +     <feature version="1.0.1" prerequisite="false" dependency="false">nexus-repository-r</feature>
+   +     <feature version="1.0.2" prerequisite="false" dependency="false">nexus-repository-r</feature>
          <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-yum</feature>
      </feature>
    ```
    And
    ```
-   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.0.1">
+   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.0.2">
    +     <details>org.sonatype.nexus.plugins:nexus-repository-r</details>
-   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.0.1</bundle>
+   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.0.2</bundle>
    + </feature>
     </features>
    ```
