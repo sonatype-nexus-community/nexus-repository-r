@@ -10,7 +10,9 @@ jobs:
       - checkout
       - run:
           name: Get project version
-          command: export PROJECT_VERSION=$(mvn help:evaluate -N -Dexpression=project.version | grep -v '\[')
+          command: |
+            echo "export PROJECT_VERSION=$(mvn help:evaluate -N -Dexpression=project.version | grep -v '\[')" >> $BASH_ENV
+      - run: echo $PROJECT_VERSION
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "pom.xml" }}
@@ -31,4 +33,4 @@ jobs:
       - store_test_results:
           path: target/surefire-reports
       - store_artifacts:
-          path: target/nexus-repository-r-${PROJECT_VERSION}-bundle.kar
+          path: "target/nexus-repository-r-${PROJECT_VERSION}-bundle.kar"
