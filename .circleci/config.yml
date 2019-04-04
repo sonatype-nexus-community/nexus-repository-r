@@ -35,6 +35,6 @@ jobs:
           name: Prep artifacts
           command: |
             mkdir /tmp/artifacts && \
-            cp $WORKDIR/$BRANCH-$LABEL/nexus-repository-r/target/nexus-repository-r-* /tmp/artifacts
+            cp /home/circleci/nexus-repository-r/target/nexus-repository-r-* /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
