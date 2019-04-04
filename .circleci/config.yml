@@ -23,12 +23,6 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
       - run: mvn --version
       - run: mvn package -PbuildKar
-      - run:
-          name: Save test results
-          command: |
-            mkdir -p ~/test-results/junit/
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
-          when: always
       - store_test_results:
           path: target/surefire-reports
       - run:
