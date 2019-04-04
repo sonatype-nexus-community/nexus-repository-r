@@ -34,4 +34,4 @@ jobs:
       - store_test_results:
           path: target/surefire-reports
       - store_artifacts:
-          path: target/nexus-repository-r-${PROJECT_VERSION}-bundle.kar
+          path: $BUNDLE_PATH
