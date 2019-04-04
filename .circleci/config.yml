@@ -18,7 +18,7 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
       - run: mvn --version
-      - run: mvn package
+      - run: mvn package -PbuildKar
       - run:
           name: Save test results
           command: |
@@ -26,6 +26,6 @@ jobs:
             find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
           when: always
       - store_test_results:
-          path: ~/test-results
+          path: target/surefire-reports
       - store_artifacts:
-          path: ~/test-results/junit
+          path: target/nexus-repository-r-*
