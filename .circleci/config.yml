@@ -11,8 +11,7 @@ jobs:
       - run:
           name: Get project version
           command: |
-            export PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout) && \
-            echo $PROJECT_VERSION >> $BASH_ENV
+            export PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
       - run: echo $PROJECT_VERSION
       - restore_cache:
           keys:
