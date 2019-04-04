@@ -17,4 +17,5 @@ jobs:
           paths:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
+      - run: mvn --version
       - run: mvn package
