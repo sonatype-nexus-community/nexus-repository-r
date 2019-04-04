@@ -11,8 +11,9 @@ jobs:
       - run:
           name: Get project version
           command: |
-            echo 'export PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)' >> $BASH_ENV
-      - run: echo $PROJECT_VERSION
+            echo 'export PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)' >> $BASH_ENV && \
+            echo 'export BUNDLE_PATH=target/nexus-repository-r-"$PROJECT_VERSION"-bundle.kar' >> $BASH_ENV
+      - run: echo $BUNDLE_PATH
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "pom.xml" }}
