@@ -14,11 +14,7 @@
 -->
 # Nexus Repository R Format
 
-[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) 
-
-[![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
-
-[![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
+[![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
 
 # Table Of Contents
 * [Developing](#developing)
