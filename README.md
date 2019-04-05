@@ -64,6 +64,7 @@ The table below outlines what version of Nexus Repository the plugin was built a
 | v1.0.0         | <3.8.0-02                |
 | v1.0.1         | >=3.8.0-02               |
 | v1.0.2         | >=3.14.0-04              |
+| v1.0.3         | >=3.15.2-01              |
 
 If a new version of Nexus Repository is released and the plugin needs changes, a new release will be made, and this
 table will be updated to indicate which version of Nexus Repository it will function against. This is done on a time 
@@ -92,7 +93,7 @@ and enter the bundle command after it has started:
   # sudo su - nexus
   $ cd <nexus_dir>/bin
   $ ./nexus run
-  > bundle:install file:///tmp/nexus-repository-r-1.0.2.jar
+  > bundle:install file:///tmp/nexus-repository-r-1.0.3.jar
   ```
   This will return text similar to "Bundle ID: 282".  You can double check this ID using bundle:list 
   (for org.sonatype.nexus.plugins:nexus-repository-r; it should be the last one).  Then start it using this 
@@ -105,7 +106,7 @@ and enter the bundle command after it has started:
 
 For more permanent installs of the nexus-repository-r plugin, follow these instructions:
 
-* Copy the bundle (nexus-repository-r-1.0.2.jar) into <nexus_dir>/deploy
+* Copy the bundle (nexus-repository-r-1.0.3.jar) into <nexus_dir>/deploy
 
 This will cause the plugin to be loaded with each restart of Nexus Repository. As well, this folder is monitored
 by Nexus Repository and the plugin should load within 60 seconds of being copied there if Nexus Repository
@@ -115,20 +116,20 @@ is running. You will still need to start the bundle using the karaf commands men
 
 If you are trying to use the R plugin permanently, it likely makes more sense to do the following:
 
-* Copy the bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.0.2/nexus-repository-r-1.0.2.jar`
+* Copy the bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.0.3/nexus-repository-r-1.0.3.jar`
 * If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
 * If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
    ```
          <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
-   +     <feature version="1.0.2" prerequisite="false" dependency="false">nexus-repository-r</feature>
+   +     <feature version="1.0.3" prerequisite="false" dependency="false">nexus-repository-r</feature>
          <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-yum</feature>
      </feature>
    ```
    And
    ```
-   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.0.2">
+   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.0.3">
    +     <details>org.sonatype.nexus.plugins:nexus-repository-r</details>
-   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.0.2</bundle>
+   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.0.3</bundle>
    + </feature>
     </features>
    ```
