@@ -1,0 +1,41 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/nexus-repository-r
+    environment:
+      MAVEN_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - run:
+          name: Get project version
+          command: |
+            echo 'export PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)' >> $BASH_ENV
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "pom.xml" }}
+            - v1-dependencies-
+      - run: mvn dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "pom.xml" }}
+      - run: mvn package -PbuildKar
+      - run:
+          name: Save test results
+          command: |
+            mkdir -p ~/test-results/junit/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
+          when: always
+      - store_test_results:
+          path: ~/test-results
+      - store_artifacts:
+          path: ~/test-results/junit
+      - run:
+          name: Prep artifacts
+          command: |
+            mkdir /tmp/artifacts && \
+            cp /home/circleci/nexus-repository-r/target/nexus-repository-r-* /tmp/artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
