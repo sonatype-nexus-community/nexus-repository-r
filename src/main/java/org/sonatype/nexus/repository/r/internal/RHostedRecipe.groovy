@@ -71,6 +71,8 @@ class RHostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
+    addBrowseUnsupportedRoute(builder)
+
     builder.route(packagesMatcher()
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
@@ -107,11 +109,6 @@ class RHostedRecipe
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
         .handler(hostedHandlers.putArchive)
-        .create())
-
-    builder.route(new Route.Builder()
-        .matcher(BrowseUnsupportedHandler.MATCHER)
-        .handler(browseUnsupportedHandler)
         .create())
 
     builder.defaultHandlers(HttpHandlers.notFound())

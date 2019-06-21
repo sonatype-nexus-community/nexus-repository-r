@@ -86,6 +86,8 @@ class RProxyRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
+    addBrowseUnsupportedRoute(builder)
+
     builder.route(packagesMatcher()
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
@@ -111,11 +113,6 @@ class RProxyRecipe
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
         .handler(proxyHandler)
-        .create())
-
-    builder.route(new Route.Builder()
-        .matcher(BrowseUnsupportedHandler.MATCHER)
-        .handler(browseUnsupportedHandler)
         .create())
 
     builder.defaultHandlers(HttpHandlers.notFound())
