@@ -24,10 +24,8 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
