@@ -69,7 +69,7 @@ public class PackagesGroupHandlerTest
   public void setup() throws Exception {
     underTest = new PackagesGroupHandler();
     members = new ArrayList<>();
-    packages = testData.resolveFile("org/sonatype/nexus/repository/r/internal/PACKAGES.gz");
+    packages = testData.resolveFile("src/test/resources/org/sonatype/nexus/repository/r/internal/PACKAGES.gz");
 
     when(context.getRepository()).thenReturn(repository);
 
