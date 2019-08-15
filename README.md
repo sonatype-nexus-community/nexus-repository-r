@@ -38,7 +38,7 @@ we would like things to flow.
 ### Requirements
 
 * [Apache Maven 3.3.3+](https://maven.apache.org/install.html)
-* [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* OpenJDK 8
 * Network access to https://repository.sonatype.org/content/groups/sonatype-public-grid
 
 Also, there is a good amount of information available at [Bundle Development](https://help.sonatype.com/display/NXRM3/Bundle+Development+Overview)
