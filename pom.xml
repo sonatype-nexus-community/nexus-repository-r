@@ -22,11 +22,15 @@
     <version>3.15.2-01</version>
   </parent>
   <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>nexus-repository-r</artifactId>
+  <artifactId>nexus-repository-base</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
   <version>1.0.3</version>
   <inceptionYear>2017</inceptionYear>
-  <packaging>bundle</packaging>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>nexus-repository-r</module>
+  </modules>
 
   <dependencies>
 
@@ -72,45 +76,4 @@
     </dependency>
 
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>extjs-maven-plugin</artifactId>
-        <configuration>
-          <namespace>NX.r</namespace>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>karaf-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.20</version>
-        <configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>alphanumeric-comparator</Embed-Dependency>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
