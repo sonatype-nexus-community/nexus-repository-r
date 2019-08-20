@@ -1,41 +1,50 @@
-version: 2
-jobs:
-  build:
-    docker:
-      - image: circleci/openjdk:8-jdk
-    working_directory: ~/nexus-repository-r
-    environment:
-      MAVEN_OPTS: -Xmx3200m
-    steps:
-      - checkout
-      - run:
-          name: Get project version
-          command: |
-            echo 'export PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)' >> $BASH_ENV
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            - v1-dependencies-
-      - run: mvn dependency:go-offline
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-      - run: mvn package -PbuildKar
-      - run:
-          name: Save test results
-          command: |
-            mkdir -p ~/test-results/junit/
-            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/test-results/junit/ \;
-          when: always
-      - store_test_results:
-          path: ~/test-results
-      - store_artifacts:
-          path: ~/test-results/junit
-      - run:
-          name: Prep artifacts
-          command: |
-            mkdir /tmp/artifacts && \
-            cp /home/circleci/nexus-repository-r/target/nexus-repository-r-* /tmp/artifacts
-      - store_artifacts:
-          path: /tmp/artifacts
+version: 2.1
+
+orbs:
+  github-maven-deploy: github-maven-deploy/github-maven-deploy@1.0.5
+
+mvn-build-test-command: &mvn-build-test-command
+  mvn-build-test-command: mvn clean verify -PbuildKar -Dit
+
+mvn-collect-artifacts-command: &mvn-collect-artifacts-command
+  mvn-collect-artifacts-command: |
+    mkdir -p ~/project/artifacts/junit/
+    cp ~/project/nexus-repository-r/target/surefire-reports/*.xml ~/project/artifacts/junit/
+    cp ~/project/nexus-repository-r/target/nexus-repository-* ~/project/artifacts/
+    cp ~/project/nexus-repository-r-it/target/failsafe-reports/*.xml ~/project/artifacts/junit/
+
+mvn-deploy-command: &mvn-deploy-command
+  mvn-deploy-command: mvn -s .maven.xml clean deploy -PbuildKar -DdeployAtEnd=true -DperformRelease=true -DskipTests -Dspotbugs.skip=true
+  context: rso
+
+workflows:
+  workflow:
+    jobs:
+      - github-maven-deploy/build-and-test:
+          <<: *mvn-build-test-command
+          <<: *mvn-collect-artifacts-command
+
+      - github-maven-deploy/approve-deploy-patch-version:
+          type: approval
+          requires:
+            - github-maven-deploy/build-and-test
+      - github-maven-deploy/approve-deploy-minor-version:
+          type: approval
+          requires:
+            - github-maven-deploy/build-and-test
+      - github-maven-deploy/approve-deploy-major-version:
+          type: approval
+          requires:
+            - github-maven-deploy/build-and-test
+      - github-maven-deploy/deploy-patch-version:
+          requires:
+            - github-maven-deploy/approve-deploy-patch-version
+          <<: *mvn-deploy-command
+      - github-maven-deploy/deploy-minor-version:
+          requires:
+            - github-maven-deploy/approve-deploy-minor-version
+          <<: *mvn-deploy-command
+      - github-maven-deploy/deploy-major-version:
+          requires:
+            - github-maven-deploy/approve-deploy-major-version
+          <<: *mvn-deploy-command
