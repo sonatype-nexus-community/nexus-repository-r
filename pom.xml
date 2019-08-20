@@ -19,8 +19,9 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins</artifactId>
-    <version>3.15.2-01</version>
+    <version>3.19.0-SNAPSHOT</version>
   </parent>
+
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-repository-base</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
@@ -30,50 +31,25 @@
 
   <modules>
     <module>nexus-repository-r</module>
+    <module>nexus-repository-r-it</module>
   </modules>
 
-  <dependencies>
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+  <properties>
+    <nxrm-version>3.19.0-SNAPSHOT</nxrm-version>
+  </properties>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-repository</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>se.sawano.java</groupId>
-      <artifactId>alphanumeric-comparator</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.goodies</groupId>
-      <artifactId>goodies-testsupport</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.spockframework</groupId>
-      <artifactId>spock-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rapture</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-  </dependencies>
+  <repositories>
+    <!-- ensure we can find the parent pom when starting from an empty local .m2 repository -->
+    <repository>
+      <id>rso-snapshots</id>
+      <url>https://repository.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 </project>
