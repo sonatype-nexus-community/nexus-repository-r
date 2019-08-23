@@ -55,7 +55,7 @@ public class RProxyIT
     BaseUrlHolder.set(this.nexusUrl.toString());
     server = Server.withPort(0)
         .serve("/*").withBehaviours(error(200))
-        .serve("/" + AGRICOLAE_FULL).withBehaviours(file(testData.resolveFile(AGRICOLAE_FILE_NAME)))
+        .serve("/" + AGRICOLAE_FULL).withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME)))
         .serve("/" + PACKAGES_FULL).withBehaviours(file(testData.resolveFile(PACKAGES_FILE_NAME)))
         .start();
     repository = repos.createRProxy("r-proxy-test", server.getUrl().toExternalForm());
@@ -69,11 +69,11 @@ public class RProxyIT
 
   @Test
   public void fetchTgzPackageFile() throws Exception {
-    assertSuccessResponseMatches(client.fetch(AGRICOLAE_FULL), AGRICOLAE_FILE_NAME);
+    assertSuccessResponseMatches(client.fetch(AGRICOLAE_FULL), AGRICOLAE_PKG_FILE_NAME);
     final Asset asset = findAsset(repository, AGRICOLAE_FULL);
     Assert.assertThat(asset.name(), is(equalTo(AGRICOLAE_FULL)));
     Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_TGZ)));
-    Assert.assertThat(asset.format(), is(equalTo(R)));
+    Assert.assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
   }
 
   @Test
@@ -81,18 +81,18 @@ public class RProxyIT
     assertSuccessResponseMatches(client.fetch(PACKAGES_FULL), PACKAGES_FILE_NAME);
     final Asset asset = findAsset(repository, PACKAGES_FULL);
     Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_GZIP)));
-    Assert.assertThat(asset.format(), is(equalTo(R)));
+    Assert.assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
   }
 
   @Test
   public void checkComponentCreated() throws Exception {
-    final Component nullComponent = findComponent(repository, AGRICOLAE);
+    final Component nullComponent = findComponent(repository, AGRICOLAE_NAME);
     Assert.assertThat(nullComponent, is(nullValue()));
     client.fetch(AGRICOLAE_FULL);
 
-    final Component component = findComponent(repository, AGRICOLAE);
-    Assert.assertThat(component.name(), is(equalTo(AGRICOLAE)));
-    Assert.assertThat(component.format(), is(equalTo(R)));
+    final Component component = findComponent(repository, AGRICOLAE_NAME);
+    Assert.assertThat(component.name(), is(equalTo(AGRICOLAE_NAME)));
+    Assert.assertThat(component.format(), is(equalTo(R_FORMAT_NAME)));
     Assert.assertThat(component.group(), is(nullValue()));
     Assert.assertThat(component.version(), is(equalTo(AGRICOLAE_VERSION)));
   }
@@ -108,6 +108,6 @@ public class RProxyIT
   public void shouldCacheTgzPackageFile() throws Exception {
     client.fetch(AGRICOLAE_FULL);
     server.stop();
-    assertSuccessResponseMatches(client.fetch(AGRICOLAE_FULL), AGRICOLAE_FILE_NAME);
+    assertSuccessResponseMatches(client.fetch(AGRICOLAE_FULL), AGRICOLAE_PKG_FILE_NAME);
   }
 }

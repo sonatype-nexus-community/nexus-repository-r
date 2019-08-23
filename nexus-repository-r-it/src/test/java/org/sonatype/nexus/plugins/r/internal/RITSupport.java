@@ -28,31 +28,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RITSupport
     extends RepositoryITSupport
 {
-  public static final String R = "r";
+  public static final String R_FORMAT_NAME = "r";
 
-  public static final String PATH = "bin/macosx/el-capitan/contrib/3.6";
+  public static final String PKG_PATH = "bin/macosx/el-capitan/contrib/3.6";
 
-  public static final String AGRICOLAE = "agricolae";
+  public static final String AGRICOLAE_NAME = "agricolae";
+
+  public static final String PACKAGES_NAME = "PACKAGES";
 
   public static final String AGRICOLAE_VERSION = "1.3-1";
 
-  public static final String TGZ = ".tgz";
+  public static final String TGZ_EXT = ".tgz";
 
-  public static final String GZ = ".gz";
+  public static final String GZ_EXT = ".gz";
 
-  public static final String AGRICOLAE_FILE_NAME = String.format("%s_%s%s", AGRICOLAE, AGRICOLAE_VERSION, TGZ);
-
-  public static final String AGRICOLAE_FULL = String.format("%s/%s", PATH, AGRICOLAE_FILE_NAME);
+  public static final String AGRICOLAE_PKG_FILE_NAME = String.format("%s_%s%s", AGRICOLAE_NAME, AGRICOLAE_VERSION,
+      TGZ_EXT);
 
   public static final String CONTENT_TYPE_TGZ = "application/x-tgz";
 
   public static final String CONTENT_TYPE_GZIP = "application/x-gzip";
 
-  public static final String PACKAGES = "PACKAGES";
+  public static final String PACKAGES_FILE_NAME = String.format("%s%s", PACKAGES_NAME, GZ_EXT);
 
-  public static final String PACKAGES_FILE_NAME = String.format("%s%s", PACKAGES, GZ);
+  public static final String AGRICOLAE_FULL = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME);
 
-  public static final String PACKAGES_FULL = String.format("%s/%s", PATH, PACKAGES_FILE_NAME);
+  public static final String PACKAGES_FULL = String.format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
 
   @Rule
   public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);
