@@ -32,17 +32,18 @@ public class RITSupport
 
   public static final String PKG_PATH = "bin/macosx/el-capitan/contrib/3.6";
 
-  public static final String AGRICOLAE_NAME = "agricolae";
+  public static final String AGRICOLAE_PKG_NAME = "agricolae";
 
   public static final String PACKAGES_NAME = "PACKAGES";
 
-  public static final String AGRICOLAE_VERSION = "1.3-1";
+  public static final String AGRICOLAE_PKG_VERSION = "1.3-1";
 
   public static final String TGZ_EXT = ".tgz";
 
   public static final String GZ_EXT = ".gz";
 
-  public static final String AGRICOLAE_PKG_FILE_NAME = String.format("%s_%s%s", AGRICOLAE_NAME, AGRICOLAE_VERSION,
+  public static final String AGRICOLAE_PKG_FILE_NAME = String.format("%s_%s%s", AGRICOLAE_PKG_NAME,
+      AGRICOLAE_PKG_VERSION,
       TGZ_EXT);
 
   public static final String CONTENT_TYPE_TGZ = "application/x-tgz";
@@ -51,9 +52,9 @@ public class RITSupport
 
   public static final String PACKAGES_FILE_NAME = String.format("%s%s", PACKAGES_NAME, GZ_EXT);
 
-  public static final String AGRICOLAE_FULL = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME);
+  public static final String AGRICOLAE_PATH_FULL = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME);
 
-  public static final String PACKAGES_FULL = String.format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
+  public static final String PACKAGES_PATH_FULL = String.format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
 
   @Rule
   public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);
