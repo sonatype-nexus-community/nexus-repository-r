@@ -14,7 +14,7 @@ mvn-collect-artifacts-command: &mvn-collect-artifacts-command
 
 mvn-deploy-command: &mvn-deploy-command
   mvn-deploy-command: mvn -s .maven.xml clean deploy -PbuildKar -DdeployAtEnd=true -DperformRelease=true -DskipTests -Dspotbugs.skip=true
-  context: rso
+  context: rso-base
 
 workflows:
   workflow:
