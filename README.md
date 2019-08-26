@@ -66,6 +66,7 @@ The table below outlines what version of Nexus Repository the plugin was built a
 | v1.0.1         | >=3.8.0-02               |
 | v1.0.2         | >=3.14.0-04              |
 | v1.0.3         | >=3.15.2-01              |
+| v1.0.4         | >=3.18.0-01              |
 
 If a new version of Nexus Repository is released and the plugin needs changes, a new release will be made, and this
 table will be updated to indicate which version of Nexus Repository it will function against. This is done on a time 
