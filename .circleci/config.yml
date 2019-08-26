@@ -9,9 +9,7 @@ mvn-build-test-command: &mvn-build-test-command
 mvn-collect-artifacts-command: &mvn-collect-artifacts-command
   mvn-collect-artifacts-command: |
     mkdir -p ~/project/artifacts/junit/
-    ls -alh ~/project/nexus-repository-r/target
-    cp ~/project/nexus-repository-r/target/surefire-reports/*.xml ~/project/artifacts/junit/
-    cp ~/project/nexus-repository-r/target/nexus-repository-* ~/project/artifacts/
+    find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
 
 mvn-deploy-command: &mvn-deploy-command
   mvn-deploy-command: mvn -s .maven.xml clean deploy -PbuildKar -DdeployAtEnd=true -DperformRelease=true -DskipTests -Dspotbugs.skip=true
