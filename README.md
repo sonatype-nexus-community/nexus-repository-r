@@ -15,6 +15,7 @@
 # Nexus Repository R Format
 
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
+[![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
 # Table Of Contents
 * [Developing](#developing)
@@ -65,6 +66,7 @@ The table below outlines what version of Nexus Repository the plugin was built a
 | v1.0.1         | >=3.8.0-02               |
 | v1.0.2         | >=3.14.0-04              |
 | v1.0.3         | >=3.15.2-01              |
+| v1.0.4         | >=3.18.0-01              |
 
 If a new version of Nexus Repository is released and the plugin needs changes, a new release will be made, and this
 table will be updated to indicate which version of Nexus Repository it will function against. This is done on a time 
