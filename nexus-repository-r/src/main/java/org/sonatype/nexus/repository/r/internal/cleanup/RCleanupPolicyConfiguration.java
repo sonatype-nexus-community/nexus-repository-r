@@ -27,6 +27,11 @@ import static org.sonatype.nexus.repository.search.DefaultComponentMetadataProdu
 import static org.sonatype.nexus.repository.search.DefaultComponentMetadataProducer.LAST_DOWNLOADED_KEY;
 import static org.sonatype.nexus.repository.search.DefaultComponentMetadataProducer.REGEX_KEY;
 
+/**
+ * Defines which cleanup policy fields to display for R.
+ *
+ * @since 1.1.0
+ */
 @Named(RFormat.NAME)
 @Singleton
 public class RCleanupPolicyConfiguration implements CleanupPolicyConfiguration

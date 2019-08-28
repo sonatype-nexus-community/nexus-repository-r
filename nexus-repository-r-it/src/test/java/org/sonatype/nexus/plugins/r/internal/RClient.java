@@ -24,6 +24,11 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+/**
+ * A simple test client for R repositories.
+ *
+ * @since 1.1.0
+ */
 public class RClient
     extends FormatClientSupport
 {
