@@ -82,6 +82,24 @@ public class CleanupTaskRIT
         () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TARGZ), 1L);
   }
 
+  @Test
+  public void cleanupByLastBlobUpdatedAndLastDownloadedPolicies() throws Exception {
+    String[] versionsOfComponentsToKeep = {AGRICOLAE_PKG_FILE_NAME_121_TARGZ};
+
+    assertLastBlobUpdatedAndLastDownloadedComponentsCleanUp(
+        repository,
+        (long) NAMES.length,
+        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_131_TARGZ),
+        () -> deployArtifacts(versionsOfComponentsToKeep),
+        versionsOfComponentsToKeep);
+  }
+
+  @Override
+  protected boolean componentMatchesByVersion(final Component component, final String version) {
+    return version
+        .equals(format("%s_%s%s", component.name().toLowerCase(), component.version().toLowerCase(), TARGZ_EXT));
+  }
+
   private int deployArtifacts(final String... names) {
     try {
       RClient client = new RClient(clientBuilder().build(),
