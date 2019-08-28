@@ -17,11 +17,18 @@ import java.net.URI;
 
 import org.sonatype.nexus.testsuite.testsupport.FormatClientSupport;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 
+/**
+ * A simple test client for R repositories.
+ *
+ * @since 1.1.0
+ */
 public class RClient
     extends FormatClientSupport
 {
@@ -34,5 +41,12 @@ public class RClient
 
   public HttpResponse fetch(final String path) throws IOException {
     return execute(new HttpGet(resolve(path)));
+  }
+
+  public HttpResponse put(String path, HttpEntity entity) throws IOException {
+    final URI resolve = resolve(path);
+    final HttpPut put = new HttpPut(resolve);
+    put.setEntity(entity);
+    return execute(put);
   }
 }
