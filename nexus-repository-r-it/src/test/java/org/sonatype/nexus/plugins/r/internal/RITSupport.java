@@ -24,6 +24,7 @@ import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 
 public class RITSupport
     extends RepositoryITSupport
@@ -36,15 +37,29 @@ public class RITSupport
 
   public static final String PACKAGES_NAME = "PACKAGES";
 
-  public static final String AGRICOLAE_PKG_VERSION = "1.3-1";
+  public static final String AGRICOLAE_PKG_VERSION_101 = "1.0-1";
+
+  public static final String AGRICOLAE_PKG_VERSION_121 = "1.2-1";
+
+  public static final String AGRICOLAE_PKG_VERSION_131 = "1.3-1";
+
+  public static final String TARGZ_EXT = ".tar.gz";
 
   public static final String TGZ_EXT = ".tgz";
 
   public static final String GZ_EXT = ".gz";
 
-  public static final String AGRICOLAE_PKG_FILE_NAME = String.format("%s_%s%s", AGRICOLAE_PKG_NAME,
-      AGRICOLAE_PKG_VERSION,
-      TGZ_EXT);
+  public static final String AGRICOLAE_PKG_FILE_NAME_131_TGZ = format("%s_%s%s",
+      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TGZ_EXT);
+
+  public static final String AGRICOLAE_PKG_FILE_NAME_101_TARGZ = format("%s_%s%s",
+      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_101, TARGZ_EXT);
+
+  public static final String AGRICOLAE_PKG_FILE_NAME_121_TARGZ = format("%s_%s%s",
+      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_121, TARGZ_EXT);
+
+  public static final String AGRICOLAE_PKG_FILE_NAME_131_TARGZ = format("%s_%s%s",
+      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TARGZ_EXT);
 
   public static final String CONTENT_TYPE_TGZ = "application/x-tgz";
 
@@ -52,7 +67,7 @@ public class RITSupport
 
   public static final String PACKAGES_FILE_NAME = String.format("%s%s", PACKAGES_NAME, GZ_EXT);
 
-  public static final String AGRICOLAE_PATH_FULL = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME);
+  public static final String AGRICOLAE_PATH_FULL = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
 
   public static final String PACKAGES_PATH_FULL = String.format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
 

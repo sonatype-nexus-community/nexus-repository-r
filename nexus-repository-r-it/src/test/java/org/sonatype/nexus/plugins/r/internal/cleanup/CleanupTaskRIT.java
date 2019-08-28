@@ -21,6 +21,7 @@ import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.plugins.r.internal.RClient;
 import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 import org.sonatype.nexus.testsuite.testsupport.cleanup.CleanupITSupport;
 
@@ -34,31 +35,14 @@ import org.ops4j.pax.exam.Option;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.*;
 import static org.sonatype.nexus.repository.http.HttpStatus.OK;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 
 public class CleanupTaskRIT
     extends CleanupITSupport
 {
-  public static final String PATH = "bin/macosx/el-capitan/contrib/3.6";
-
-  public static final String AGRICOLAE = "agricolae";
-
-  public static final String AGRICOLAE_VERSION_101 = "1.0-1";
-
-  public static final String AGRICOLAE_VERSION_121 = "1.2-1";
-
-  public static final String AGRICOLAE_VERSION_131 = "1.3-1";
-
-  public static final String TARGZ = ".tar.gz";
-
-  public static final String AGRICOLAE_FILE_NAME_101_TARGZ = format("%s_%s%s", AGRICOLAE, AGRICOLAE_VERSION_101, TARGZ);
-
-  public static final String AGRICOLAE_FILE_NAME_121_TARGZ = format("%s_%s%s", AGRICOLAE, AGRICOLAE_VERSION_121, TARGZ);
-
-  public static final String AGRICOLAE_FILE_NAME_131_TARGZ = format("%s_%s%s", AGRICOLAE, AGRICOLAE_VERSION_131, TARGZ);
-
-  public static final String[] VERSIONS = {AGRICOLAE_FILE_NAME_101_TARGZ};
+  public static final String[] NAMES = {AGRICOLAE_PKG_FILE_NAME_101_TARGZ};
 
   public Repository repository;
 
@@ -77,40 +61,40 @@ public class CleanupTaskRIT
   public void setup() {
     testData.addDirectory(NexusPaxExamSupport.resolveBaseFile("target/test-classes/r"));
     repository = repos.createRHosted(testName.getMethodName());
-    deployArtifacts(VERSIONS);
+    deployArtifacts(NAMES);
   }
 
   @Test
   public void cleanupByLastBlobUpdated() throws Exception {
-    assertLastBlobUpdatedComponentsCleanedUp(repository, (long) VERSIONS.length,
-        () -> deployArtifacts(AGRICOLAE_FILE_NAME_131_TARGZ), 1L);
+    assertLastBlobUpdatedComponentsCleanedUp(repository, (long) NAMES.length,
+        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_131_TARGZ), 1L);
   }
 
   @Test
   public void cleanupByLastDownloaded() throws Exception {
-    assertLastDownloadedComponentsCleanedUp(repository, (long) VERSIONS.length,
-        () -> deployArtifacts(AGRICOLAE_FILE_NAME_131_TARGZ), 1L);
+    assertLastDownloadedComponentsCleanedUp(repository, (long) NAMES.length,
+        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_131_TARGZ), 1L);
   }
 
   @Test
   public void cleanupByRegex() throws Exception {
-    assertCleanupByRegex(repository, VERSIONS.length, "bin.*1.[0,3]-1.tar.gz",
-        () -> deployArtifacts(AGRICOLAE_FILE_NAME_121_TARGZ, AGRICOLAE_FILE_NAME_131_TARGZ), 1L);
+    assertCleanupByRegex(repository, NAMES.length, "bin.*1.[0,3]-1.tar.gz",
+        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TARGZ), 1L);
   }
 
-  private int deployArtifacts(final String... pathToFile) {
+  private int deployArtifacts(final String... names) {
     try {
       RClient client = new RClient(clientBuilder().build(),
           clientContext(),
           resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()
       );
 
-      for (String name : pathToFile) {
-        assertThat(status(client.put(format("%s/%s", PATH, name), new ByteArrayEntity(getBytesFromTestData(name)))),
+      for (String name : names) {
+        assertThat(status(client.put(format("%s/%s", PKG_PATH, name), new ByteArrayEntity(getBytesFromTestData(name)))),
             is(OK));
       }
 
-      return pathToFile.length;
+      return names.length;
     }
     catch (Exception e) {
       log.error("", e);
