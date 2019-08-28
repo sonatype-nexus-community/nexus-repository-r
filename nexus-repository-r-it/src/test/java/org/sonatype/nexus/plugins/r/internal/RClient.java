@@ -39,7 +39,8 @@ public class RClient
   }
 
   public HttpResponse put(String path, HttpEntity entity) throws IOException {
-    final HttpPut put = new HttpPut(resolve(path));
+    final URI resolve = resolve(path);
+    final HttpPut put = new HttpPut(resolve);
     put.setEntity(entity);
     return execute(put);
   }

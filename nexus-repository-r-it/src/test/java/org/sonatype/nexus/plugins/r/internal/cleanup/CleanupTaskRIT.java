@@ -92,11 +92,11 @@ public class CleanupTaskRIT
         () -> deployArtifacts(AGRICOLAE_FILE_NAME_131_TARGZ), 1L);
   }
 
-  //@Test
-  //public void cleanupByRegex() throws Exception {
-  //  assertCleanupByRegex(repository, VERSIONS.length, "*",
-  //      () -> deployArtifacts(AGRICOLAE_FILE_NAME_121_TARGZ), 1L);
-  //}
+  @Test
+  public void cleanupByRegex() throws Exception {
+    assertCleanupByRegex(repository, VERSIONS.length, "bin.*1.[0,3]-1.tar.gz",
+        () -> deployArtifacts(AGRICOLAE_FILE_NAME_121_TARGZ, AGRICOLAE_FILE_NAME_131_TARGZ), 1L);
+  }
 
   private int deployArtifacts(final String... pathToFile) {
     try {
