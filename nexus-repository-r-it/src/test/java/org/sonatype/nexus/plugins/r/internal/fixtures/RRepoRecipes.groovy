@@ -34,5 +34,11 @@ trait RRepoRecipes
     createRepository(createProxy(name, 'r-proxy', remoteUrl))
   }
 
+  @Nonnull
+  Repository createRHosted(final String name)
+  {
+    createRepository(createHosted(name, 'r-hosted'))
+  }
+
   abstract Repository createRepository(final Configuration configuration)
 }
