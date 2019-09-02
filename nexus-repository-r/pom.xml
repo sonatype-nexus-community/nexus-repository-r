@@ -67,6 +67,11 @@
       <artifactId>nexus-rapture</artifactId>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-cleanup</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
