@@ -42,6 +42,8 @@ public class RITSupport
 
   public static final String PACKAGES_NAME = "PACKAGES";
 
+  public static final String PACKAGES_AGRICOLAE_131_NAME = "PACKAGES_agricolae_131";
+
   public static final String AGRICOLAE_PKG_VERSION_101 = "1.0-1";
 
   public static final String AGRICOLAE_PKG_VERSION_121 = "1.2-1";

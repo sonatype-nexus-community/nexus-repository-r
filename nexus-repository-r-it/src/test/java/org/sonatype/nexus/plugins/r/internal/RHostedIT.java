@@ -13,11 +13,10 @@
 package org.sonatype.nexus.plugins.r.internal;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.zip.GZIPInputStream;
+import java.util.stream.Collectors;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
@@ -26,20 +25,20 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.util.EntityUtils;
-import org.hamcrest.Matchers;
+import org.apache.tika.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
+import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -93,4 +92,24 @@ public class RHostedIT
     assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_GZIP));
   }
 
+  @Test
+  public void testGeneratedMetadataIsCorrect() throws Exception
+  {
+    final File expectedPackaFile = testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME);
+    final String expectedPackageData =
+        Files.readAllLines(expectedPackaFile.toPath())
+            .stream().collect(Collectors.joining(System.lineSeparator()));
+
+    assertThat(getAllComponents(repository), hasSize(0));
+
+    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+    assertThat(getAllComponents(repository), hasSize(1));
+
+    final InputStream content = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
+    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, content)) {
+      final String downloadedPackageData = IOUtils.toString(cin);
+      assertThat(downloadedPackageData, is(equalTo(expectedPackageData)));
+    }
+  }
 }
