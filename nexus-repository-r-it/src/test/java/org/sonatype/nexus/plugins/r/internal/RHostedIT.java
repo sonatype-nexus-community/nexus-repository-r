@@ -72,12 +72,12 @@ public class RHostedIT
   public void testPullingPackages() throws Exception
   {
     assertThat(getAllComponents(repository), hasSize(0));
-    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME);
-    client.put(AGRICOLAE_PATH_FULL, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
 
     Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
     assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
-    assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION)));
+    assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_131)));
   }
 
   @Test
@@ -85,8 +85,8 @@ public class RHostedIT
   {
     assertThat(getAllComponents(repository), hasSize(0));
 
-    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME);
-    client.put(AGRICOLAE_PATH_FULL, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
     assertThat(getAllComponents(repository), hasSize(1));
     HttpResponse resp = client.fetch(PACKAGES_PATH_FULL);
     assertThat(resp.getEntity().getContentLength(), notNullValue());

@@ -65,9 +65,6 @@ public class RITSupport
 
   public static final String AGRICOLAE_PKG_FILE_NAME_131_TARGZ = format("%s_%s%s",
       AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TARGZ_EXT);
-  public static final String AGRICOLAE_PKG_FILE_NAME = format("%s_%s%s", AGRICOLAE_PKG_NAME,
-      AGRICOLAE_PKG_VERSION,
-      TGZ_EXT);
 
   public static final String CONTENT_TYPE_TGZ = "application/x-tgz";
 
@@ -75,8 +72,7 @@ public class RITSupport
 
   public static final String PACKAGES_FILE_NAME = format("%s%s", PACKAGES_NAME, GZ_EXT);
 
-  public static final String AGRICOLAE_PATH_FULL = format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME);
-  public static final String AGRICOLAE_PATH_FULL = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+  public static final String AGRICOLAE_PATH_FULL_131_TGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
 
   public static final String PACKAGES_PATH_FULL = format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
 
