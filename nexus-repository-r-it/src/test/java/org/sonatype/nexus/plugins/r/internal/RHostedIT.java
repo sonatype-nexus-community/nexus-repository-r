@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
@@ -23,6 +24,7 @@ import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.ComponentMaintenance;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
@@ -39,6 +41,7 @@ import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZ
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -93,7 +96,7 @@ public class RHostedIT
   }
 
   @Test
-  public void testGeneratedMetadataIsCorrect() throws Exception
+  public void testMetadataProcessing() throws Exception
   {
     final File expectedPackaFile = testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME);
     final String expectedPackageData =
@@ -106,10 +109,22 @@ public class RHostedIT
     client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
     assertThat(getAllComponents(repository), hasSize(1));
 
+    //Verify PACKAGES(metadata) contain appropriate content about R package.
     final InputStream content = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
     try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, content)) {
       final String downloadedPackageData = IOUtils.toString(cin);
       assertThat(downloadedPackageData, is(equalTo(expectedPackageData)));
+    }
+
+    //Verify PACKAGES(metadata) is clean if component has been deleted
+    List<Component> components = getAllComponents(repository);
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteComponent(components.get(0).getEntityMetadata().getId());
+
+    final InputStream contentAfterDelete = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
+    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, contentAfterDelete)) {
+      final String downloadedPackageData = IOUtils.toString(cin);
+      assertThat(downloadedPackageData, isEmptyString());
     }
   }
 }
