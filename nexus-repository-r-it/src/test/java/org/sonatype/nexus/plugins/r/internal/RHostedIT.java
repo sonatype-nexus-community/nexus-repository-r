@@ -98,8 +98,8 @@ public class RHostedIT
   @Test
   public void testMetadataProcessing() throws Exception
   {
-    final File expectedPackaFile = testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME);
-    final String expectedPackageData = new String(Files.readAllBytes(expectedPackaFile.toPath()));
+    final File expectedPackageFile = testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME);
+    final String expectedPackageData = new String(Files.readAllBytes(expectedPackageFile.toPath()));
 
     assertThat(getAllComponents(repository), hasSize(0));
 
