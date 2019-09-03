@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
@@ -31,6 +30,7 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.tika.io.IOUtils;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -105,24 +105,25 @@ public class RHostedIT
 
     final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
     client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+
     assertThat(getAllComponents(repository), hasSize(1));
 
     //Verify PACKAGES(metadata) contain appropriate content about R package.
     final InputStream content = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
-    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, content)) {
-      final String downloadedPackageData = IOUtils.toString(cin);
-      assertThat(downloadedPackageData, is(equalTo(expectedPackageData)));
-    }
+    verifyTextGzipContent(is(equalTo(expectedPackageData)),content);
 
     //Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteComponent(components.get(0).getEntityMetadata().getId());
-
     final InputStream contentAfterDelete = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
-    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, contentAfterDelete)) {
+    verifyTextGzipContent(isEmptyString(), contentAfterDelete);
+  }
+
+  private void verifyTextGzipContent(Matcher<String> expectedContent, InputStream is) throws Exception {
+    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, is)) {
       final String downloadedPackageData = IOUtils.toString(cin);
-      assertThat(downloadedPackageData, isEmptyString());
+      assertThat(downloadedPackageData, expectedContent);
     }
   }
 }
