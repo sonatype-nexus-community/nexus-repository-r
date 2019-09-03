@@ -5,4 +5,3 @@ Imports: klaR, MASS, nlme, cluster, spdep, AlgDesign, graphics
 License: GPL
 NeedsCompilation: no
 
-
