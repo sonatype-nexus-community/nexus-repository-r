@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.r.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,12 +39,11 @@ import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
+import static java.lang.String.*;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public class RHostedIT
@@ -69,57 +69,60 @@ public class RHostedIT
     BaseUrlHolder.set(this.nexusUrl.toString());
     repository = repos.createRHosted("r-hosted-test");
     client = createRHostedClient(repository);
+    uploadPackage(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 
   @Test
-  public void testPackagesProcessing() throws Exception
+  public void testPackageUpload() throws Exception
   {
-    assertThat(getAllComponents(repository), hasSize(0));
-    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
-    client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
-
     //Verify DB contains data about uploaded component and asset
     Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
     assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
-    assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_131)));
+    assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_121)));
 
     //Verify Asset is created.
-    Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
-    assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_131_TGZ)));
+    Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
+    assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_121_TARGZ)));
     assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
+  }
 
-    //Verify that package could be downloaded from NXRM
+  @Test
+  public void testFetchPackage() throws Exception
+  {
     HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
     assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_TGZ));
-    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
-
-    //TODO DELETE ASSET and check that component is deleted. will be implemented after NEXUS-20711 fix.
+    assertSuccessResponseMatches(resp, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 
   @Test
   public void testMetadataProcessing() throws Exception
   {
-    final File expectedPackageFile = testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME);
-    final String expectedPackageData = new String(Files.readAllBytes(expectedPackageFile.toPath()));
-
-    assertThat(getAllComponents(repository), hasSize(0));
-
-    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
-    client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
-
-    assertThat(getAllComponents(repository), hasSize(1));
+    final String agricolae121Content =
+        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_121_NAME).toPath()));
+    final String agricolae131Content =
+        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME).toPath()));
 
     //Verify PACKAGES(metadata) contain appropriate content about R package.
     final InputStream content = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
-    verifyTextGzipContent(is(equalTo(expectedPackageData)), content);
+    verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
 
     //Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
-    maintenanceFacet.deleteComponent(components.get(0).getEntityMetadata().getId());
+    maintenanceFacet.deleteComponent(components.get(1).getEntityMetadata().getId());
 
     final InputStream contentAfterDelete = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
-    verifyTextGzipContent(isEmptyString(), contentAfterDelete);
+    verifyTextGzipContent(is(equalTo(agricolae121Content)), contentAfterDelete);
+  }
+
+  private void uploadPackage(String... names) throws IOException {
+    assertThat(getAllComponents(repository), hasSize(0));
+    for (String name : names) {
+      final File file = testData.resolveFile(name);
+      client.put(format("%s/%s", PKG_PATH, name),
+          new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+    }
+    assertThat(getAllComponents(repository), hasSize(names.length));
   }
 
   private void verifyTextGzipContent(Matcher<String> expectedContent, InputStream is) throws Exception {

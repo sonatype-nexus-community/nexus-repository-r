@@ -42,6 +42,8 @@ public class RITSupport
 
   public static final String PACKAGES_NAME = "PACKAGES";
 
+  public static final String PACKAGES_AGRICOLAE_121_NAME = "PACKAGES_agricolae_121";
+
   public static final String PACKAGES_AGRICOLAE_131_NAME = "PACKAGES_agricolae_131";
 
   public static final String AGRICOLAE_PKG_VERSION_101 = "1.0-1";
@@ -75,6 +77,8 @@ public class RITSupport
   public static final String PACKAGES_FILE_NAME = format("%s%s", PACKAGES_NAME, GZ_EXT);
 
   public static final String AGRICOLAE_PATH_FULL_131_TGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+
+  public static final String AGRICOLAE_PATH_FULL_121_TARGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
 
   public static final String PACKAGES_PATH_FULL = format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
 
