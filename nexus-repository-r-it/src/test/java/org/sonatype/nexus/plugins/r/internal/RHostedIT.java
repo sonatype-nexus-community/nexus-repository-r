@@ -22,6 +22,7 @@ import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentMaintenance;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
@@ -77,9 +78,21 @@ public class RHostedIT
     final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
     client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
 
+    //Verify DB contains data about uploaded component and asset
     Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
     assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
     assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_131)));
+
+    //Verify Asset is created.
+    Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_131_TGZ)));
+    assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
+
+    //Verify that package could be downloaded from NXRM
+    HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+    assertThat(resp.getEntity().getContentLength(), notNullValue());
+    assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_TGZ));
+    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 
   @Test
@@ -118,6 +131,9 @@ public class RHostedIT
     maintenanceFacet.deleteComponent(components.get(0).getEntityMetadata().getId());
     final InputStream contentAfterDelete = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
     verifyTextGzipContent(isEmptyString(), contentAfterDelete);
+
+    //TODO DELETE ASSET and check that component is deleted. will be implemented after NEXUS-20711 fix.
+
   }
 
   private void verifyTextGzipContent(Matcher<String> expectedContent, InputStream is) throws Exception {
