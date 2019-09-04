@@ -72,7 +72,7 @@ public class RHostedIT
   }
 
   @Test
-  public void testPullingPackages() throws Exception
+  public void testPackagesProcessing() throws Exception
   {
     assertThat(getAllComponents(repository), hasSize(0));
     final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
@@ -90,22 +90,10 @@ public class RHostedIT
 
     //Verify that package could be downloaded from NXRM
     HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
-    assertThat(resp.getEntity().getContentLength(), notNullValue());
     assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_TGZ));
     assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
-  }
 
-  @Test
-  public void testPullingMetadata() throws Exception
-  {
-    assertThat(getAllComponents(repository), hasSize(0));
-
-    final File file = testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ);
-    client.put(AGRICOLAE_PATH_FULL_131_TGZ, new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
-    assertThat(getAllComponents(repository), hasSize(1));
-    HttpResponse resp = client.fetch(PACKAGES_PATH_FULL);
-    assertThat(resp.getEntity().getContentLength(), notNullValue());
-    assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_GZIP));
+    //TODO DELETE ASSET and check that component is deleted. will be implemented after NEXUS-20711 fix.
   }
 
   @Test
@@ -123,17 +111,15 @@ public class RHostedIT
 
     //Verify PACKAGES(metadata) contain appropriate content about R package.
     final InputStream content = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
-    verifyTextGzipContent(is(equalTo(expectedPackageData)),content);
+    verifyTextGzipContent(is(equalTo(expectedPackageData)), content);
 
     //Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteComponent(components.get(0).getEntityMetadata().getId());
+
     final InputStream contentAfterDelete = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
     verifyTextGzipContent(isEmptyString(), contentAfterDelete);
-
-    //TODO DELETE ASSET and check that component is deleted. will be implemented after NEXUS-20711 fix.
-
   }
 
   private void verifyTextGzipContent(Matcher<String> expectedContent, InputStream is) throws Exception {
