@@ -42,6 +42,10 @@ public class RITSupport
 
   public static final String PACKAGES_NAME = "PACKAGES";
 
+  public static final String PACKAGES_AGRICOLAE_121_NAME = "PACKAGES_agricolae_121";
+
+  public static final String PACKAGES_AGRICOLAE_131_NAME = "PACKAGES_agricolae_131";
+
   public static final String AGRICOLAE_PKG_VERSION_101 = "1.0-1";
 
   public static final String AGRICOLAE_PKG_VERSION_121 = "1.2-1";
@@ -70,11 +74,13 @@ public class RITSupport
 
   public static final String CONTENT_TYPE_GZIP = "application/x-gzip";
 
-  public static final String PACKAGES_FILE_NAME = String.format("%s%s", PACKAGES_NAME, GZ_EXT);
+  public static final String PACKAGES_FILE_NAME = format("%s%s", PACKAGES_NAME, GZ_EXT);
 
-  public static final String AGRICOLAE_PATH_FULL = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+  public static final String AGRICOLAE_PATH_FULL_131_TGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
 
-  public static final String PACKAGES_PATH_FULL = String.format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
+  public static final String AGRICOLAE_PATH_FULL_121_TARGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
+
+  public static final String PACKAGES_PATH_FULL = format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
 
   @Rule
   public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);
@@ -88,6 +94,15 @@ public class RITSupport
     checkNotNull(repository);
     final URL repositoryUrl = repositoryBaseUrl(repository);
     return rClient(repositoryUrl);
+  }
+
+  @Nonnull
+  protected RClient createRHostedClient(final Repository repository) throws Exception {
+    return new RClient(
+        clientBuilder().build(),
+        clientContext(),
+        resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()
+    );
   }
 
   protected RClient rClient(final URL repositoryUrl) throws Exception {
