@@ -1,0 +1,6 @@
+Package: agricolae
+Version: 1.2-1
+Imports: klaR, MASS, nlme, cluster, spdep
+License: GPL
+NeedsCompilation: no
+
