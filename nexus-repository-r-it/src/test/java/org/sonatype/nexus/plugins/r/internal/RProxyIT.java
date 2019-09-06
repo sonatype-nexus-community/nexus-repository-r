@@ -55,7 +55,7 @@ public class RProxyIT
     BaseUrlHolder.set(this.nexusUrl.toString());
     server = Server.withPort(0)
         .serve("/*").withBehaviours(error(200))
-        .serve("/" + AGRICOLAE_PATH_FULL).withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ)))
+        .serve("/" + AGRICOLAE_PATH_FULL_131_TGZ).withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ)))
         .serve("/" + PACKAGES_PATH_FULL).withBehaviours(file(testData.resolveFile(PACKAGES_FILE_NAME)))
         .start();
     repository = repos.createRProxy("r-proxy-test", server.getUrl().toExternalForm());
@@ -69,9 +69,9 @@ public class RProxyIT
 
   @Test
   public void fetchTgzPackageFile() throws Exception {
-    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
-    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL);
-    Assert.assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL)));
+    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    Assert.assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_131_TGZ)));
     Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_TGZ)));
     Assert.assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
   }
@@ -88,7 +88,7 @@ public class RProxyIT
   public void checkComponentCreated() throws Exception {
     final Component nullComponent = findComponent(repository, AGRICOLAE_PKG_NAME);
     Assert.assertThat(nullComponent, is(nullValue()));
-    client.fetch(AGRICOLAE_PATH_FULL);
+    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
 
     final Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
     Assert.assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
@@ -106,8 +106,8 @@ public class RProxyIT
 
   @Test
   public void shouldCacheTgzPackageFile() throws Exception {
-    client.fetch(AGRICOLAE_PATH_FULL);
+    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
     server.stop();
-    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 }
