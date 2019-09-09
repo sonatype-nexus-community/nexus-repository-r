@@ -43,6 +43,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPILATION;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LINKINGTO;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RMetadataUtils.parseDescriptionFile;
 
@@ -94,6 +95,7 @@ public final class RPackagesUtils
           headers.addHeader(P_DEPENDS, entry.get(P_DEPENDS));
           headers.addHeader(P_IMPORTS, entry.get(P_IMPORTS));
           headers.addHeader(P_SUGGESTS, entry.get(P_SUGGESTS));
+          headers.addHeader(P_LINKINGTO, entry.get(P_LINKINGTO));
           headers.addHeader(P_LICENSE, entry.get(P_LICENSE));
           headers.addHeader(P_NEEDS_COMPILATION, entry.get(P_NEEDS_COMPILATION));
           Enumeration<String> headerLines = headers.getAllHeaderLines();
