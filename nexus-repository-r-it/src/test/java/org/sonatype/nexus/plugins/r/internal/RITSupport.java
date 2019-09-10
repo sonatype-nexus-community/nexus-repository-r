@@ -12,7 +12,12 @@
  */
 package org.sonatype.nexus.plugins.r.internal;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.Nonnull;
 
@@ -21,6 +26,8 @@ import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -58,6 +65,8 @@ public class RITSupport
 
   public static final String GZ_EXT = ".gz";
 
+  public static final String DOES_NOT_EXIST_PKG_TGZ =  format("%s/%s%s", PKG_PATH, "doesnt_exist", TGZ_EXT);
+
   public static final String AGRICOLAE_PKG_FILE_NAME_131_TGZ = format("%s_%s%s",
       AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TGZ_EXT);
 
@@ -78,6 +87,8 @@ public class RITSupport
 
   public static final String AGRICOLAE_PATH_FULL_131_TGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
 
+  public static final String AGRICOLAE_PATH_FULL_131_TARGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
+
   public static final String AGRICOLAE_PATH_FULL_121_TARGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
 
   public static final String PACKAGES_PATH_FULL = format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
@@ -97,7 +108,7 @@ public class RITSupport
   }
 
   @Nonnull
-  protected RClient createRHostedClient(final Repository repository) throws Exception {
+  protected RClient createRClient(final Repository repository) throws Exception {
     return new RClient(
         clientBuilder().build(),
         clientContext(),
@@ -111,5 +122,13 @@ public class RITSupport
         clientContext(),
         repositoryUrl.toURI()
     );
+  }
+
+  protected HttpEntity fileToHttpEntity(String name) throws IOException {
+    return new ByteArrayEntity(Files.readAllBytes(getFilePathByName(name)));
+  }
+
+  private Path getFilePathByName(String fileName){
+    return Paths.get(testData.resolveFile(fileName).getAbsolutePath());
   }
 }
