@@ -26,6 +26,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPILATION;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LINKINGTO;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 
 /**
@@ -87,6 +88,7 @@ public class RPackagesBuilder
         newInformation.put(P_DEPENDS, asset.formatAttributes().get(P_DEPENDS, String.class));
         newInformation.put(P_IMPORTS, asset.formatAttributes().get(P_IMPORTS, String.class));
         newInformation.put(P_SUGGESTS, asset.formatAttributes().get(P_SUGGESTS, String.class));
+        newInformation.put(P_LINKINGTO, asset.formatAttributes().get(P_LINKINGTO, String.class));
         newInformation.put(P_LICENSE, asset.formatAttributes().get(P_LICENSE, String.class));
         newInformation.put(P_NEEDS_COMPILATION, asset.formatAttributes().get(P_NEEDS_COMPILATION, String.class));
 
