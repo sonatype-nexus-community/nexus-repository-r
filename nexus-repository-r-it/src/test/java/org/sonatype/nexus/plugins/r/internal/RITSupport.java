@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.plugins.r.internal;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,12 +26,17 @@ import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.tika.io.IOUtils;
+import org.hamcrest.Matcher;
 import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Support class for R ITs.
@@ -126,6 +131,13 @@ public class RITSupport
 
   protected HttpEntity fileToHttpEntity(String name) throws IOException {
     return new ByteArrayEntity(Files.readAllBytes(getFilePathByName(name)));
+  }
+
+  protected void verifyTextGzipContent(Matcher<String> expectedContent, InputStream is) throws Exception {
+    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, is)) {
+      final String downloadedPackageData = IOUtils.toString(cin);
+      assertThat(downloadedPackageData, expectedContent);
+    }
   }
 
   private Path getFilePathByName(String fileName){

@@ -119,11 +119,4 @@ public class RHostedIT
     }
     assertThat(getAllComponents(repository), hasSize(names.length));
   }
-
-  private void verifyTextGzipContent(Matcher<String> expectedContent, InputStream is) throws Exception {
-    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, is)) {
-      final String downloadedPackageData = IOUtils.toString(cin);
-      assertThat(downloadedPackageData, expectedContent);
-    }
-  }
 }
