@@ -94,7 +94,7 @@ public class RGroupIT
   }
 
   @Test
-  public void whenRequestMetadataFromGroupShouldReturnSuccess() throws Exception {
+  public void whenRequestMetadataFromGroup_ShouldReturnSuccess() throws Exception {
     final String agricolae131Content =
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME).toPath()));
 
