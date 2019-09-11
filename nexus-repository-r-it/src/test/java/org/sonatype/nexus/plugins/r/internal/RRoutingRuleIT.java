@@ -71,13 +71,13 @@ public class RRoutingRuleIT
   @Test
   public void testBlockedRoutingRule() throws Exception {
     String packageFileName = "agricolae_1.0-1.tar.gz";
-    String allowedPackagePath = "github.com/allowed/example/@v/agricolae_1.0-1.tar.gz";
-    String blockedPackagePath = "github.com/blocked/example/@v/agricolae_1.0-1.tar.gz";
+    String allowedPackagePath = "bin/macosx/el-capitan/contrib/1.0/agricolae_1.0-1.tar.gz";
+    String blockedPackagePath = "bin/macosx/el-capitan/contrib/1.1/agricolae_1.0-1.tar.gz";
 
     configureProxyBehaviour(allowedPackagePath, packageFileName);
     configureProxyBehaviour(blockedPackagePath, packageFileName);
 
-    EntityId routingRuleId = createBlockedRoutingRule("r-blocking-rule", ".*/blocked/.*");
+    EntityId routingRuleId = createBlockedRoutingRule("r-blocking-rule", ".*/1.1/.*");
     Repository proxyRepo = repos.createRProxy("test-r-blocking-proxy", proxyServer.getUrl().toString());
     RawClient client = rawClient(proxyRepo);
 

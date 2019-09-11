@@ -58,6 +58,8 @@ public class RRoutingRuleITSupport
   protected static class BehaviourSpy
       implements Behaviour
   {
+    private static final String REQUEST_URI_PATTERN = "%s?%s";
+
     private Behaviour delegate;
 
     List<String> requestUris = new ArrayList<>();
@@ -72,7 +74,7 @@ public class RRoutingRuleITSupport
         final HttpServletResponse response,
         final Map<Object, Object> ctx) throws Exception
     {
-      requestUris.add(request.getRequestURI() + '?' + request.getQueryString());
+      requestUris.add(String.format(REQUEST_URI_PATTERN, request.getRequestURI(), request.getQueryString()));
       return delegate.execute(request, response, ctx);
     }
   }
