@@ -30,7 +30,9 @@ Ext.define('NX.r.controller.SearchR', {
       description: NX.I18n.get('SearchR_Description'),
       readOnly: true,
       criterias: [
-        {id: 'format', value: 'r', hidden: true}
+        {id: 'format', value: 'r', hidden: true},
+        {id: 'name.raw'},
+        {id: 'version'}
       ]
     }, me);
   }
