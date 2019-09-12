@@ -71,9 +71,9 @@ public class RGroupIT
         .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_121_TARGZ)))
         .start();
 
-    repoProxy = repos.createRProxy("r-proxy", remote.getUrl().toExternalForm());
-    repoHosted = repos.createRHosted("r-hosted");
-    repoGroup = repos.createRGroup("r-group", repoHosted.getName(), repoProxy.getName());
+    repoProxy = repos.createRProxy(testName.getMethodName() + "-proxy", remote.getUrl().toExternalForm());
+    repoHosted = repos.createRHosted(testName.getMethodName() + "-hosted");
+    repoGroup = repos.createRGroup(testName.getMethodName() + "-group", repoHosted.getName(), repoProxy.getName());
 
     hostedClient = createRClient(repoHosted);
     groupClient = createRClient(repoGroup);
