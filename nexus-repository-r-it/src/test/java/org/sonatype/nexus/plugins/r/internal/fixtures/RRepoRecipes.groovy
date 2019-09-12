@@ -40,5 +40,11 @@ trait RRepoRecipes
     createRepository(createHosted(name, 'r-hosted'))
   }
 
+  @Nonnull
+  Repository createRGroup(final String name, final String... members)
+  {
+    createRepository(createGroup(name, 'r-group', members))
+  }
+
   abstract Repository createRepository(final Configuration configuration)
 }

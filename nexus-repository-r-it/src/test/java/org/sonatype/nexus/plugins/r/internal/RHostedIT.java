@@ -53,9 +53,6 @@ public class RHostedIT
 
   private Repository repository;
 
-  @Rule
-  public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);
-
   @Configuration
   public static Option[] configureNexus() {
     return NexusPaxExamSupport.options(
@@ -68,7 +65,7 @@ public class RHostedIT
   public void setUp() throws Exception {
     BaseUrlHolder.set(this.nexusUrl.toString());
     repository = repos.createRHosted("r-hosted-test");
-    client = createRHostedClient(repository);
+    client = createRClient(repository);
     uploadPackage(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 
@@ -118,17 +115,8 @@ public class RHostedIT
   private void uploadPackage(String... names) throws IOException {
     assertThat(getAllComponents(repository), hasSize(0));
     for (String name : names) {
-      final File file = testData.resolveFile(name);
-      client.put(format("%s/%s", PKG_PATH, name),
-          new ByteArrayEntity(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
+      client.put(format("%s/%s", PKG_PATH, name), fileToHttpEntity(name));
     }
     assertThat(getAllComponents(repository), hasSize(names.length));
-  }
-
-  private void verifyTextGzipContent(Matcher<String> expectedContent, InputStream is) throws Exception {
-    try (InputStream cin = new CompressorStreamFactory().createCompressorInputStream(GZIP, is)) {
-      final String downloadedPackageData = IOUtils.toString(cin);
-      assertThat(downloadedPackageData, expectedContent);
-    }
   }
 }
