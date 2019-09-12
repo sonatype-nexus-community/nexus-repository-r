@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.plugins.r.internal;
 
+import java.io.IOException;
+
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.ComponentMaintenance;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.junit.After;
@@ -30,6 +33,9 @@ import org.ops4j.pax.exam.Option;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
 
@@ -55,7 +61,10 @@ public class RProxyIT
     BaseUrlHolder.set(this.nexusUrl.toString());
     server = Server.withPort(0)
         .serve("/*").withBehaviours(error(200))
-        .serve("/" + AGRICOLAE_PATH_FULL_131_TGZ).withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ)))
+        .serve("/" + AGRICOLAE_PATH_FULL_131_TGZ)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ)))
+        .serve("/" + AGRICOLAE_PATH_FULL_131_TARGZ)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TARGZ)))
         .serve("/" + PACKAGES_PATH_FULL).withBehaviours(file(testData.resolveFile(PACKAGES_FILE_NAME)))
         .start();
     repository = repos.createRProxy("r-proxy-test", server.getUrl().toExternalForm());
@@ -109,5 +118,66 @@ public class RProxyIT
     client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
     server.stop();
     assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+  }
+
+  @Test
+  public void testDeleteAssetWithComponent() throws IOException {
+    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+
+    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    assertNotNull(asset);
+    assertNotNull(asset.componentId());
+
+    final Component component = findComponentById(repository, asset.componentId());
+    assertNotNull(component);
+    assertEquals(1, findAssetsByComponent(repository, component).size());
+
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteAsset(asset.getEntityMetadata().getId(), true);
+
+    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ));
+    assertNull(findComponentById(repository, asset.componentId()));
+  }
+
+  @Test
+  public void testDeleteAssetWithoutComponent() throws IOException {
+    client.fetch(AGRICOLAE_PATH_FULL_131_TARGZ);
+    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+
+    final Asset assetTgz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    assertNotNull(assetTgz);
+    assertNotNull(assetTgz.componentId());
+
+    final Asset assetTargz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TARGZ);
+    assertNotNull(assetTargz);
+    assertNotNull(assetTargz.componentId());
+
+    final Component component = findComponentById(repository, assetTargz.componentId());
+    assertNotNull(component);
+    assertEquals(2, findAssetsByComponent(repository, component).size());
+
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteAsset(assetTargz.getEntityMetadata().getId(), true);
+
+    assertNull(findAsset(repository, AGRICOLAE_PKG_FILE_NAME_131_TARGZ));
+    assertNotNull(findComponentById(repository, assetTargz.componentId()));
+  }
+
+  @Test
+  public void testDeleteComponent() throws IOException {
+    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+
+    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    assertNotNull(asset);
+    assertNotNull(asset.componentId());
+
+    final Component component = findComponentById(repository, asset.componentId());
+    assertNotNull(component);
+
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteComponent(component.getEntityMetadata().getId(), true);
+
+    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ));
+    assertNull(findComponentById(repository, asset.componentId()));
   }
 }

@@ -12,39 +12,33 @@
  */
 package org.sonatype.nexus.plugins.r.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
-import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentMaintenance;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.tika.io.IOUtils;
-import org.hamcrest.Matcher;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
-import static java.lang.String.*;
-import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class RHostedIT
     extends RITSupport
@@ -66,7 +60,7 @@ public class RHostedIT
     BaseUrlHolder.set(this.nexusUrl.toString());
     repository = repos.createRHosted("r-hosted-test");
     client = createRClient(repository);
-    uploadPackage(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    uploadPackages(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 
   @Test
@@ -112,11 +106,71 @@ public class RHostedIT
     verifyTextGzipContent(is(equalTo(agricolae121Content)), contentAfterDelete);
   }
 
-  private void uploadPackage(String... names) throws IOException {
+  @Test
+  public void testDeleteAssetWithComponent() {
+    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
+    assertNotNull(asset);
+    assertNotNull(asset.componentId());
+
+    final Component component = findComponentById(repository, asset.componentId());
+    assertNotNull(component);
+    assertEquals(1, findAssetsByComponent(repository, component).size());
+
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteAsset(asset.getEntityMetadata().getId(), true);
+
+    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ));
+    assertNull(findComponentById(repository, asset.componentId()));
+  }
+
+  @Test
+  public void testDeleteAssetWithoutComponent() throws IOException {
+    uploadSinglePackage(AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
+
+    final Asset assetTgz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    assertNotNull(assetTgz);
+    assertNotNull(assetTgz.componentId());
+
+    final Asset assetTargz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TARGZ);
+    assertNotNull(assetTargz);
+    assertNotNull(assetTargz.componentId());
+
+    final Component component = findComponentById(repository, assetTargz.componentId());
+    assertNotNull(component);
+    assertEquals(2, findAssetsByComponent(repository, component).size());
+
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteAsset(assetTargz.getEntityMetadata().getId(), true);
+
+    assertNull(findAsset(repository, AGRICOLAE_PKG_FILE_NAME_131_TARGZ));
+    assertNotNull(findComponentById(repository, assetTargz.componentId()));
+  }
+
+  @Test
+  public void testDeleteComponent() {
+    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
+    assertNotNull(asset);
+    assertNotNull(asset.componentId());
+
+    final Component component = findComponentById(repository, asset.componentId());
+    assertNotNull(component);
+
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteComponent(component.getEntityMetadata().getId(), true);
+
+    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ));
+    assertNull(findComponentById(repository, asset.componentId()));
+  }
+
+  private void uploadPackages(String... names) throws IOException {
     assertThat(getAllComponents(repository), hasSize(0));
     for (String name : names) {
-      client.put(format("%s/%s", PKG_PATH, name), fileToHttpEntity(name));
+      uploadSinglePackage(name);
     }
     assertThat(getAllComponents(repository), hasSize(names.length));
+  }
+
+  private void uploadSinglePackage(String name) throws IOException {
+    client.put(format("%s/%s", PKG_PATH, name), fileToHttpEntity(name));
   }
 }
