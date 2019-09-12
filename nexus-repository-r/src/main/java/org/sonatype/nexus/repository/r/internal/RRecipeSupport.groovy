@@ -21,6 +21,7 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.http.PartialFetchHandler
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
+import org.sonatype.nexus.repository.routing.RoutingRuleHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
 import org.sonatype.nexus.repository.storage.DefaultComponentMaintenanceImpl
@@ -72,6 +73,9 @@ abstract class RRecipeSupport
 
   @Inject
   SecurityHandler securityHandler
+
+  @Inject
+  RoutingRuleHandler routingRuleHandler;
 
   @Inject
   PartialFetchHandler partialFetchHandler
