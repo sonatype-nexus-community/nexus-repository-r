@@ -121,7 +121,7 @@ public class RProxyIT
   }
 
   @Test
-  public void testDeleteAssetWithComponent() throws IOException {
+  public void testDeletingRemainingAssetAlsoDeletesComponent() throws IOException {
     client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
 
     final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
@@ -140,7 +140,7 @@ public class RProxyIT
   }
 
   @Test
-  public void testDeleteAssetWithoutComponent() throws IOException {
+  public void testDeletingAssetWhenMultipleExistDoesNotDeleteComponent() throws IOException {
     client.fetch(AGRICOLAE_PATH_FULL_131_TARGZ);
     client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
 
@@ -164,7 +164,7 @@ public class RProxyIT
   }
 
   @Test
-  public void testDeleteComponent() throws IOException {
+  public void testDeletingComponentDeletesAllAssociatedAssets() throws IOException {
     client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
 
     final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);

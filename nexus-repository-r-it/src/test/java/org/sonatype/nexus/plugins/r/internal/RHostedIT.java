@@ -107,7 +107,7 @@ public class RHostedIT
   }
 
   @Test
-  public void testDeleteAssetWithComponent() {
+  public void testDeletingRemainingAssetAlsoDeletesComponent() {
     final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
     assertNotNull(asset);
     assertNotNull(asset.componentId());
@@ -124,7 +124,7 @@ public class RHostedIT
   }
 
   @Test
-  public void testDeleteAssetWithoutComponent() throws IOException {
+  public void testDeletingAssetWhenMultipleExistDoesNotDeleteComponent() throws IOException {
     uploadSinglePackage(AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
 
     final Asset assetTgz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
@@ -147,7 +147,7 @@ public class RHostedIT
   }
 
   @Test
-  public void testDeleteComponent() {
+  public void testDeletingComponentDeletesAllAssociatedAssets() {
     final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
     assertNotNull(asset);
     assertNotNull(asset.componentId());
