@@ -18,14 +18,20 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ByteArrayEntity;
@@ -90,11 +96,14 @@ public class RITSupport
 
   public static final String PACKAGES_FILE_NAME = format("%s%s", PACKAGES_NAME, GZ_EXT);
 
-  public static final String AGRICOLAE_PATH_FULL_131_TGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+  public static final String AGRICOLAE_PATH_FULL_131_TGZ =
+      String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
 
-  public static final String AGRICOLAE_PATH_FULL_131_TARGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
+  public static final String AGRICOLAE_PATH_FULL_131_TARGZ =
+      String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
 
-  public static final String AGRICOLAE_PATH_FULL_121_TARGZ = String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
+  public static final String AGRICOLAE_PATH_FULL_121_TARGZ =
+      String.format("%s/%s", PKG_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
 
   public static final String PACKAGES_PATH_FULL = format("%s/%s", PKG_PATH, PACKAGES_FILE_NAME);
 
@@ -142,5 +151,19 @@ public class RITSupport
 
   private Path getFilePathByName(String fileName){
     return Paths.get(testData.resolveFile(fileName).getAbsolutePath());
+  }
+
+  protected Component findComponentById(final Repository repository, final EntityId componentId) {
+    try (StorageTx tx = getStorageTx(repository)) {
+      tx.begin();
+      return tx.findComponent(componentId);
+    }
+  }
+
+  protected List<Asset> findAssetsByComponent(final Repository repository, final Component component) {
+    try (StorageTx tx = getStorageTx(repository)) {
+      tx.begin();
+      return IteratorUtils.toList(tx.browseAssets(component).iterator());
+    }
   }
 }
