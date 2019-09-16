@@ -88,7 +88,7 @@ public class RGroupIT
   }
 
   @Test
-  @Ignore("https://issues.sonatype.org/browse/NEXUS-21089")
+  //@Ignore("https://issues.sonatype.org/browse/NEXUS-21089")
   public void whenRequestUnknownR_ShouldReturnError() throws Exception {
     assertThat(status(groupClient.fetch(DOES_NOT_EXIST_PKG_TGZ)), is(NOT_FOUND));
   }
