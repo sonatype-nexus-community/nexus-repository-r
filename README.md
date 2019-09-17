@@ -83,14 +83,17 @@ then install the plugin with the options shown below:
 
 ### Easiest Install
 
-Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it's become a LOT easier to install a plugin. To install the `R` plugin, follow these steps:
+Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it's become a LOT easier to install a plugin. To install the `R` plugin, you can either build locally or download from The Central Repository:
 
+#### Option 1: Build locally
 * Clone this repo and `cd` to the cloned directory location
 * Build the plugin with `mvn clean package -PbuildKar`
+
+#### Option 2: Download from The Central Repository 
 * Download `nexus-repository-r-1.0.4-bundle.kar` from [The Central Repository](https://search.maven.org/artifact/org.sonatype.nexus.plugins/nexus-repository-r/1.0.4/bundle)
 * Copy the downloaded `nexus-repository-r-1.0.4-bundle.kar` file into the `<nexus_dir>/deploy` folder for your Nexus Repository installation.
 
-Once you've done this, go ahead and either restart Nexus Repo, or go ahead and start it if it wasn't running to begin with.
+Once you've completed Option 1 or 2, restart Nexus Repo, or go ahead and start it if it wasn't running to begin with.
 
 You should see the R repository types (e.g. `r (proxy)`) in the available Repository Recipes to use, if all has gone according to plan :)
 
