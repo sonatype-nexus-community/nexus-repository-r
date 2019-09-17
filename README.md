@@ -87,11 +87,12 @@ Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it'
 
 * Clone this repo and `cd` to the cloned directory location
 * Build the plugin with `mvn clean package -PbuildKar`
-* Copy the `nexus-repository-r-1.0.4-bundle.kar` file from your `target` folder to the `deploy` folder for your Nexus Repository installation.
+* Download `nexus-repository-r-1.0.4-bundle.kar` from [The Central Repository](https://search.maven.org/artifact/org.sonatype.nexus.plugins/nexus-repository-r/1.0.4/bundle)
+* Copy the downloaded `nexus-repository-r-1.0.4-bundle.kar` file into the `<nexus_dir>/deploy` folder for your Nexus Repository installation.
 
 Once you've done this, go ahead and either restart Nexus Repo, or go ahead and start it if it wasn't running to begin with.
 
-You should see `r (proxy)` in the available Repository Recipes to use, if all has gone according to plan :)
+You should see the R repository types (e.g. `r (proxy)`) in the available Repository Recipes to use, if all has gone according to plan :)
 
 
 ### Temporary Install
