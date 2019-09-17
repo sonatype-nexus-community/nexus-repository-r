@@ -151,7 +151,6 @@ public class RHostedFacetImpl
 
     Map<String, String> attributes;
     try (InputStream is = archiveContent.get()) {
-      // TODO: Check attributes for null or exception ??? or check why this method is called when archive doesn't exist
       attributes = extractDescriptionFromArchive(path, is);
     }
 

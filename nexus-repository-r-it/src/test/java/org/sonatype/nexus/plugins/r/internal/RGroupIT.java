@@ -66,7 +66,7 @@ public class RGroupIT
   public void setUp() throws Exception {
     ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
     remote = Server.withPort(0)
-        .serve("/*").withBehaviours(error(OK))
+        .serve("/*").withBehaviours(error(NOT_FOUND))
         .serve("/" + AGRICOLAE_PATH_FULL_121_TARGZ)
         .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_121_TARGZ)))
         .start();
@@ -88,7 +88,6 @@ public class RGroupIT
   }
 
   @Test
-  //@Ignore("https://issues.sonatype.org/browse/NEXUS-21089")
   public void whenRequestUnknownR_ShouldReturnError() throws Exception {
     assertThat(status(groupClient.fetch(DOES_NOT_EXIST_PKG_TGZ)), is(NOT_FOUND));
   }
