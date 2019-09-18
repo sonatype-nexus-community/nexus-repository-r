@@ -29,8 +29,8 @@ import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
-import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES_GZ
 
 /**
  * R proxy repository recipe.
@@ -71,9 +71,9 @@ class RHostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(packagesMatcher()
+    builder.route(packagesGzMatcher()
         .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(PACKAGES))
+        .handler(assetKindHandler.rcurry(PACKAGES_GZ))
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)

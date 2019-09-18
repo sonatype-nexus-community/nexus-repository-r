@@ -70,9 +70,9 @@ class RGroupRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(packagesMatcher()
+    builder.route(packagesGzMatcher()
         .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
+        .handler(assetKindHandler.rcurry(AssetKind.PACKAGES_GZ))
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)

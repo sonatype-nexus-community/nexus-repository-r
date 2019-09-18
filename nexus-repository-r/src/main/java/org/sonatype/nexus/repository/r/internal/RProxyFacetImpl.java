@@ -42,7 +42,6 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
@@ -53,7 +52,8 @@ import static org.sonatype.nexus.repository.r.internal.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.toContent;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.filename;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.matcherState;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesPath;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesGzPath;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesRdsPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
@@ -72,12 +72,14 @@ public class RProxyFacetImpl
 
   @Nullable
   @Override
-  protected Content getCachedContent(final Context context) throws IOException {
+  protected Content getCachedContent(final Context context) {
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
     TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
-      case PACKAGES:
-        return getAsset(packagesPath(path(matcherState)));
+      case PACKAGES_GZ:
+        return getAsset(packagesGzPath(path(matcherState)));
+      case PACKAGES_RDS:
+        return getAsset(packagesRdsPath(path(matcherState)));
       case ARCHIVE:
         return getAsset(path(path(matcherState), filename(matcherState)));
       default:
@@ -90,8 +92,10 @@ public class RProxyFacetImpl
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
     TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
-      case PACKAGES:
-        return putPackages(path(matcherState), content);
+      case PACKAGES_GZ:
+        return putPackages(packagesGzPath(path(matcherState)), content, assetKind.name());
+      case PACKAGES_RDS:
+        return putPackages(packagesRdsPath(path(matcherState)), content, assetKind.name());
       case ARCHIVE:
         return putArchive(path(matcherState), filename(matcherState), content);
       default:
@@ -107,7 +111,7 @@ public class RProxyFacetImpl
   }
 
   @TransactionalTouchMetadata
-  public void setCacheInfo(final Content content, final CacheInfo cacheInfo) throws IOException {
+  public void setCacheInfo(final Content content, final CacheInfo cacheInfo) {
     StorageTx tx = UnitOfWork.currentTx();
 
     Asset asset = Content.findAsset(tx, tx.findBucket(getRepository()), content);
@@ -170,28 +174,28 @@ public class RProxyFacetImpl
     return saveAsset(tx, asset, archiveContent, payload);
   }
 
-  private Content putPackages(final String path, final Content content) throws IOException {
+  private Content putPackages(final String path, final Content content, final String packageKindName)
+      throws IOException
+  {
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(content.openInputStream(), RFacetUtils.HASH_ALGORITHMS)) {
-      return doPutPackages(path, tempBlob, content);
+      return doPutPackages(path, tempBlob, content, packageKindName);
     }
   }
 
   @TransactionalStoreBlob
   protected Content doPutPackages(final String path,
                                   final TempBlob packagesContent,
-                                  final Payload payload) throws IOException
+                                  final Payload payload,
+                                  final String packageKindName) throws IOException
   {
     StorageTx tx = UnitOfWork.currentTx();
     Bucket bucket = tx.findBucket(getRepository());
-
-    String assetPath = packagesPath(path);
-
-    Asset asset = findAsset(tx, bucket, assetPath);
+    Asset asset = findAsset(tx, bucket, path);
     if (asset == null) {
       asset = tx.createAsset(bucket, getRepository().getFormat());
-      asset.name(assetPath);
-      asset.formatAttributes().set(P_ASSET_KIND, PACKAGES.name());
+      asset.name(path);
+      asset.formatAttributes().set(P_ASSET_KIND, packageKindName);
     }
     return saveAsset(tx, asset, packagesContent, payload);
   }

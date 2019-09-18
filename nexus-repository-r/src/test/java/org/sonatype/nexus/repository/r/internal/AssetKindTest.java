@@ -22,7 +22,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.sonatype.nexus.repository.cache.CacheControllerHolder.CONTENT;
 import static org.sonatype.nexus.repository.cache.CacheControllerHolder.METADATA;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES_GZ;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES_RDS;
 
 public class AssetKindTest
     extends TestSupport
@@ -30,6 +31,7 @@ public class AssetKindTest
   @Test
   public void cacheTypes() throws Exception {
     assertThat(ARCHIVE.getCacheType(), is(equalTo(CONTENT)));
-    assertThat(PACKAGES.getCacheType(), is(equalTo(METADATA)));
+    assertThat(PACKAGES_GZ.getCacheType(), is(equalTo(METADATA)));
+    assertThat(PACKAGES_RDS.getCacheType(), is(equalTo(METADATA)));
   }
 }

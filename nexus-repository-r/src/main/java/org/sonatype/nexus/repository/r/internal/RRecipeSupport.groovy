@@ -74,7 +74,7 @@ abstract class RRecipeSupport
   SecurityHandler securityHandler
 
   @Inject
-  RoutingRuleHandler routingRuleHandler;
+  RoutingRuleHandler routingRuleHandler
 
   @Inject
   PartialFetchHandler partialFetchHandler
@@ -110,13 +110,24 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Matcher for packages mapping.
+   * Matcher for packages.gz mapping.
    */
-  static Builder packagesMatcher() {
+  static Builder packagesGzMatcher() {
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
             new TokenMatcher('/{path:.+}/PACKAGES.gz')
+        ))
+  }
+
+  /**
+   * Matcher for packages.rds mapping.
+   */
+  static Builder packagesRdsMatcher() {
+    new Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET, HEAD),
+            new TokenMatcher('/{path:.+}/PACKAGES.rds')
         ))
   }
 

@@ -61,10 +61,17 @@ public final class RPathUtils
   }
 
   /**
-   * Builds a path to a package for a particular path.
+   * Builds a path to a package.gz for a particular path.
    */
-  static String packagesPath(final String path) {
+  static String packagesGzPath(final String path) {
     return path + "/PACKAGES.gz";
+  }
+
+  /**
+   * Builds a path to a package.rds for a particular path.
+   */
+  static String packagesRdsPath(final String path) {
+    return path + "/PACKAGES.rds";
   }
 
   private RPathUtils() {
