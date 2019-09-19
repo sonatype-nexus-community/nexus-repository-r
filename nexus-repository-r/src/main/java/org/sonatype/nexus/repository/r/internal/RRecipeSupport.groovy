@@ -121,13 +121,13 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Matcher for packages.rds mapping.
+   * Matcher for *.rds metadata mapping.
    */
-  static Builder packagesRdsMatcher() {
+  static Builder metadataRdsMatcher() {
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
-            new TokenMatcher('/{path:.+}/PACKAGES.rds')
+            new TokenMatcher('/{path:.+}/{filename:.+}.rds')
         ))
   }
 

@@ -58,13 +58,15 @@ public class RITSupport
 
   public static final String PKG_RDS_PATH = "src/contrib";
 
+  public static final String ARCHIVE_RDS_PATH = "src/contrib/Meta";
+
   public static final String AGRICOLAE_PKG_NAME = "agricolae";
 
   public static final String PACKAGES_NAME = "PACKAGES";
 
-  public static final String PACKAGES_GZ_KIND = "PACKAGES_GZ";
+  public static final String ARCHIVE_RDS_NAME = "archive";
 
-  public static final String PACKAGES_RDS_KIND = "PACKAGES_RDS";
+  public static final String METADATA_KIND = "METADATA";
 
   public static final String PACKAGES_AGRICOLAE_121_NAME = "PACKAGES_agricolae_121";
 
@@ -98,15 +100,19 @@ public class RITSupport
   public static final String AGRICOLAE_PKG_FILE_NAME_131_TARGZ = format("%s_%s%s",
       AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TARGZ_EXT);
 
-  public static final String CONTENT_TYPE_TGZ = "application/x-tgz";
+  public static final String CONTENT_TYPE_X_TGZ = "application/x-tgz";
 
-  public static final String CONTENT_TYPE_GZIP = "application/x-gzip";
+  public static final String CONTENT_TYPE_X_GZIP = "application/x-gzip";
 
-  public static final String CONTENT_TYPE_RDS = "application/x-xz";
+  public static final String CONTENT_TYPE_GZIP = "application/gzip";
+
+  public static final String CONTENT_TYPE_X_XZ = "application/x-xz";
 
   public static final String PACKAGES_GZ_FILE_NAME = format("%s%s", PACKAGES_NAME, GZ_EXT);
 
   public static final String PACKAGES_RDS_FILE_NAME = format("%s%s", PACKAGES_NAME, RDS_EXT);
+
+  public static final String ARCHIVE_RDS_FILE_NAME = format("%s%s", ARCHIVE_RDS_NAME, RDS_EXT);
 
   public static final String AGRICOLAE_PATH_FULL_131_TGZ =
       String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
@@ -120,6 +126,8 @@ public class RITSupport
   public static final String PACKAGES_GZ_PATH_FULL = format("%s/%s", PKG_GZ_PATH, PACKAGES_GZ_FILE_NAME);
 
   public static final String PACKAGES_RDS_PATH_FULL = format("%s/%s", PKG_RDS_PATH, PACKAGES_RDS_FILE_NAME);
+
+  public static final String ARCHIVE_RDS_PATH_FULL = format("%s/%s", ARCHIVE_RDS_PATH, ARCHIVE_RDS_FILE_NAME);
 
   @Rule
   public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);

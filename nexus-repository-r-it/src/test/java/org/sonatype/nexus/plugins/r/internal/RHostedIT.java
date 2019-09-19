@@ -81,7 +81,7 @@ public class RHostedIT
   public void testFetchPackage() throws Exception
   {
     HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
-    assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_TGZ));
+    assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_X_TGZ));
     assertSuccessResponseMatches(resp, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 

@@ -72,6 +72,8 @@ public class RProxyIT
         .withBehaviours(file(testData.resolveFile(PACKAGES_GZ_FILE_NAME)))
         .serve("/" + PACKAGES_RDS_PATH_FULL)
         .withBehaviours(file(testData.resolveFile(PACKAGES_RDS_FILE_NAME)))
+        .serve("/" + ARCHIVE_RDS_PATH_FULL)
+        .withBehaviours(file(testData.resolveFile(ARCHIVE_RDS_FILE_NAME)))
         .start();
     repository = repos.createRProxy("r-proxy-test", server.getUrl().toExternalForm());
     client = rClient(repository);
@@ -87,23 +89,32 @@ public class RProxyIT
     assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
     final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
     Assert.assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_131_TGZ)));
-    Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_TGZ)));
+    Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_X_TGZ)));
     Assert.assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
   }
 
   @Test
   public void fetchMetaData() throws Exception {
     assertSuccessResponseMatches(client.fetch(PACKAGES_GZ_PATH_FULL), PACKAGES_GZ_FILE_NAME);
-    final Asset assetGz = findAsset(repository, PACKAGES_GZ_PATH_FULL);
-    Assert.assertThat(assetGz.contentType(), is(equalTo(CONTENT_TYPE_GZIP)));
-    Assert.assertThat(assetGz.format(), is(equalTo(R_FORMAT_NAME)));
-    Assert.assertThat(assetGz.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(PACKAGES_GZ_KIND)));
+    final Asset assetPackagesGz = findAsset(repository, PACKAGES_GZ_PATH_FULL);
+    Assert.assertEquals(PACKAGES_GZ_PATH_FULL, assetPackagesGz.name());
+    Assert.assertThat(assetPackagesGz.contentType(), is(equalTo(CONTENT_TYPE_X_GZIP)));
+    Assert.assertThat(assetPackagesGz.format(), is(equalTo(R_FORMAT_NAME)));
+    Assert.assertThat(assetPackagesGz.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(METADATA_KIND)));
 
     assertSuccessResponseMatches(client.fetch(PACKAGES_RDS_PATH_FULL), PACKAGES_RDS_FILE_NAME);
-    final Asset assetRds = findAsset(repository, PACKAGES_RDS_PATH_FULL);
-    Assert.assertThat(assetRds.contentType(), is(equalTo(CONTENT_TYPE_RDS)));
-    Assert.assertThat(assetRds.format(), is(equalTo(R_FORMAT_NAME)));
-    Assert.assertThat(assetRds.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(PACKAGES_RDS_KIND)));
+    final Asset assetPackagesRds = findAsset(repository, PACKAGES_RDS_PATH_FULL);
+    Assert.assertEquals(PACKAGES_RDS_PATH_FULL, assetPackagesRds.name());
+    Assert.assertThat(assetPackagesRds.contentType(), is(equalTo(CONTENT_TYPE_X_XZ))); //PACKAGE.rds is compressed in XZ
+    Assert.assertThat(assetPackagesRds.format(), is(equalTo(R_FORMAT_NAME)));
+    Assert.assertThat(assetPackagesRds.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(METADATA_KIND)));
+
+    assertSuccessResponseMatches(client.fetch(ARCHIVE_RDS_PATH_FULL), ARCHIVE_RDS_FILE_NAME);
+    final Asset assetArchiveRds = findAsset(repository, ARCHIVE_RDS_PATH_FULL);
+    Assert.assertEquals(ARCHIVE_RDS_PATH_FULL, assetArchiveRds.name());
+    Assert.assertThat(assetArchiveRds.contentType(), is(equalTo(CONTENT_TYPE_GZIP)));
+    Assert.assertThat(assetArchiveRds.format(), is(equalTo(R_FORMAT_NAME)));
+    Assert.assertThat(assetArchiveRds.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(METADATA_KIND)));
   }
 
   @Test

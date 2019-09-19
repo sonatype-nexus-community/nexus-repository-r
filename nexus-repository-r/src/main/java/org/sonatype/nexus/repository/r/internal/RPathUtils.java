@@ -68,10 +68,20 @@ public final class RPathUtils
   }
 
   /**
-   * Builds a path to a package.rds for a particular path.
+   * Removes slash if path starts with it
    */
-  static String packagesRdsPath(final String path) {
-    return path + "/PACKAGES.rds";
+  static String extractFullPath(final Context context) {
+    return removeInitialSlashFromPath(context.getRequest().getPath());
+  }
+
+  /**
+   * Removes slash if path starts with it
+   */
+  private static String removeInitialSlashFromPath(final String path) {
+    if (path.startsWith("/")) {
+      return path.replaceFirst("/", "");
+    }
+    return path;
   }
 
   private RPathUtils() {

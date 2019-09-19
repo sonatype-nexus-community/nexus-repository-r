@@ -30,7 +30,7 @@ import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
-import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES_GZ
+import static org.sonatype.nexus.repository.r.internal.AssetKind.METADATA
 
 /**
  * R proxy repository recipe.
@@ -73,7 +73,7 @@ class RHostedRecipe
 
     builder.route(packagesGzMatcher()
         .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(PACKAGES_GZ))
+        .handler(assetKindHandler.rcurry(METADATA))
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)

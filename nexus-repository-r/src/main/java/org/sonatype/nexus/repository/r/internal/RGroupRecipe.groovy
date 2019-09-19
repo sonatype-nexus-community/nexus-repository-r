@@ -72,7 +72,16 @@ class RGroupRecipe
 
     builder.route(packagesGzMatcher()
         .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(AssetKind.PACKAGES_GZ))
+        .handler(assetKindHandler.rcurry(AssetKind.METADATA))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(packagesGroupHandler)
+        .create())
+
+    builder.route(metadataRdsMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.METADATA))
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)

@@ -43,6 +43,7 @@ import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.METADATA;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
@@ -50,10 +51,9 @@ import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.toContent;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractFullPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.filename;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.matcherState;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesGzPath;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesRdsPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
@@ -76,10 +76,8 @@ public class RProxyFacetImpl
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
     TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
-      case PACKAGES_GZ:
-        return getAsset(packagesGzPath(path(matcherState)));
-      case PACKAGES_RDS:
-        return getAsset(packagesRdsPath(path(matcherState)));
+      case METADATA:
+        return getAsset(extractFullPath(context));
       case ARCHIVE:
         return getAsset(path(path(matcherState), filename(matcherState)));
       default:
@@ -92,10 +90,8 @@ public class RProxyFacetImpl
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
     TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
-      case PACKAGES_GZ:
-        return putPackages(packagesGzPath(path(matcherState)), content, assetKind.name());
-      case PACKAGES_RDS:
-        return putPackages(packagesRdsPath(path(matcherState)), content, assetKind.name());
+      case METADATA:
+        return putPackages(extractFullPath(context), content);
       case ARCHIVE:
         return putArchive(path(matcherState), filename(matcherState), content);
       default:
@@ -174,20 +170,19 @@ public class RProxyFacetImpl
     return saveAsset(tx, asset, archiveContent, payload);
   }
 
-  private Content putPackages(final String path, final Content content, final String packageKindName)
+  private Content putPackages(final String path, final Content content)
       throws IOException
   {
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(content.openInputStream(), RFacetUtils.HASH_ALGORITHMS)) {
-      return doPutPackages(path, tempBlob, content, packageKindName);
+      return doPutPackages(path, tempBlob, content);
     }
   }
 
   @TransactionalStoreBlob
   protected Content doPutPackages(final String path,
                                   final TempBlob packagesContent,
-                                  final Payload payload,
-                                  final String packageKindName) throws IOException
+                                  final Payload payload) throws IOException
   {
     StorageTx tx = UnitOfWork.currentTx();
     Bucket bucket = tx.findBucket(getRepository());
@@ -195,7 +190,7 @@ public class RProxyFacetImpl
     if (asset == null) {
       asset = tx.createAsset(bucket, getRepository().getFormat());
       asset.name(path);
-      asset.formatAttributes().set(P_ASSET_KIND, packageKindName);
+      asset.formatAttributes().set(P_ASSET_KIND, METADATA.name());
     }
     return saveAsset(tx, asset, packagesContent, payload);
   }
