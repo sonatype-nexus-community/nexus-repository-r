@@ -68,7 +68,7 @@ public final class RPathUtils
   }
 
   /**
-   * Removes slash if path starts with it
+   * Extracts full path from {@link Context}
    */
   static String extractFullPath(final Context context) {
     return removeInitialSlashFromPath(context.getRequest().getPath());
