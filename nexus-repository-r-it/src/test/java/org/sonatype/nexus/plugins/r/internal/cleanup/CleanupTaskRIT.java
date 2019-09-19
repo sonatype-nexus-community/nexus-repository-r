@@ -35,7 +35,11 @@ import org.ops4j.pax.exam.Option;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.sonatype.nexus.plugins.r.internal.RITSupport.*;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_PKG_FILE_NAME_101_TARGZ;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_PKG_FILE_NAME_121_TARGZ;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_PKG_FILE_NAME_131_TARGZ;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.PKG_GZ_PATH;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.TARGZ_EXT;
 import static org.sonatype.nexus.repository.http.HttpStatus.OK;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 
@@ -108,7 +112,8 @@ public class CleanupTaskRIT
       );
 
       for (String name : names) {
-        assertThat(status(client.put(format("%s/%s", PKG_PATH, name), new ByteArrayEntity(getBytesFromTestData(name)))),
+        assertThat(
+            status(client.put(format("%s/%s", PKG_GZ_PATH, name), new ByteArrayEntity(getBytesFromTestData(name)))),
             is(OK));
       }
 

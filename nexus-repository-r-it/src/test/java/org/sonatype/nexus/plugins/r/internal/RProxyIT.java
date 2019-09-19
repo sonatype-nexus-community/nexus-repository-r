@@ -38,6 +38,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
+import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 public class RProxyIT
     extends RITSupport
@@ -60,12 +62,16 @@ public class RProxyIT
   public void setup() throws Exception {
     BaseUrlHolder.set(this.nexusUrl.toString());
     server = Server.withPort(0)
-        .serve("/*").withBehaviours(error(200))
+        .serve("/*")
+        .withBehaviours(error(NOT_FOUND))
         .serve("/" + AGRICOLAE_PATH_FULL_131_TGZ)
         .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ)))
         .serve("/" + AGRICOLAE_PATH_FULL_131_TARGZ)
         .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TARGZ)))
-        .serve("/" + PACKAGES_PATH_FULL).withBehaviours(file(testData.resolveFile(PACKAGES_FILE_NAME)))
+        .serve("/" + PACKAGES_GZ_PATH_FULL)
+        .withBehaviours(file(testData.resolveFile(PACKAGES_GZ_FILE_NAME)))
+        .serve("/" + PACKAGES_RDS_PATH_FULL)
+        .withBehaviours(file(testData.resolveFile(PACKAGES_RDS_FILE_NAME)))
         .start();
     repository = repos.createRProxy("r-proxy-test", server.getUrl().toExternalForm());
     client = rClient(repository);
@@ -87,10 +93,17 @@ public class RProxyIT
 
   @Test
   public void fetchMetaData() throws Exception {
-    assertSuccessResponseMatches(client.fetch(PACKAGES_PATH_FULL), PACKAGES_FILE_NAME);
-    final Asset asset = findAsset(repository, PACKAGES_PATH_FULL);
-    Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_GZIP)));
-    Assert.assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
+    assertSuccessResponseMatches(client.fetch(PACKAGES_GZ_PATH_FULL), PACKAGES_GZ_FILE_NAME);
+    final Asset assetGz = findAsset(repository, PACKAGES_GZ_PATH_FULL);
+    Assert.assertThat(assetGz.contentType(), is(equalTo(CONTENT_TYPE_GZIP)));
+    Assert.assertThat(assetGz.format(), is(equalTo(R_FORMAT_NAME)));
+    Assert.assertThat(assetGz.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(PACKAGES_GZ_KIND)));
+
+    assertSuccessResponseMatches(client.fetch(PACKAGES_RDS_PATH_FULL), PACKAGES_RDS_FILE_NAME);
+    final Asset assetRds = findAsset(repository, PACKAGES_RDS_PATH_FULL);
+    Assert.assertThat(assetRds.contentType(), is(equalTo(CONTENT_TYPE_RDS)));
+    Assert.assertThat(assetRds.format(), is(equalTo(R_FORMAT_NAME)));
+    Assert.assertThat(assetRds.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(PACKAGES_RDS_KIND)));
   }
 
   @Test
@@ -107,10 +120,17 @@ public class RProxyIT
   }
 
   @Test
-  public void shouldCacheMetadata() throws Exception {
-    client.fetch(PACKAGES_PATH_FULL);
+  public void shouldCachePackageGz() throws Exception {
+    client.fetch(PACKAGES_GZ_PATH_FULL);
     server.stop();
-    assertSuccessResponseMatches(client.fetch(PACKAGES_PATH_FULL), PACKAGES_FILE_NAME);
+    assertSuccessResponseMatches(client.fetch(PACKAGES_GZ_PATH_FULL), PACKAGES_GZ_FILE_NAME);
+  }
+
+  @Test
+  public void shouldCachePackageRds() throws Exception {
+    client.fetch(PACKAGES_RDS_PATH_FULL);
+    server.stop();
+    assertSuccessResponseMatches(client.fetch(PACKAGES_RDS_PATH_FULL), PACKAGES_RDS_FILE_NAME);
   }
 
   @Test
