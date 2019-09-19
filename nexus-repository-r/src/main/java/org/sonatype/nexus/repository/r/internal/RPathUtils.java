@@ -22,6 +22,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class RPathUtils
 {
+  public static final String PACKAGES_GZ = "PACKAGES.gz";
+
   /**
    * Returns the {@link TokenMatcher.State} for the content.
    */
@@ -64,7 +66,7 @@ public final class RPathUtils
    * Builds a path to a package for a particular path.
    */
   static String packagesPath(final String path) {
-    return path + "/PACKAGES.gz";
+    return path + "/" + PACKAGES_GZ;
   }
 
   private RPathUtils() {
