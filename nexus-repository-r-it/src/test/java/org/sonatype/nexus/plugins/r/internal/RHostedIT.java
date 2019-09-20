@@ -110,6 +110,7 @@ public class RHostedIT
   public void testDeletingRemainingAssetAlsoDeletesComponent() {
     final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
     assertNotNull(asset);
+    assertNotNull(asset);
     assertNotNull(asset.componentId());
 
     final Component component = findComponentById(repository, asset.componentId());
