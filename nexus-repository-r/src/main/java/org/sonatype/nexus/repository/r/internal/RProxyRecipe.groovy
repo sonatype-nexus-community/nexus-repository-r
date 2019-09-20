@@ -46,6 +46,8 @@ class RProxyRecipe
 {
   public static final String NAME = 'r-proxy'
 
+  public static final String TEST = 'r-proxy'
+
   @Inject
   Provider<RProxyFacetImpl> proxyFacet
 
