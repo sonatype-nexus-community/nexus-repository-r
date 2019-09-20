@@ -24,7 +24,6 @@ import org.sonatype.nexus.repository.r.RFacet;
 import org.sonatype.nexus.repository.r.RRestoreFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetBlob;
-import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.Query;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -47,7 +46,6 @@ public class RRestoreFacetImpl
   @TransactionalTouchBlob
   public void restore(final AssetBlob assetBlob, final String path) throws IOException {
     StorageTx tx = UnitOfWork.currentTx();
-    Bucket bucket = tx.findBucket(getRepository());
     RFacet facet = facet(RFacet.class);
     Map<String, String> attributes;
 
@@ -55,8 +53,15 @@ public class RRestoreFacetImpl
       attributes = extractDescriptionFromArchive(path, is);
     }
 
-    Component component = facet.findOrCreateComponent(tx, bucket, attributes);
-    Asset asset = facet.findOrCreateAsset(tx, bucket, component, path);
+    Asset asset;
+    if (componentRequired(path)) {
+      Component component = facet.findOrCreateComponent(tx, attributes);
+      asset = facet.findOrCreateAsset(tx, component, path, attributes);
+    }
+    else
+    {
+      asset = facet.findOrCreateMetadata(tx, path, attributes);
+    }
     tx.attachBlob(asset, assetBlob);
 
     Content.applyToAsset(asset, Content.maintainLastModified(asset, new AttributesMap()));

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
@@ -20,12 +19,19 @@ public interface RFacet
    *
    * @return Component
    */
-  Component findOrCreateComponent(final StorageTx tx, final Bucket bucket, final Map<String, String> attributes);
+  Component findOrCreateComponent(final StorageTx tx, final Map<String, String> attributes);
 
   /**
    * Find or Create Asset
    *
-   * @return CAsset
+   * @return Asset
    */
-  Asset findOrCreateAsset(final StorageTx tx, final Bucket bucket, final Component component, String path);
+  Asset findOrCreateAsset(final StorageTx tx, final Component component, final String path, final Map<String, String> attributes);
+
+  /**
+   * Find or Create Asset for metadata
+   *
+   * @return Asset
+   */
+  Asset findOrCreateMetadata(final StorageTx tx, final String path, final Map<String, String> attributes);
 }

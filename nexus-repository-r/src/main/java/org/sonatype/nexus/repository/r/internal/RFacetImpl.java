@@ -10,14 +10,12 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
-import org.sonatype.nexus.repository.transaction.TransactionalStoreBlob;
 
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
-import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
+import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
 /**
  * {@link RFacet} implementation.
@@ -28,9 +26,7 @@ public class RFacetImpl
     implements RFacet
 {
   @Override
-  @TransactionalStoreBlob
   public Component findOrCreateComponent(final StorageTx tx,
-                                         final Bucket bucket,
                                          final Map<String, String> attributes)
   {
     String name = attributes.get(P_PACKAGE);
@@ -38,6 +34,7 @@ public class RFacetImpl
 
     Component component = findComponent(tx, getRepository(), name, version);
     if (component == null) {
+      Bucket bucket = tx.findBucket(getRepository());
       component = tx.createComponent(bucket, getRepository().getFormat()).name(name).version(version);
       tx.saveComponent(component);
     }
@@ -46,13 +43,31 @@ public class RFacetImpl
   }
 
   @Override
-  @TransactionalStoreBlob
-  public Asset findOrCreateAsset(final StorageTx tx, final Bucket bucket, final Component component, String path) {
-    Asset asset = findAsset(tx, bucket, path);
+  public Asset findOrCreateAsset(final StorageTx tx, final Component component, final String path, final Map<String, String> attributes) {
+    Bucket bucket = tx.findBucket(getRepository());
+    Asset asset = tx.findAssetWithProperty(P_NAME, path, bucket);
     if (asset == null) {
       asset = tx.createAsset(bucket, component);
       asset.name(path);
-      asset.formatAttributes().set(P_ASSET_KIND, ARCHIVE.name());
+      for (Map.Entry attribute : attributes.entrySet()) {
+        asset.formatAttributes().set(attribute.getKey().toString(), attribute.getValue());
+      }
+      tx.saveAsset(asset);
+    }
+
+    return asset;
+  }
+
+  @Override
+  public Asset findOrCreateMetadata(final StorageTx tx, final String path, final Map<String, String> attributes) {
+    Bucket bucket = tx.findBucket(getRepository());
+    Asset asset = findAsset(tx, bucket, path);
+    if (asset == null) {
+      asset = tx.createAsset(bucket, getRepository().getFormat());
+      asset.name(path);
+      for (Map.Entry attribute : attributes.entrySet()) {
+        asset.formatAttributes().set(attribute.getKey().toString(), attribute.getValue());
+      }
       tx.saveAsset(asset);
     }
 

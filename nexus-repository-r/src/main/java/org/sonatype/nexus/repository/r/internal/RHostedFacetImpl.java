@@ -137,7 +137,7 @@ public class RHostedFacetImpl
   }
 
   @TransactionalStoreBlob
-  void doPutArchive(final String path,
+  protected void doPutArchive(final String path,
                     final TempBlob archiveContent,
                     final Payload payload) throws IOException
   {
@@ -145,7 +145,6 @@ public class RHostedFacetImpl
     checkNotNull(archiveContent);
     checkNotNull(payload);
     StorageTx tx = UnitOfWork.currentTx();
-    Bucket bucket = tx.findBucket(getRepository());
     RFacet rFacet = facet(RFacet.class);
 
     Map<String, String> attributes;
@@ -153,9 +152,9 @@ public class RHostedFacetImpl
       attributes = extractDescriptionFromArchive(path, is);
     }
 
-    Component component = rFacet.findOrCreateComponent(tx, bucket, attributes);
+    Component component = rFacet.findOrCreateComponent(tx, attributes);
 
-    Asset asset = rFacet.findOrCreateAsset(tx, bucket, component, path);
+    Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
 
     // TODO: Make this a bit more robust (could be problematic if keys are removed in later versions, or if keys clash)
     for (Entry<String, String> entry : attributes.entrySet()) {

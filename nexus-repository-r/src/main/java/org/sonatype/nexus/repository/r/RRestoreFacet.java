@@ -22,7 +22,8 @@ import org.sonatype.nexus.repository.storage.Query;
  * @since 1.0.next
  */
 @Facet.Exposed
-public interface RRestoreFacet extends Facet
+public interface RRestoreFacet
+    extends Facet
 {
   void restore(final AssetBlob assetBlob, final String path) throws IOException;
 
