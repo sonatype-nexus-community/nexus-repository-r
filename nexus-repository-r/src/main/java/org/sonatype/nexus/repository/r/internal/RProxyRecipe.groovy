@@ -86,21 +86,7 @@ class RProxyRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(packagesGzMatcher()
-        .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(METADATA))
-        .handler(securityHandler)
-        .handler(routingRuleHandler)
-        .handler(exceptionHandler)
-        .handler(handlerContributor)
-        .handler(negativeCacheHandler)
-        .handler(partialFetchHandler)
-        .handler(contentHeadersHandler)
-        .handler(unitOfWorkHandler)
-        .handler(proxyHandler)
-        .create())
-
-    builder.route(metadataRdsMatcher()
+    builder.route(metadataMatcher()
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(METADATA))
         .handler(securityHandler)
