@@ -30,7 +30,6 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.r.RFacet;
 import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -138,8 +137,8 @@ public class RHostedFacetImpl
 
   @TransactionalStoreBlob
   protected void doPutArchive(final String path,
-                    final TempBlob archiveContent,
-                    final Payload payload) throws IOException
+                              final TempBlob archiveContent,
+                              final Payload payload) throws IOException
   {
     checkNotNull(path);
     checkNotNull(archiveContent);
