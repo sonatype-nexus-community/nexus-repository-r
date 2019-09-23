@@ -28,6 +28,7 @@ public class AssetKindTest
   @Test
   public void cacheTypes() throws Exception {
     assertThat(AssetKind.ARCHIVE.getCacheType(), is(equalTo(CONTENT)));
-    assertThat(AssetKind.METADATA.getCacheType(), is(equalTo(METADATA)));
+    assertThat(AssetKind.RDS_METADATA.getCacheType(), is(equalTo(METADATA)));
+    assertThat(AssetKind.PACKAGES.getCacheType(), is(equalTo(METADATA)));
   }
 }

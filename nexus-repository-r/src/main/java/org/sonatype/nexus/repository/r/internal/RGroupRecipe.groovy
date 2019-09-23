@@ -70,9 +70,18 @@ class RGroupRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(metadataMatcher()
+    builder.route(packagesMatcher()
         .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(AssetKind.METADATA))
+        .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(packagesGroupHandler)
+        .create())
+
+    builder.route(metadataRdsMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.RDS_METADATA))
         .handler(securityHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)

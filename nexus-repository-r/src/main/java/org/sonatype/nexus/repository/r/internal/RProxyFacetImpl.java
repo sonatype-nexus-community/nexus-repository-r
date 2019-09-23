@@ -43,7 +43,6 @@ import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.METADATA;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
@@ -76,7 +75,8 @@ public class RProxyFacetImpl
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
     TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
-      case METADATA:
+      case RDS_METADATA:
+      case PACKAGES:
         return getAsset(extractFullPath(context));
       case ARCHIVE:
         return getAsset(path(path(matcherState), filename(matcherState)));
@@ -90,8 +90,9 @@ public class RProxyFacetImpl
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
     TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
-      case METADATA:
-        return putPackages(extractFullPath(context), content);
+      case RDS_METADATA:
+      case PACKAGES:
+        return putMetadata(extractFullPath(context), content, assetKind.name());
       case ARCHIVE:
         return putArchive(path(matcherState), filename(matcherState), content);
       default:
@@ -170,19 +171,20 @@ public class RProxyFacetImpl
     return saveAsset(tx, asset, archiveContent, payload);
   }
 
-  private Content putPackages(final String path, final Content content)
+  private Content putMetadata(final String path, final Content content, final String metadataKind)
       throws IOException
   {
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(content.openInputStream(), RFacetUtils.HASH_ALGORITHMS)) {
-      return doPutPackages(path, tempBlob, content);
+      return doPutMetadata(path, tempBlob, content, metadataKind);
     }
   }
 
   @TransactionalStoreBlob
-  protected Content doPutPackages(final String path,
+  protected Content doPutMetadata(final String path,
                                   final TempBlob packagesContent,
-                                  final Payload payload) throws IOException
+                                  final Payload payload,
+                                  final String metadataKind) throws IOException
   {
     StorageTx tx = UnitOfWork.currentTx();
     Bucket bucket = tx.findBucket(getRepository());
@@ -190,7 +192,7 @@ public class RProxyFacetImpl
     if (asset == null) {
       asset = tx.createAsset(bucket, getRepository().getFormat());
       asset.name(path);
-      asset.formatAttributes().set(P_ASSET_KIND, METADATA.name());
+      asset.formatAttributes().set(P_ASSET_KIND, metadataKind);
     }
     return saveAsset(tx, asset, packagesContent, payload);
   }

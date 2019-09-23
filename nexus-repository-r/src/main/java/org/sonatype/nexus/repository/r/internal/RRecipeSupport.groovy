@@ -28,7 +28,6 @@ import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
-import org.sonatype.nexus.repository.view.Matcher
 import org.sonatype.nexus.repository.view.Route.Builder
 import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
@@ -122,13 +121,24 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Matcher for all metadata mapping.
+   * Matcher for all packages mapping.
    */
-  static Builder metadataMatcher() {
+  static Builder packagesMatcher() {
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
-            metadataTokenMatcher()
+            packagesTokenMatcher()
+        ))
+  }
+
+  /**
+   * Matcher for all .rds metadata mapping.
+   */
+  static Builder metadataRdsMatcher() {
+    new Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET, HEAD),
+            metadataRdsTokenMatcher()
         ))
   }
 
@@ -155,17 +165,17 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Token matcher for all metadata files.
-   */
-  static Matcher metadataTokenMatcher() {
-    return LogicMatchers.or(packagesGzTokenMatcher(), metadataRdsTokenMatcher())
-  }
-
-  /**
    * Token matcher for PACKAGES.gz files.
    */
   static TokenMatcher packagesGzTokenMatcher() {
     return new TokenMatcher('/{path:.+}/PACKAGES.gz')
+  }
+
+  /**
+   * Token matcher for all PACKAGES files.
+   */
+  static TokenMatcher packagesTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/PACKAGES{extension:.*}')
   }
 
   /**

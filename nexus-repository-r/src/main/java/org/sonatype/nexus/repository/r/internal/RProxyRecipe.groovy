@@ -34,7 +34,8 @@ import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
-import static org.sonatype.nexus.repository.r.internal.AssetKind.METADATA
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
+import static org.sonatype.nexus.repository.r.internal.AssetKind.RDS_METADATA
 
 /**
  * R proxy repository recipe.
@@ -86,9 +87,23 @@ class RProxyRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Router.Builder builder = new Router.Builder()
 
-    builder.route(metadataMatcher()
+    builder.route(packagesMatcher()
         .handler(timingHandler)
-        .handler(assetKindHandler.rcurry(METADATA))
+        .handler(assetKindHandler.rcurry(PACKAGES))
+        .handler(securityHandler)
+        .handler(routingRuleHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(negativeCacheHandler)
+        .handler(partialFetchHandler)
+        .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
+        .handler(proxyHandler)
+        .create())
+
+    builder.route(metadataRdsMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(RDS_METADATA))
         .handler(securityHandler)
         .handler(routingRuleHandler)
         .handler(exceptionHandler)

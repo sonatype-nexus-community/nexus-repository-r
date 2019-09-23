@@ -66,7 +66,9 @@ public class RITSupport
 
   public static final String ARCHIVE_RDS_NAME = "archive";
 
-  public static final String METADATA_KIND = "METADATA";
+  public static final String RDS_METADATA_KIND = "RDS_METADATA";
+
+  public static final String PACKAGES_KIND = "PACKAGES";
 
   public static final String PACKAGES_AGRICOLAE_121_NAME = "PACKAGES_agricolae_121";
 
