@@ -17,16 +17,32 @@
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
+> **Huzzah!** R is now part of Nexus Repository Manager. Version 3.20.0 includes the R plugin by default. In the same time it is still open for community. 
+
+> **Filing issues:** If using 3.20.0 or later please file any issues at https://issues.sonatype.org/.
+
+> **Upgrading to 3.20.0:** After upgrading to 3.20 your existing data will remain intact.
+> We have added new features to the community version of the plugin such as:
+* Search; 
+* Cleanup Policies; 
+* Tagging (PRO only);
+* Moving between repositories (PRO only);. #NEXUS-21170
+* Uploading R package from UI; #NEXUS-20703
+* Restore Metadata Task; #NEXUS-20532 (Looks like it should be renamed)
+* API for Repository creation via Groovy; #NEXUS-21171
+* Routing Rule support;
+* Fixed minor issues 
+
+
 # Table Of Contents
 * [Developing](#developing)
    * [Requirements](#requirements)
    * [Building](#building)
 * [Using R with Nexus Repository Manager 3](#using-r-with-nexus-repository-manager-3)
+* [Compatibility with Nexus Repository Manager 3 Versions](#compatibility-with-nexus-repository-manager-3-versions)
 * [Installing the plugin](#installing-the-plugin)
+   * [Permanent Reinstall](#permanent-reinstall)
    * [Easiest Install](#easiest-install)
-   * [Temporary Install](#temporary-install)
-   * [(more) Permanent Install](#more-permanent-install)
-   * [(most) Permament Install](#most-permanent-install)
 * [The Fine Print](#the-fine-print)
 * [Getting Help](#getting-help)
 
@@ -51,11 +67,11 @@ To build the project and generate the bundle use Maven
 
     mvn clean install
 
-If everything checks out, the bundle for R should be available in the `target` folder
+If everything checks out, the bundle for `R` should be available in the `target` folder
 
 ## Using R With Nexus Repository Manager 3
 
-After installing the plugin, we have detailed instructions on [how to get started here!](docs/R_USER_DOCUMENTATION.md)
+Please view detailed instructions on [how to get started here!](https://help.sonatype.com/repomanager3/formats/r-repositories)
 
 ## Compatibility with Nexus Repository Manager 3 Versions
 
@@ -68,20 +84,37 @@ The table below outlines what version of Nexus Repository the plugin was built a
 | v1.0.2         | >=3.14.0-04              |
 | v1.0.3         | >=3.15.2-01              |
 | v1.0.4         | >=3.18.0-01              |
-
-If a new version of Nexus Repository is released and the plugin needs changes, a new release will be made, and this
-table will be updated to indicate which version of Nexus Repository it will function against. This is done on a time 
-available basis, as this is community supported. If you see a new version of Nexus Repository, go ahead and update the
-plugin and send us a PR after testing it out!
-
+| v1.1.0 In product | >=3.20.0              |
 All released versions can be found [here](https://github.com/sonatype-nexus-community/nexus-repository-r/releases).
 
 ## Installing the plugin
+Starting from Nexus Repository Manager 3.20 `R` format is already included. So there are no need to install it.  But if you want to reinstall plugin with your improvements then next instructions will be useful for you.
 
-There are a range of options for installing the R plugin. You'll need to build it first, and
-then install the plugin with the options shown below:
+### Permanent Reinstall
 
-### Easiest Install
+* Copy the new bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.1.1-SNAPSHOT/nexus-repository-r-1.1.1-SNAPSHOT.jar`
+* If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
+* If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
+
+   ```
+         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
+   +     <feature version="1.1.1.SNAPSHOT" prerequisite="false" dependency="false">nexus-repository-r</feature>
+         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-yum</feature>
+     </feature>
+   ```
+   And
+   ```
+   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.1.1.SNAPSHOT">
+   +     <details>org.sonatype.nexus.plugins:nexus-repository-r</details>
+   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.1.1-SNAPSHOT</bundle>
+   + </feature>
+    </features>
+   ```
+This will cause the plugin to be loaded and started with each startup of Nexus Repository.
+
+### Easiest Install for version  
+Relevant only for Nexus Repository manager version 3.18.0-01 and lower  which doest includes `R` plugin.
+But we strongly recommend to update to the latest Nexus Repository version.
 
 Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it's become a LOT easier to install a plugin. To install the `R` plugin, you can either build locally or download from The Central Repository:
 
@@ -99,73 +132,10 @@ Restart Nexus Repo, or go ahead and start it if it wasn't running to begin with.
 
 You should see the R repository types (e.g. `r (proxy)`) in the available Repository Recipes to use, if all has gone according to plan :)
 
-### Temporary Install
-
-Installations done via the Karaf console will be wiped out with every restart of Nexus Repository. This is a
-good installation path if you are just testing or doing development on the plugin.
-
-* Enable Nexus console: edit `<nexus_dir>/bin/nexus.vmoptions` and change `karaf.startLocalConsole`  to `true`.
-
-  More details here: https://help.sonatype.com/display/NXRM3/Installing+Bundles
-
-* Run NXRM console mode (the below assumes you are running as 'nexus' user as recommended in our documentation) 
-and enter the bundle command after it has started:
-  ```
-  # sudo su - nexus
-  $ cd <nexus_dir>/bin
-  $ ./nexus run
-  > bundle:install file:///tmp/nexus-repository-r-1.0.3.jar
-  ```
-  This will return text similar to "Bundle ID: 282".  You can double check this ID using bundle:list 
-  (for org.sonatype.nexus.plugins:nexus-repository-r; it should be the last one).  Then start it using this 
-  bundle command:
-  ```
-  > bundle:start <org.sonatype.nexus.plugins:nexus-repository-r ID>
-  ```
-
-### (more) Permanent Install
-
-For more permanent installs of the nexus-repository-r plugin, follow these instructions:
-
-* Copy the bundle (nexus-repository-r-1.0.3.jar) into <nexus_dir>/deploy
-
-This will cause the plugin to be loaded with each restart of Nexus Repository. As well, this folder is monitored
-by Nexus Repository and the plugin should load within 60 seconds of being copied there if Nexus Repository
-is running. You will still need to start the bundle using the karaf commands mentioned in the temporary install.
-
-### (most) Permanent Install
-
-If you are trying to use the R plugin permanently, it likely makes more sense to do the following:
-
-* Copy the bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.0.3/nexus-repository-r-1.0.3.jar`
-* If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
-* If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
-   ```
-         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
-   +     <feature version="1.0.3" prerequisite="false" dependency="false">nexus-repository-r</feature>
-         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-yum</feature>
-     </feature>
-   ```
-   And
-   ```
-   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.0.3">
-   +     <details>org.sonatype.nexus.plugins:nexus-repository-r</details>
-   +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.0.3</bundle>
-   + </feature>
-    </features>
-   ```
-This will cause the plugin to be loaded and started with each startup of Nexus Repository.
-
 ## The Fine Print
 
-It is worth noting that this is **NOT SUPPORTED** by Sonatype, and is a contribution of ours
+Starting from version 3.20.0 `R` plugin is supported by Sonatype, but still is a contribution of ours
 to the open source community (read: you!)
-
-Remember:
-
-* Use this contribution at the risk tolerance that you have
-* Do NOT file Sonatype support tickets related to R support
-* DO file issues here on GitHub, so that the community can pitch in
 
 Phew, that was easier than I thought. Last but not least of all:
 
