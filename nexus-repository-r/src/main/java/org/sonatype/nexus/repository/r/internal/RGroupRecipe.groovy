@@ -79,6 +79,15 @@ class RGroupRecipe
         .handler(packagesGroupHandler)
         .create())
 
+    builder.route(metadataRdsMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.RDS_METADATA))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(packagesGroupHandler)
+        .create())
+
     builder.route(archiveMatcher()
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(AssetKind.ARCHIVE))

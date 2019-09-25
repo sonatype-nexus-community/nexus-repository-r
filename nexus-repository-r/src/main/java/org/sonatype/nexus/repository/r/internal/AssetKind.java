@@ -22,8 +22,8 @@ import org.sonatype.nexus.repository.cache.CacheControllerHolder.CacheType;
  */
 enum AssetKind
 {
-
   PACKAGES(CacheControllerHolder.METADATA),
+  RDS_METADATA(CacheControllerHolder.METADATA),
   ARCHIVE(CacheControllerHolder.CONTENT);
 
   private final CacheType cacheType;

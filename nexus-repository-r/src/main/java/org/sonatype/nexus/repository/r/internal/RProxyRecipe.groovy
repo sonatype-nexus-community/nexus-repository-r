@@ -25,16 +25,17 @@ import org.sonatype.nexus.repository.cache.NegativeCacheFacet
 import org.sonatype.nexus.repository.cache.NegativeCacheHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.proxy.ProxyHandler
-import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.purge.PurgeUnusedFacet
+import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
-import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
+import static org.sonatype.nexus.repository.r.internal.AssetKind.RDS_METADATA
 
 /**
  * R proxy repository recipe.
@@ -91,6 +92,20 @@ class RProxyRecipe
     builder.route(packagesMatcher()
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
+        .handler(securityHandler)
+        .handler(routingRuleHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(negativeCacheHandler)
+        .handler(partialFetchHandler)
+        .handler(contentHeadersHandler)
+        .handler(unitOfWorkHandler)
+        .handler(proxyHandler)
+        .create())
+
+    builder.route(metadataRdsMatcher()
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(RDS_METADATA))
         .handler(securityHandler)
         .handler(routingRuleHandler)
         .handler(exceptionHandler)

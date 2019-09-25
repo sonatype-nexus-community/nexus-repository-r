@@ -24,7 +24,7 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher.State;
 
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.filename;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesPath;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesGzPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 
 /**
@@ -40,7 +40,7 @@ public final class HostedHandlers
    */
   final Handler getPackages = context -> {
     State state = context.getAttributes().require(TokenMatcher.State.class);
-    String path = packagesPath(path(state));
+    String path = packagesGzPath(path(state));
     Content content = context.getRepository().facet(RHostedFacet.class).getPackages(path);
     if (content != null) {
       return HttpResponses.ok(content);

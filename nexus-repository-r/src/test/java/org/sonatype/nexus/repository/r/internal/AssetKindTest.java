@@ -21,15 +21,14 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.sonatype.nexus.repository.cache.CacheControllerHolder.CONTENT;
 import static org.sonatype.nexus.repository.cache.CacheControllerHolder.METADATA;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
 
 public class AssetKindTest
     extends TestSupport
 {
   @Test
   public void cacheTypes() throws Exception {
-    assertThat(ARCHIVE.getCacheType(), is(equalTo(CONTENT)));
-    assertThat(PACKAGES.getCacheType(), is(equalTo(METADATA)));
+    assertThat(AssetKind.ARCHIVE.getCacheType(), is(equalTo(CONTENT)));
+    assertThat(AssetKind.RDS_METADATA.getCacheType(), is(equalTo(METADATA)));
+    assertThat(AssetKind.PACKAGES.getCacheType(), is(equalTo(METADATA)));
   }
 }

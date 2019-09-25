@@ -74,7 +74,7 @@ abstract class RRecipeSupport
   SecurityHandler securityHandler
 
   @Inject
-  RoutingRuleHandler routingRuleHandler;
+  RoutingRuleHandler routingRuleHandler
 
   @Inject
   PartialFetchHandler partialFetchHandler
@@ -116,13 +116,35 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Matcher for packages mapping.
+   * Matcher for packages.gz mapping.
+   */
+  static Builder packagesGzMatcher() {
+    new Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET, HEAD),
+            packagesGzTokenMatcher()
+        ))
+  }
+
+  /**
+   * Matcher for all packages mapping.
    */
   static Builder packagesMatcher() {
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
-            new TokenMatcher('/{path:.+}/PACKAGES.gz')
+            packagesTokenMatcher()
+        ))
+  }
+
+  /**
+   * Matcher for all .rds metadata mapping.
+   */
+  static Builder metadataRdsMatcher() {
+    new Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET, HEAD),
+            metadataRdsTokenMatcher()
         ))
   }
 
@@ -133,7 +155,7 @@ abstract class RRecipeSupport
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
-            new TokenMatcher('/{path:.+}/{filename:.+}')
+            allFilesTokenMatcher()
         ))
   }
 
@@ -144,7 +166,35 @@ abstract class RRecipeSupport
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(PUT),
-            new TokenMatcher('/{path:.+}/{filename:.+}')
+            allFilesTokenMatcher()
         ))
+  }
+
+  /**
+   * Token matcher for PACKAGES.gz files.
+   */
+  static TokenMatcher packagesGzTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/PACKAGES.gz')
+  }
+
+  /**
+   * Token matcher for all PACKAGES files.
+   */
+  static TokenMatcher packagesTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/PACKAGES{extension:.*}')
+  }
+
+  /**
+   * Token matcher for .rds metadata files.
+   */
+  static TokenMatcher metadataRdsTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/{filename:.+}.rds')
+  }
+
+  /**
+   * Token matcher for all files.
+   */
+  static TokenMatcher allFilesTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/{filename:.+}')
   }
 }

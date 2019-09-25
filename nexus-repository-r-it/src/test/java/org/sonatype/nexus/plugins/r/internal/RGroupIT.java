@@ -25,7 +25,6 @@ import org.apache.http.HttpResponse;
 import org.apache.shiro.util.ThreadContext;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -109,7 +108,7 @@ public class RGroupIT
     final String agricolae131Content =
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME).toPath()));
 
-    final InputStream content = groupClient.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
+    final InputStream content = groupClient.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
   }
 }
