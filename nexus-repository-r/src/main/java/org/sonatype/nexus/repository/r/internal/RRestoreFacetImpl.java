@@ -48,20 +48,20 @@ public class RRestoreFacetImpl
   public void restore(final AssetBlob assetBlob, final String path) throws IOException {
     StorageTx tx = UnitOfWork.currentTx();
     RFacet facet = facet(RFacet.class);
-    Map<String, String> attributes;
-
-    try (InputStream is = assetBlob.getBlob().getInputStream()) {
-      attributes = extractDescriptionFromArchive(path, is);
-    }
 
     Asset asset;
     if (componentRequired(path)) {
+      Map<String, String> attributes;
+
+      try (InputStream is = assetBlob.getBlob().getInputStream()) {
+        attributes = extractDescriptionFromArchive(path, is);
+      }
+
       Component component = facet.findOrCreateComponent(tx, attributes);
       asset = facet.findOrCreateAsset(tx, component, path, attributes);
     }
-    else
-    {
-      asset = facet.findOrCreateMetadata(tx, path, attributes);
+    else {
+      asset = facet.findOrCreateMetadata(tx, path);
     }
     tx.attachBlob(asset, assetBlob);
 
@@ -78,12 +78,17 @@ public class RRestoreFacetImpl
 
   @Override
   public boolean componentRequired(final String name) {
-    return !name.contains("PACKAGES.");
+    return !(name.contains("PACKAGES") || name.endsWith(".rds"));
   }
 
   @Override
-  public Query getComponentQuery(final String packageName, final String packageVersion) {
-    return Query.builder().where(P_NAME).eq(packageName)
-        .and(P_VERSION).eq(packageVersion).build();
+  public Query getComponentQuery(final Map<String, String> attributes) {
+    return Query.builder().where(P_NAME).eq(attributes.get(RAttributes.P_PACKAGE))
+        .and(P_VERSION).eq(attributes.get(RAttributes.P_VERSION)).build();
+  }
+
+  @Override
+  public Map<String, String> extractComponentAttributesFromArchive(final String filename, final InputStream is) {
+    return extractDescriptionFromArchive(filename, is);
   }
 }

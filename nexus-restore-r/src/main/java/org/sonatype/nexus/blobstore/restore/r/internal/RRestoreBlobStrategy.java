@@ -39,9 +39,6 @@ import org.sonatype.nexus.repository.storage.Query;
 import static com.google.common.base.Preconditions.checkState;
 import static org.eclipse.aether.util.StringUtils.isEmpty;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
-import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
-import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
-import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
 
 /**
  * @since 1.0.next
@@ -121,11 +118,11 @@ public class RRestoreBlobStrategy
     RRestoreFacet facet = getRestoreFacet(data);
     RestoreBlobData blobData = data.getBlobData();
     Map<String, String> attributes;
-    try(InputStream inputStream = blobData.getBlob().getInputStream()) {
-      attributes = extractDescriptionFromArchive(blobData.getBlobName(), inputStream);
+    try (InputStream inputStream = blobData.getBlob().getInputStream()) {
+      attributes = facet.extractComponentAttributesFromArchive(blobData.getBlobName(), inputStream);
     }
 
-    return facet.getComponentQuery(attributes.get(P_PACKAGE), attributes.get(P_VERSION));
+    return facet.getComponentQuery(attributes);
   }
 
   @Override

@@ -43,7 +43,7 @@ public final class RDescriptionUtils
   /**
    * Extracts the DESCRIPTION contents from the tgz or zip.
    */
-  public static Map<String, String> extractDescriptionFromArchive(String filename, InputStream is) {
+  public static Map<String, String> extractDescriptionFromArchive(final String filename, InputStream is) {
     checkNotNull(filename);
     checkNotNull(is);
     final String lowerCaseFilename = filename.toLowerCase();

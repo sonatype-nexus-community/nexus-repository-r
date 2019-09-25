@@ -13,6 +13,8 @@
 package org.sonatype.nexus.repository.r;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.storage.AssetBlob;
@@ -31,5 +33,7 @@ public interface RRestoreFacet
 
   boolean componentRequired(final String name);
 
-  Query getComponentQuery(final String packageName, final String packageVersion);
+  Query getComponentQuery(final Map<String, String> attributes);
+
+  Map<String, String> extractComponentAttributesFromArchive(final String filename, final InputStream is);
 }

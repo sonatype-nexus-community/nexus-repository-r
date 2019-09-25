@@ -49,6 +49,14 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT
 abstract class RRecipeSupport
     extends RecipeSupport
 {
+  static final String PATTERN_PACKAGES_GZ = "/{path:.+}/PACKAGES.gz"
+
+  static final String PATTERN_PACKAGES = "/{path:.+}/PACKAGES{extension:.*}"
+
+  static final String PATTERN_METADATA_RDS = "/{path:.+}/{filename:.+}.rds"
+
+  static final String PATTERN_ALL_FILES = "/{path:.+}/{filename:.+}"
+
   @Inject
   Provider<RSecurityFacet> securityFacet
 
@@ -174,27 +182,27 @@ abstract class RRecipeSupport
    * Token matcher for PACKAGES.gz files.
    */
   static TokenMatcher packagesGzTokenMatcher() {
-    return new TokenMatcher('/{path:.+}/PACKAGES.gz')
+    return new TokenMatcher(PATTERN_PACKAGES_GZ)
   }
 
   /**
    * Token matcher for all PACKAGES files.
    */
   static TokenMatcher packagesTokenMatcher() {
-    return new TokenMatcher('/{path:.+}/PACKAGES{extension:.*}')
+    return new TokenMatcher(PATTERN_PACKAGES)
   }
 
   /**
    * Token matcher for .rds metadata files.
    */
   static TokenMatcher metadataRdsTokenMatcher() {
-    return new TokenMatcher('/{path:.+}/{filename:.+}.rds')
+    return new TokenMatcher(PATTERN_METADATA_RDS)
   }
 
   /**
    * Token matcher for all files.
    */
   static TokenMatcher allFilesTokenMatcher() {
-    return new TokenMatcher('/{path:.+}/{filename:.+}')
+    return new TokenMatcher(PATTERN_ALL_FILES)
   }
 }
