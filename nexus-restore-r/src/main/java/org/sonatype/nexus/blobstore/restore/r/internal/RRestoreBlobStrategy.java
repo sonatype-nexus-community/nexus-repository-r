@@ -13,7 +13,9 @@
 package org.sonatype.nexus.blobstore.restore.r.internal;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -37,6 +39,9 @@ import org.sonatype.nexus.repository.storage.Query;
 import static com.google.common.base.Preconditions.checkState;
 import static org.eclipse.aether.util.StringUtils.isEmpty;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
+import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
 
 /**
  * @since 1.0.next
@@ -112,9 +117,15 @@ public class RRestoreBlobStrategy
   }
 
   @Override
-  protected Query getComponentQuery(final RRestoreBlobData data) {
+  protected Query getComponentQuery(final RRestoreBlobData data) throws IOException {
     RRestoreFacet facet = getRestoreFacet(data);
-    return facet.getComponentQuery(data.getBlobData().getBlobName());
+    RestoreBlobData blobData = data.getBlobData();
+    Map<String, String> attributes;
+    try(InputStream inputStream = blobData.getBlob().getInputStream()) {
+      attributes = extractDescriptionFromArchive(blobData.getBlobName(), inputStream);
+    }
+
+    return facet.getComponentQuery(attributes.get(P_PACKAGE), attributes.get(P_VERSION));
   }
 
   @Override

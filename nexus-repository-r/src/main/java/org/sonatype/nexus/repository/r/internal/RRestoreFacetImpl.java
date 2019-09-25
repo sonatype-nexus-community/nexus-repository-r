@@ -32,6 +32,7 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
+import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
 /**
@@ -81,7 +82,8 @@ public class RRestoreFacetImpl
   }
 
   @Override
-  public Query getComponentQuery(final String packageName) {
-    return Query.builder().where(P_NAME).eq(packageName).build();
+  public Query getComponentQuery(final String packageName, final String packageVersion) {
+    return Query.builder().where(P_NAME).eq(packageName)
+        .and(P_VERSION).eq(packageVersion).build();
   }
 }

@@ -31,5 +31,5 @@ public interface RRestoreFacet
 
   boolean componentRequired(final String name);
 
-  Query getComponentQuery(final String packageName);
+  Query getComponentQuery(final String packageName, final String packageVersion);
 }
