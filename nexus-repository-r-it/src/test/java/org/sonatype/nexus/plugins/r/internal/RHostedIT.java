@@ -81,7 +81,7 @@ public class RHostedIT
   public void testFetchPackage() throws Exception
   {
     HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
-    assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_TGZ));
+    assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_X_TGZ));
     assertSuccessResponseMatches(resp, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
   }
 
@@ -94,7 +94,7 @@ public class RHostedIT
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME).toPath()));
 
     //Verify PACKAGES(metadata) contain appropriate content about R package.
-    final InputStream content = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
+    final InputStream content = client.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
 
     //Verify PACKAGES(metadata) is clean if component has been deleted
@@ -102,7 +102,7 @@ public class RHostedIT
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteComponent(components.get(1).getEntityMetadata().getId());
 
-    final InputStream contentAfterDelete = client.fetch(PACKAGES_PATH_FULL).getEntity().getContent();
+    final InputStream contentAfterDelete = client.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae121Content)), contentAfterDelete);
   }
 
@@ -171,6 +171,6 @@ public class RHostedIT
   }
 
   private void uploadSinglePackage(String name) throws IOException {
-    client.put(format("%s/%s", PKG_PATH, name), fileToHttpEntity(name));
+    client.put(format("%s/%s", PKG_GZ_PATH, name), fileToHttpEntity(name));
   }
 }
