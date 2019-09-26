@@ -57,7 +57,7 @@ public final class RPathUtils
    * Builds a path to an archive for a particular path and filename.
    */
   static String path(final String path, final String filename) {
-    return path + "/" + filename;
+    return  path.endsWith("/") ? path + filename : path + "/" + filename;
   }
 
   /**
@@ -77,7 +77,7 @@ public final class RPathUtils
   /**
    * Removes slash if path starts with it
    */
-  private static String removeInitialSlashFromPath(final String path) {
+  static String removeInitialSlashFromPath(final String path) {
     if (path.startsWith("/")) {
       return path.replaceFirst("/", "");
     }
