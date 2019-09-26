@@ -72,6 +72,7 @@ class RHostedRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(packagesGzMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
         .handler(securityHandler)
@@ -84,6 +85,7 @@ class RHostedRecipe
         .create())
 
     builder.route(archiveMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
@@ -97,6 +99,7 @@ class RHostedRecipe
         .create())
 
     builder.route(uploadMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)

@@ -33,7 +33,9 @@ import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.FormatHighAvailabilitySupportHandler
 import org.sonatype.nexus.repository.view.handlers.HandlerContributor
+import org.sonatype.nexus.repository.view.handlers.HighAvailabilitySupportChecker
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
@@ -63,6 +65,12 @@ abstract class RRecipeSupport
 
   @Inject
   Provider<AttributesFacet> attributesFacet
+
+  @Inject
+  FormatHighAvailabilitySupportHandler highAvailabilitySupportHandler;
+
+  @Inject
+  HighAvailabilitySupportChecker highAvailabilitySupportChecker
 
   @Inject
   ExceptionHandler exceptionHandler
@@ -102,6 +110,11 @@ abstract class RRecipeSupport
 
   protected RRecipeSupport(final Type type, final Format format) {
     super(type, format)
+  }
+
+  @Override
+  boolean isFeatureEnabled() {
+    return highAvailabilitySupportChecker.isSupported(getFormat().getValue());
   }
 
   Closure assetKindHandler = { Context context, AssetKind value ->
