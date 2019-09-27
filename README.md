@@ -26,12 +26,12 @@
 * Search; 
 * Cleanup Policies; 
 * Tagging (PRO only);
-* Moving between repositories (PRO only);. #NEXUS-21170
-* Uploading R package from UI; #NEXUS-20703
-* Restore Metadata Task; #NEXUS-20532 (Looks like it should be renamed)
-* API for Repository creation via Groovy; #NEXUS-21171
+* Moving between repositories (PRO only);
+* Uploading R package from UI;
+* Restore Metadata Task;
+* API for Repository creation via Groovy;
 * Routing Rule support;
-* Fixed minor issues 
+* Fixed minor issues; 
 
 
 # Table Of Contents
