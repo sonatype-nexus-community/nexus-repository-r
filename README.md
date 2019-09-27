@@ -27,7 +27,7 @@
 * Cleanup Policies; 
 * Tagging (PRO only);
 * Moving between repositories (PRO only);
-* Uploading R package from UI;
+* Uploading R packages from UI to a hosted repository;
 * Restore Metadata Task;
 * API for Repository creation via Groovy;
 * Routing Rule support;
