@@ -75,7 +75,7 @@ Please view detailed instructions on [how to get started here!](https://help.son
 
 ## Compatibility with Nexus Repository Manager 3 Versions
 
-The table below outlines what version of Nexus Repository the plugin was built against
+The table below outlines what version of Nexus Repository the plugin was built against:
 
 | Plugin Version | Nexus Repository Version |
 |----------------|--------------------------|
