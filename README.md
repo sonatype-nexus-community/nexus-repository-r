@@ -134,7 +134,7 @@ You should see the R repository types (e.g. `r (proxy)`) in the available Reposi
 
 ## The Fine Print
 
-Starting from version 3.20.0 `R` plugin is supported by Sonatype, but still is a contribution of ours
+Starting from version 3.20.0 the `R` plugin is supported by Sonatype, but still is a contribution of ours
 to the open source community (read: you!)
 
 Phew, that was easier than I thought. Last but not least of all:
