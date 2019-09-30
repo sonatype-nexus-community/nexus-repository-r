@@ -128,7 +128,7 @@ Once you've completed Option 1 or 2, copy the `nexus-repository-r-1.1.0.jar` fil
 
 Restart Nexus Repo, or go ahead and start it if it wasn't running to begin with.
 
-You should see the R repository types (e.g. `r (proxy)`) in the available Repository Recipes to use, if all has gone according to plan :)
+You should see the R repository types (e.g. `r (proxy)`) in the available Repository Recipes to use if everything goes according to the plan.
 
 ## The Fine Print
 
