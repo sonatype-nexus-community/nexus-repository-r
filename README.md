@@ -86,7 +86,7 @@ The table below outlines what version of Nexus Repository the plugin was built a
 All released versions can be found [here](https://github.com/sonatype-nexus-community/nexus-repository-r/releases).
 
 ## Installing the plugin
-Starting from Nexus Repository Manager 3.20+ `R` format is already included. So there are no need to install it.  But if you want to reinstall plugin with your improvements then next instructions will be useful for you.
+Starting from Nexus Repository Manager 3.20+ `R` format is already included. So there are no need to install it.  But if you want to reinstall the plugin with your improvements then following instructions will be useful. <br> <b>Note:</b> Using an unofficial version of the plugin is not supported by the Sonatype Support team.
 
 ### Permanent Reinstall
 
