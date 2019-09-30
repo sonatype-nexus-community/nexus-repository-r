@@ -31,7 +31,6 @@
 * Support of the 'Repair - Reconcile component database from blobstore' task
 * API for Repository creation via Groovy
 * Routing Rule support
-* Fixed minor issues
 
 # Table Of Contents
 * [Developing](#developing)
