@@ -17,11 +17,11 @@
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
-> **What's New** R is now part of Nexus Repository Manager. Version 3.20.0 includes the R plugin by default. At the same time it is still open for community. 
+> **What's New** R is now part of Nexus Repository Manager. Version 3.20+ includes the R plugin by default. At the same time it is still open for community. 
 
-> **Filing issues:** If using 3.20.0 or later please file any issues at https://issues.sonatype.org/.
+> **Filing issues:** If using 3.20+ or later please file any issues at https://issues.sonatype.org/.
 
-> **Upgrading to 3.20.0:** After upgrading to 3.20 your existing data will remain intact.
+> **Upgrading to 3.20+:** After upgrading to 3.20+ your existing data will remain intact.
 > We have added new features to the community version of the plugin such as:
 * Search 
 * Cleanup Policies 
@@ -86,7 +86,7 @@ The table below outlines what version of Nexus Repository the plugin was built a
 All released versions can be found [here](https://github.com/sonatype-nexus-community/nexus-repository-r/releases).
 
 ## Installing the plugin
-Starting from Nexus Repository Manager 3.20 `R` format is already included. So there are no need to install it.  But if you want to reinstall plugin with your improvements then next instructions will be useful for you.
+Starting from Nexus Repository Manager 3.20+ `R` format is already included. So there are no need to install it.  But if you want to reinstall plugin with your improvements then next instructions will be useful for you.
 
 ### Permanent Reinstall
 
@@ -132,7 +132,7 @@ You should see the R repository types (e.g. `r (proxy)`) in the available Reposi
 
 ## The Fine Print
 
-Starting from version 3.20.0 the `R` plugin is supported by Sonatype, but still is a contribution of ours
+Starting from version 3.20+ the `R` plugin is supported by Sonatype, but still is a contribution of ours
 to the open source community (read: you!)
 
 Phew, that was easier than I thought. Last but not least of all:
