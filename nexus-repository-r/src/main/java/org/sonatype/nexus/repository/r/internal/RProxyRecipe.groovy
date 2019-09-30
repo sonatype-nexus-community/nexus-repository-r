@@ -90,6 +90,7 @@ class RProxyRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(packagesMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
         .handler(securityHandler)
@@ -104,6 +105,7 @@ class RProxyRecipe
         .create())
 
     builder.route(metadataRdsMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(RDS_METADATA))
         .handler(securityHandler)
@@ -118,6 +120,7 @@ class RProxyRecipe
         .create())
 
     builder.route(archiveMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
