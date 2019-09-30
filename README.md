@@ -17,7 +17,7 @@
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
-> **Huzzah!** R is now part of Nexus Repository Manager. Version 3.20.0 includes the R plugin by default. At the same time it is still open for community. 
+> **What's New** R is now part of Nexus Repository Manager. Version 3.20.0 includes the R plugin by default. At the same time it is still open for community. 
 
 > **Filing issues:** If using 3.20.0 or later please file any issues at https://issues.sonatype.org/.
 
