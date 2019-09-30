@@ -23,16 +23,15 @@
 
 > **Upgrading to 3.20.0:** After upgrading to 3.20 your existing data will remain intact.
 > We have added new features to the community version of the plugin such as:
-* Search; 
-* Cleanup Policies; 
-* Tagging (PRO only);
-* Moving between repositories (PRO only);
-* Uploading R packages from UI to a hosted repository;
-* Restore Metadata Task;
-* API for Repository creation via Groovy;
-* Routing Rule support;
-* Fixed minor issues; 
-
+* Search 
+* Cleanup Policies 
+* Tagging (PRO only)
+* Moving between repositories (PRO only)
+* Uploading R packages from UI to a hosted repository
+* Restore Metadata Task
+* API for Repository creation via Groovy
+* Routing Rule support
+* Fixed minor issues
 
 # Table Of Contents
 * [Developing](#developing)
@@ -113,7 +112,7 @@ Starting from Nexus Repository Manager 3.20 `R` format is already included. So t
 This will cause the plugin to be loaded and started with each startup of Nexus Repository.
 
 ### Easiest Install for version  
-Relevant only for Nexus Repository manager version 3.18.0-01 and lower  which doest includes `R` plugin.
+Relevant only for Nexus Repository manager version 3.19 and lower  which doesn't include `R` plugin.
 But we strongly recommend to update to the latest Nexus Repository version.
 
 Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it's become a LOT easier to install a plugin. To install the `R` plugin, you can either build locally or download from The Central Repository:
