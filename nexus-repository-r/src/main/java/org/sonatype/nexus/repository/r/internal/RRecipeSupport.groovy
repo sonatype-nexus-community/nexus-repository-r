@@ -33,7 +33,9 @@ import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.FormatHighAvailabilitySupportHandler
 import org.sonatype.nexus.repository.view.handlers.HandlerContributor
+import org.sonatype.nexus.repository.view.handlers.HighAvailabilitySupportChecker
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
 import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
@@ -65,6 +67,12 @@ abstract class RRecipeSupport
   Provider<AttributesFacet> attributesFacet
 
   @Inject
+  FormatHighAvailabilitySupportHandler highAvailabilitySupportHandler;
+
+  @Inject
+  HighAvailabilitySupportChecker highAvailabilitySupportChecker
+
+  @Inject
   ExceptionHandler exceptionHandler
 
   @Inject
@@ -74,7 +82,7 @@ abstract class RRecipeSupport
   SecurityHandler securityHandler
 
   @Inject
-  RoutingRuleHandler routingRuleHandler;
+  RoutingRuleHandler routingRuleHandler
 
   @Inject
   PartialFetchHandler partialFetchHandler
@@ -104,19 +112,46 @@ abstract class RRecipeSupport
     super(type, format)
   }
 
+  @Override
+  boolean isFeatureEnabled() {
+    return highAvailabilitySupportChecker.isSupported(getFormat().getValue());
+  }
+
   Closure assetKindHandler = { Context context, AssetKind value ->
     context.attributes.set(AssetKind, value)
     return context.proceed()
   }
 
   /**
-   * Matcher for packages mapping.
+   * Matcher for packages.gz mapping.
+   */
+  static Builder packagesGzMatcher() {
+    new Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET, HEAD),
+            packagesGzTokenMatcher()
+        ))
+  }
+
+  /**
+   * Matcher for all packages mapping.
    */
   static Builder packagesMatcher() {
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
-            new TokenMatcher('/{path:.+}/PACKAGES.gz')
+            packagesTokenMatcher()
+        ))
+  }
+
+  /**
+   * Matcher for all .rds metadata mapping.
+   */
+  static Builder metadataRdsMatcher() {
+    new Builder().matcher(
+        LogicMatchers.and(
+            new ActionMatcher(GET, HEAD),
+            metadataRdsTokenMatcher()
         ))
   }
 
@@ -127,7 +162,7 @@ abstract class RRecipeSupport
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(GET, HEAD),
-            new TokenMatcher('/{path:.+}/{filename:.+}')
+            allFilesTokenMatcher()
         ))
   }
 
@@ -138,7 +173,35 @@ abstract class RRecipeSupport
     new Builder().matcher(
         LogicMatchers.and(
             new ActionMatcher(PUT),
-            new TokenMatcher('/{path:.+}/{filename:.+}')
+            allFilesTokenMatcher()
         ))
+  }
+
+  /**
+   * Token matcher for PACKAGES.gz files.
+   */
+  static TokenMatcher packagesGzTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/PACKAGES.gz')
+  }
+
+  /**
+   * Token matcher for all PACKAGES files.
+   */
+  static TokenMatcher packagesTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/PACKAGES{extension:.*}')
+  }
+
+  /**
+   * Token matcher for .rds metadata files.
+   */
+  static TokenMatcher metadataRdsTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/{filename:.+}.rds')
+  }
+
+  /**
+   * Token matcher for all files.
+   */
+  static TokenMatcher allFilesTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/{filename:.+}')
   }
 }

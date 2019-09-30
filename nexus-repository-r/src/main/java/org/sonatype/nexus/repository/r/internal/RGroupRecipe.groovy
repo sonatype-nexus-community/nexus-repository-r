@@ -71,6 +71,7 @@ class RGroupRecipe
     Router.Builder builder = new Router.Builder()
 
     builder.route(packagesMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
         .handler(securityHandler)
@@ -79,7 +80,18 @@ class RGroupRecipe
         .handler(packagesGroupHandler)
         .create())
 
+    builder.route(metadataRdsMatcher()
+        .handler(highAvailabilitySupportHandler)
+        .handler(timingHandler)
+        .handler(assetKindHandler.rcurry(AssetKind.RDS_METADATA))
+        .handler(securityHandler)
+        .handler(exceptionHandler)
+        .handler(handlerContributor)
+        .handler(packagesGroupHandler)
+        .create())
+
     builder.route(archiveMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(AssetKind.ARCHIVE))
         .handler(securityHandler)

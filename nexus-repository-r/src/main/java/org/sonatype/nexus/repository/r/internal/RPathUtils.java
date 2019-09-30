@@ -61,10 +61,27 @@ public final class RPathUtils
   }
 
   /**
-   * Builds a path to a package for a particular path.
+   * Builds a path to a package.gz for a particular path.
    */
-  static String packagesPath(final String path) {
+  static String packagesGzPath(final String path) {
     return path + "/PACKAGES.gz";
+  }
+
+  /**
+   * Extracts full path from {@link Context}
+   */
+  static String extractFullPath(final Context context) {
+    return removeInitialSlashFromPath(context.getRequest().getPath());
+  }
+
+  /**
+   * Removes slash if path starts with it
+   */
+  private static String removeInitialSlashFromPath(final String path) {
+    if (path.startsWith("/")) {
+      return path.replaceFirst("/", "");
+    }
+    return path;
   }
 
   private RPathUtils() {
