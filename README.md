@@ -28,7 +28,7 @@
 * Tagging (PRO only)
 * Moving between repositories (PRO only)
 * Uploading R packages from UI to a hosted repository
-* Restore Metadata Task
+* Support of the 'Repair - Reconcile component database from blobstore' task
 * API for Repository creation via Groovy
 * Routing Rule support
 * Fixed minor issues
