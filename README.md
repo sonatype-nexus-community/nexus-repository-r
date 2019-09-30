@@ -119,13 +119,13 @@ Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it'
 
 #### Option 1: Build a *.kar file locally from the GitHub Repo
 * Clone this repo and `cd` to the cloned directory location
-* Build the plugin with `mvn clean package -PbuildKar`
-* There should now be a `nexus-repository-r-1.0.4-bundle.kar` file your `<cloned_repo>/target` directory 
+* Build the plugin with `mvn clean package`
+* There should now be a `nexus-repository-r-1.1.0.jar` file your `<cloned_repo>/target` directory 
 
 #### Option 2: Download a *.kar file from The Central Repository 
-* Download `nexus-repository-r-1.0.4-bundle.kar` from [The Central Repository](https://search.maven.org/artifact/org.sonatype.nexus.plugins/nexus-repository-r/1.0.4/bundle)
+* Download `nexus-repository-r-1.1.0.jar` from [The Central Repository](https://search.maven.org/artifact/org.sonatype.nexus.plugins/nexus-repository-r/1.1.0/bundle)
 
-Once you've completed Option 1 or 2, copy the `nexus-repository-r-1.0.4-bundle.kar` file into the `<nexus_dir>/deploy` folder for your Nexus Repository installation.
+Once you've completed Option 1 or 2, copy the `nexus-repository-r-1.1.0.jar` file into the `<nexus_dir>/deploy` folder for your Nexus Repository installation.
 
 Restart Nexus Repo, or go ahead and start it if it wasn't running to begin with.
 
