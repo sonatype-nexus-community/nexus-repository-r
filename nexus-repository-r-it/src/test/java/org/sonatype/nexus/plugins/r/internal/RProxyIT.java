@@ -68,6 +68,8 @@ public class RProxyIT
         .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ)))
         .serve("/" + AGRICOLAE_PATH_FULL_131_TARGZ)
         .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TARGZ)))
+        .serve("/" + AGRICOLAE_PATH_FULL_WRONG_EXTENSION_TRGZ)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_TRGZ)))
         .serve("/" + PACKAGES_GZ_PATH_FULL)
         .withBehaviours(file(testData.resolveFile(PACKAGES_GZ_FILE_NAME)))
         .serve("/" + PACKAGES_RDS_PATH_FULL)
@@ -91,6 +93,12 @@ public class RProxyIT
     Assert.assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_131_TGZ)));
     Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_X_TGZ)));
     Assert.assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
+  }
+
+  @Test
+  public void fetchWrongTrgzPackageFileNotFound() throws Exception {
+    assertGetResponseStatus(client, repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_TRGZ, NOT_FOUND);
+    Assert.assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_TRGZ));
   }
 
   @Test
