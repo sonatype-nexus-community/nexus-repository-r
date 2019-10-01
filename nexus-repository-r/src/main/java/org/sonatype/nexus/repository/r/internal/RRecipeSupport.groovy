@@ -165,7 +165,7 @@ abstract class RRecipeSupport
     new Builder().matcher(
         and(
             new ActionMatcher(GET, HEAD),
-            sourcesAndBinariesPathMatcher()
+            archivePathMatcher()
         ))
   }
 
@@ -181,9 +181,9 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Path matcher for all source and binary files.
+   * Path matcher for archive files.
    */
-  static Matcher sourcesAndBinariesPathMatcher() {
+  static Matcher archivePathMatcher() {
     return and(
         allFilesTokenMatcher(),
         or(
