@@ -111,8 +111,7 @@ Starting from Nexus Repository Manager 3.20+ `R` format is already included. So 
 This will cause the plugin to be loaded and started with each startup of Nexus Repository.
 
 ### Easiest Install for version  
-Relevant only for Nexus Repository manager version 3.19 and lower  which doesn't include `R` plugin.
-But we strongly recommend to update to the latest Nexus Repository version.
+Nexus Repository Manager 3.20+ already includes the R plugin. If you want to install an old R plugin in an old Nexus Repository Manager, the instructions below may be useful. However, we strongly recommend you update to the latest Nexus Repository version. If you are developing new features for R plugin and want to install your new R plugin, then follow the instructions below.
 
 Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it's become a LOT easier to install a plugin. To install the `R` plugin, you can either build locally or download from The Central Repository:
 
