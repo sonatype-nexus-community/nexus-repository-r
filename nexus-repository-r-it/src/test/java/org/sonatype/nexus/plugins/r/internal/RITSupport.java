@@ -86,7 +86,7 @@ public class RITSupport
 
   public static final String TARGZ_EXT = ".tar.gz";
 
-  public static final String TRGZ_EXT = ".trgz";
+  public static final String XXX_EXT = ".xxx";
 
   public static final String TGZ_EXT = ".tgz";
 
@@ -108,8 +108,8 @@ public class RITSupport
   public static final String AGRICOLAE_PKG_FILE_NAME_131_TARGZ = format("%s_%s%s",
       AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TARGZ_EXT);
 
-  public static final String AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_TRGZ = format("%s_%s%s",
-      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TRGZ_EXT);
+  public static final String AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX = format("%s_%s%s",
+      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, XXX_EXT);
 
   public static final String CONTENT_TYPE_X_TGZ = "application/x-tgz";
 
@@ -134,8 +134,8 @@ public class RITSupport
   public static final String AGRICOLAE_PATH_FULL_121_TARGZ =
       String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
 
-  public static final String AGRICOLAE_PATH_FULL_WRONG_EXTENSION_TRGZ =
-      String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_TRGZ);
+  public static final String AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX =
+      String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX);
 
   public static final String PACKAGES_GZ_PATH_FULL = format("%s/%s", PKG_GZ_PATH, PACKAGES_GZ_FILE_NAME);
 
