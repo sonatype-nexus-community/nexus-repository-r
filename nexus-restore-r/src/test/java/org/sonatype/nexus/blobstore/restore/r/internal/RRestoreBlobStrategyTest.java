@@ -47,6 +47,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 
+/**
+ * @since 1.0.next
+ */
 public class RRestoreBlobStrategyTest
     extends TestSupport
 {

@@ -38,6 +38,8 @@ import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_
 
 /**
  * {@link RFacet} implementation.
+ *
+ * @since 1.0.next
  */
 @Named
 public class RFacetImpl
