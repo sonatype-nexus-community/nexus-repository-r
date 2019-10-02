@@ -1,3 +1,15 @@
+/*
+ * Sonatype Nexus (TM) Open Source Version
+ * Copyright (c) 2017-present Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
+ *
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,
+ * which accompanies this distribution and is available at http://www.eclipse.org/legal/epl-v10.html.
+ *
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
+ * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
+ * Eclipse Foundation. All other trademarks are the property of their respective owners.
+ */
 package org.sonatype.nexus.blobstore.restore.r.internal;
 
 import java.io.ByteArrayInputStream;
@@ -19,7 +31,6 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.r.RRestoreFacet;
 import org.sonatype.nexus.repository.storage.AssetBlob;
-import org.sonatype.nexus.repository.storage.Query;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
@@ -27,14 +38,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.MD5;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
-import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA256;
 
 public class RRestoreBlobStrategyTest
     extends TestSupport
@@ -42,12 +53,6 @@ public class RRestoreBlobStrategyTest
   private static final String TEST_BLOB_STORE_NAME = "test";
 
   private static final String ARCHIVE_PATH = "src/contrib/curl_4.2.tar.gz";
-
-  private static final String PACKAGES_PATH = "src/contrib/PACKAGES";
-
-  private static final String PACKAGES_GZ_PATH = "src/contrib/PACKAGES.gz";
-
-  private static final String PACKAGES_RDS_PATH = "src/contrib/PACKAGES.rds";
 
   @Mock
   RepositoryManager repositoryManager;
@@ -96,11 +101,12 @@ public class RRestoreBlobStrategyTest
     when(repository.facet(RRestoreFacet.class)).thenReturn(rRestoreFacet);
     when(repository.optionalFacet(RRestoreFacet.class)).thenReturn(Optional.of(rRestoreFacet));
     when(repository.optionalFacet(StorageFacet.class)).thenReturn(Optional.of(storageFacet));
-    when(rRestoreBlobData.getBlobData()).thenReturn(restoreBlobData);
-    when(rRestoreBlobData.getBlobData().getBlobName()).thenReturn(ARCHIVE_PATH);
-    when(rRestoreBlobData.getBlobData().getRepository()).thenReturn(repository);
-    when(storageFacet.txSupplier()).thenReturn(() -> storageTx);
     when(blob.getInputStream()).thenReturn(new ByteArrayInputStream(blobBytes));
+    when(rRestoreBlobData.getBlobData()).thenReturn(restoreBlobData);
+    when(restoreBlobData.getBlobName()).thenReturn(ARCHIVE_PATH);
+    when(restoreBlobData.getRepository()).thenReturn(repository);
+    when(restoreBlobData.getBlob()).thenReturn(blob);
+    when(storageFacet.txSupplier()).thenReturn(() -> storageTx);
     when(blobStoreManager.get(TEST_BLOB_STORE_NAME)).thenReturn(blobStore);
     when(restoreBlobData.getRepository()).thenReturn(repository);
 
@@ -120,7 +126,7 @@ public class RRestoreBlobStrategyTest
   }
 
   @Test(expected = IllegalStateException.class)
-  public void testIfBlobDataNameIsEmpty_ExceptionIsThrown() {
+  public void testIfBlobDataNameIsEmptyExceptionIsThrown() {
     when(rRestoreBlobData.getBlobData().getBlobName()).thenReturn("");
     restoreBlobStrategy.createRestoreData(restoreBlobData);
   }
@@ -144,7 +150,7 @@ public class RRestoreBlobStrategyTest
   }
 
   @Test
-  public void testRestoreIsSkip_IfPackageExists() {
+  public void testRestoreIsSkipIfPackageExists() {
     when(rRestoreFacet.assetExists(ARCHIVE_PATH)).thenReturn(true);
     restoreBlobStrategy.restore(properties, blob, TEST_BLOB_STORE_NAME, false);
 
@@ -165,6 +171,7 @@ public class RRestoreBlobStrategyTest
   @Test
   public void testComponentQuery() throws IOException
   {
-    Query query = restoreBlobStrategy.getComponentQuery(rRestoreBlobData);
+    restoreBlobStrategy.getComponentQuery(rRestoreBlobData);
+    verify(rRestoreFacet, times(1)).getComponentQuery(anyMapOf(String.class, String.class));
   }
 }

@@ -68,15 +68,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus.testsuite</groupId>
-      <artifactId>nexus-repository-testsupport</artifactId>
-      <version>${nxrm-version}</version>
-      <type>xml</type>
-      <classifier>features</classifier>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.testsuite</groupId>
       <artifactId>nexus-it-suite-data</artifactId>
       <version>${nxrm-version}</version>
       <scope>test</scope>
@@ -96,6 +87,26 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-restore-r</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-blobstore-tasks</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-blobstore-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
