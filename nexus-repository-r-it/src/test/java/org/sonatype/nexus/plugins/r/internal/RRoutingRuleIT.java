@@ -13,7 +13,6 @@
 package org.sonatype.nexus.plugins.r.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,20 +22,15 @@ import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
-import org.sonatype.nexus.testsuite.testsupport.raw.RawClient;
 
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 /**
  * @since 1.1.0
@@ -79,25 +73,13 @@ public class RRoutingRuleIT
 
     EntityId routingRuleId = createBlockedRoutingRule("r-blocking-rule", ".*/1.1/.*");
     Repository proxyRepo = repos.createRProxy("test-r-blocking-proxy", proxyServer.getUrl().toString());
-    RawClient client = rawClient(proxyRepo);
+    RClient client = rClient(proxyRepo);
 
     attachRuleToRepository(proxyRepo, routingRuleId);
 
     assertGetResponseStatus(client, proxyRepo, blockedPackagePath, 403);
     assertGetResponseStatus(client, proxyRepo, allowedPackagePath, 200);
     assertNoRequests(blockedPackagePath);
-  }
-
-  private void assertGetResponseStatus(
-      final RawClient client,
-      final Repository repository,
-      final String path,
-      final int responseCode) throws IOException
-  {
-    try (CloseableHttpResponse response = client.get(path)) {
-      StatusLine statusLine = response.getStatusLine();
-      assertThat("Repository:" + repository.getName() + " Path:" + path, statusLine.getStatusCode(), is(responseCode));
-    }
   }
 
   private void assertNoRequests(final String reqPath) {

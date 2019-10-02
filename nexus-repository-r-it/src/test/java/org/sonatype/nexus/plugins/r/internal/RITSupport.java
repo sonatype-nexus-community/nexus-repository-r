@@ -34,15 +34,19 @@ import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.tika.io.IOUtils;
 import org.hamcrest.Matcher;
+import org.junit.Assert;
 import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Support class for R ITs.
@@ -82,6 +86,8 @@ public class RITSupport
 
   public static final String TARGZ_EXT = ".tar.gz";
 
+  public static final String XXX_EXT = ".xxx";
+
   public static final String TGZ_EXT = ".tgz";
 
   public static final String GZ_EXT = ".gz";
@@ -101,6 +107,9 @@ public class RITSupport
 
   public static final String AGRICOLAE_PKG_FILE_NAME_131_TARGZ = format("%s_%s%s",
       AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TARGZ_EXT);
+
+  public static final String AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX = format("%s_%s%s",
+      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, XXX_EXT);
 
   public static final String CONTENT_TYPE_X_TGZ = "application/x-tgz";
 
@@ -124,6 +133,9 @@ public class RITSupport
 
   public static final String AGRICOLAE_PATH_FULL_121_TARGZ =
       String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
+
+  public static final String AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX =
+      String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX);
 
   public static final String PACKAGES_GZ_PATH_FULL = format("%s/%s", PKG_GZ_PATH, PACKAGES_GZ_FILE_NAME);
 
@@ -188,6 +200,20 @@ public class RITSupport
     try (StorageTx tx = getStorageTx(repository)) {
       tx.begin();
       return IteratorUtils.toList(tx.browseAssets(component).iterator());
+    }
+  }
+
+  protected void assertGetResponseStatus(
+      final RClient client,
+      final Repository repository,
+      final String path,
+      final int responseCode) throws IOException
+  {
+    try (CloseableHttpResponse response = client.get(path)) {
+      StatusLine statusLine = response.getStatusLine();
+      Assert.assertThat("Repository:" + repository.getName() + " Path:" + path,
+          statusLine.getStatusCode(),
+          is(responseCode));
     }
   }
 }
