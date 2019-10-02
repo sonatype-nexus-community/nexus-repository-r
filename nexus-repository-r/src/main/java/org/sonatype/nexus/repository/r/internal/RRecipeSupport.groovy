@@ -28,6 +28,7 @@ import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Matcher
 import org.sonatype.nexus.repository.view.Route.Builder
 import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
@@ -38,12 +39,14 @@ import org.sonatype.nexus.repository.view.handlers.HandlerContributor
 import org.sonatype.nexus.repository.view.handlers.HighAvailabilitySupportChecker
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
-import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
+import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET
 import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or
 
 /**
  * Support for R recipes.
@@ -51,14 +54,6 @@ import static org.sonatype.nexus.repository.http.HttpMethods.PUT
 abstract class RRecipeSupport
     extends RecipeSupport
 {
-  static final String PATTERN_PACKAGES_GZ = "/{path:.+}/PACKAGES.gz"
-
-  static final String PATTERN_PACKAGES = "/{path:.+}/PACKAGES{extension:.*}"
-
-  static final String PATTERN_METADATA_RDS = "/{path:.+}/{filename:.+}.rds"
-
-  static final String PATTERN_ALL_FILES = "/{path:.+}/{filename:.+}"
-
   @Inject
   Provider<RSecurityFacet> securityFacet
 
@@ -141,7 +136,7 @@ abstract class RRecipeSupport
    */
   static Builder packagesGzMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
             packagesGzTokenMatcher()
         ))
@@ -152,7 +147,7 @@ abstract class RRecipeSupport
    */
   static Builder packagesMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
             packagesTokenMatcher()
         ))
@@ -163,9 +158,9 @@ abstract class RRecipeSupport
    */
   static Builder metadataRdsMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
-            metadataRdsTokenMatcher()
+            metadataRdsPathMatcher()
         ))
   }
 
@@ -174,9 +169,9 @@ abstract class RRecipeSupport
    */
   static Builder archiveMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
-            allFilesTokenMatcher()
+            archivePathMatcher()
         ))
   }
 
@@ -185,37 +180,61 @@ abstract class RRecipeSupport
    */
   static Builder uploadMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(PUT),
             allFilesTokenMatcher()
         ))
   }
 
   /**
+   * Path matcher for archive files.
+   */
+  static Matcher archivePathMatcher() {
+    return and(
+        allFilesTokenMatcher(),
+        or(
+            suffixMatcherForExtension('.zip'),
+            suffixMatcherForExtension('.tgz'),
+            suffixMatcherForExtension('.tar.gz')
+        )
+    )
+  }
+
+  /**
+   * Path matcher for .rds metadata files.
+   */
+  static Matcher metadataRdsPathMatcher() {
+    return and(
+        allFilesTokenMatcher(),
+        suffixMatcherForExtension('.rds')
+    )
+  }
+
+  /**
    * Token matcher for PACKAGES.gz files.
    */
   static TokenMatcher packagesGzTokenMatcher() {
-    return new TokenMatcher(PATTERN_PACKAGES_GZ)
+    return new TokenMatcher('/{path:.+}/PACKAGES.gz')
   }
 
   /**
    * Token matcher for all PACKAGES files.
    */
   static TokenMatcher packagesTokenMatcher() {
-    return new TokenMatcher(PATTERN_PACKAGES)
+    return new TokenMatcher('/{path:.+}/PACKAGES{extension:.*}')
   }
 
   /**
-   * Token matcher for .rds metadata files.
-   */
-  static TokenMatcher metadataRdsTokenMatcher() {
-    return new TokenMatcher(PATTERN_METADATA_RDS)
-  }
-
-  /**
-   * Token matcher for all files.
+   * Token matcher for all files
    */
   static TokenMatcher allFilesTokenMatcher() {
-    return new TokenMatcher(PATTERN_ALL_FILES)
+    return new TokenMatcher('/{path:.+}/{filename:.+}')
+  }
+
+  /**
+   * Suffix matcher for files with given extension.
+   */
+  static SuffixMatcher suffixMatcherForExtension(final String extension) {
+    return new SuffixMatcher(extension)
   }
 }
