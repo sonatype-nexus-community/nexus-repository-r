@@ -35,7 +35,7 @@ import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
 /**
  * R proxy repository recipe.
  *
- * @since 1.0.next
+ * @since 1.1.next
  */
 @Named(RHostedRecipe.NAME)
 @Singleton

@@ -33,6 +33,7 @@ import org.sonatype.nexus.plugins.r.internal.RClient;
 import org.sonatype.nexus.plugins.r.internal.RITSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.http.HttpStatus;
+import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetEntityAdapter;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -54,7 +55,7 @@ public class RRestoreBlobIT
   private BlobstoreRestoreTestHelper testHelper;
 
   @Inject
-  @Named("r")
+  @Named(RFormat.NAME)
   private RestoreBlobStrategy rRestoreBlobStrategy;
 
   private static final String HOSTED_REPO_NAME = "r-hosted";

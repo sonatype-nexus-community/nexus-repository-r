@@ -22,7 +22,7 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 /**
  * General R facet
  *
- * @since 1.0.next
+ * @since 1.1.next
  */
 @Facet.Exposed
 public interface RFacet

@@ -33,6 +33,7 @@ import org.sonatype.nexus.common.node.NodeAccess;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.r.RRestoreFacet;
+import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Query;
 
@@ -41,9 +42,9 @@ import static org.eclipse.aether.util.StringUtils.isEmpty;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 
 /**
- * @since 1.0.next
+ * @since 1.1.next
  */
-@Named("r")
+@Named(RFormat.NAME)
 @Singleton
 public class RRestoreBlobStrategy
     extends BaseRestoreBlobStrategy<RRestoreBlobData>
