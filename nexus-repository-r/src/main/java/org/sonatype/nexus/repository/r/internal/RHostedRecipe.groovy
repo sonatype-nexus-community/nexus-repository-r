@@ -34,6 +34,8 @@ import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
 
 /**
  * R proxy repository recipe.
+ *
+ * @since 1.1.next
  */
 @Named(RHostedRecipe.NAME)
 @Singleton
@@ -43,7 +45,7 @@ class RHostedRecipe
   public static final String NAME = 'r-hosted'
 
   @Inject
-  Provider<RHostedFacet> hostedFacet
+  Provider<org.sonatype.nexus.repository.r.RHostedFacet> hostedFacet
 
   @Inject
   HostedHandlers hostedHandlers
@@ -60,6 +62,8 @@ class RHostedRecipe
     repository.attach(httpClientFacet.get())
     repository.attach(componentMaintenanceFacet.get())
     repository.attach(hostedFacet.get())
+    repository.attach(rFacet.get())
+    repository.attach(rRestoreFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(attributesFacet.get())

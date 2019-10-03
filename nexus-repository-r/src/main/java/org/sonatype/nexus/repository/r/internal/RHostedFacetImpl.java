@@ -23,9 +23,13 @@ import java.util.Map.Entry;
 import javax.inject.Named;
 import javax.mail.internet.InternetHeaders;
 
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.sonatype.nexus.repository.FacetSupport;
+import org.sonatype.nexus.repository.r.RFacet;
+import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -38,14 +42,9 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
-
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -55,10 +54,8 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
-import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.toContent;
-import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
  * {@link RHostedFacet} implementation.
@@ -147,28 +144,16 @@ public class RHostedFacetImpl
     checkNotNull(archiveContent);
     checkNotNull(payload);
     StorageTx tx = UnitOfWork.currentTx();
-    Bucket bucket = tx.findBucket(getRepository());
+    RFacet rFacet = facet(RFacet.class);
 
     Map<String, String> attributes;
     try (InputStream is = archiveContent.get()) {
       attributes = extractDescriptionFromArchive(path, is);
     }
 
-    String name = attributes.get(P_PACKAGE);
-    String version = attributes.get(P_VERSION);
+    Component component = rFacet.findOrCreateComponent(tx, attributes);
 
-    Component component = findComponent(tx, getRepository(), name, version);
-    if (component == null) {
-      component = tx.createComponent(bucket, getRepository().getFormat()).name(name).version(version);
-    }
-    tx.saveComponent(component);
-
-    Asset asset = findAsset(tx, bucket, path);
-    if (asset == null) {
-      asset = tx.createAsset(bucket, component);
-      asset.name(path);
-      asset.formatAttributes().set(P_ASSET_KIND, ARCHIVE.name());
-    }
+    Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
 
     // TODO: Make this a bit more robust (could be problematic if keys are removed in later versions, or if keys clash)
     for (Entry<String, String> entry : attributes.entrySet()) {

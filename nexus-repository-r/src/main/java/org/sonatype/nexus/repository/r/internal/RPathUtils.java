@@ -22,6 +22,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class RPathUtils
 {
+  static final String PATTERN_PACKAGES = ".*/.+/PACKAGES.*";
+
+  static final String PATTERN_METADATA_RDS = ".*/.+/.+.rds";
+
   /**
    * Returns the {@link TokenMatcher.State} for the content.
    */

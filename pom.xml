@@ -23,7 +23,6 @@
     <version>3.20.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-repository-base</artifactId>
   <version>1.0.4</version>
   <packaging>pom</packaging>
@@ -34,6 +33,7 @@
   <modules>
     <module>nexus-repository-r</module>
     <module>nexus-repository-r-it</module>
+    <module>nexus-restore-r</module>
   </modules>
 
   <distributionManagement>

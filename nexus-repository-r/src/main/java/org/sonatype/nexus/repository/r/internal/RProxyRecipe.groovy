@@ -75,6 +75,8 @@ class RProxyRecipe
     repository.attach(negativeCacheFacet.get())
     repository.attach(componentMaintenanceFacet.get())
     repository.attach(proxyFacet.get())
+    repository.attach(rFacet.get())
+    repository.attach(rRestoreFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(purgeUnusedFacet.get())

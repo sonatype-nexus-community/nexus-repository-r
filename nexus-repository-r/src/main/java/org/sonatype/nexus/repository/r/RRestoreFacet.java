@@ -10,42 +10,30 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.r.internal;
+package org.sonatype.nexus.repository.r;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.Payload;
+import org.sonatype.nexus.repository.storage.AssetBlob;
+import org.sonatype.nexus.repository.storage.Query;
 
 /**
- * Persistence for R hosted.
+ * @since 1.1.next
  */
 @Facet.Exposed
-public interface RHostedFacet
+public interface RRestoreFacet
     extends Facet
 {
-  /**
-   * Retrieve packages.
-   *
-   * @param packagesPath the full packages path
-   * @return simple package HTML
-   */
-  Content getPackages(String packagesPath);
+  void restore(final AssetBlob assetBlob, final String path) throws IOException;
 
-  /**
-   * Retrieve package.
-   *
-   * @param archivePath the full archive path
-   * @return the package content
-   */
-  Content getArchive(String archivePath);
+  boolean assetExists(final String path);
 
-  /**
-   * Perform upload.
-   *
-   * @param path    the upload path
-   * @param payload uploaded file content
-   */
-  void upload(String path, Payload payload) throws IOException;
+  boolean componentRequired(final String name);
+
+  Query getComponentQuery(final Map<String, String> attributes);
+
+  Map<String, String> extractComponentAttributesFromArchive(final String filename, final InputStream is);
 }

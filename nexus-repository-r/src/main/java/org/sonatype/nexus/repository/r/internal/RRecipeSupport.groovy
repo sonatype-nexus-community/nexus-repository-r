@@ -111,6 +111,12 @@ abstract class RRecipeSupport
   @Inject
   Provider<HttpClientFacet> httpClientFacet
 
+  @Inject
+  Provider<org.sonatype.nexus.repository.r.RRestoreFacet> rRestoreFacet;
+
+  @Inject
+  Provider<org.sonatype.nexus.repository.r.RFacet> rFacet;
+
   protected RRecipeSupport(final Type type, final Format format) {
     super(type, format)
   }
