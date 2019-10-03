@@ -78,7 +78,7 @@ public class RRestoreFacetImpl
 
   @Override
   public boolean componentRequired(final String name) {
-    return !(name.contains("PACKAGES") || name.endsWith(".rds"));
+    return !(name.contains("/PACKAGES") || name.endsWith(".rds"));
   }
 
   @Override
