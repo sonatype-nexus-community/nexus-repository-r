@@ -85,7 +85,7 @@ public class RFacetImpl
   }
 
   @Override
-  public Asset findOrCreateMetadata(final StorageTx tx, final String path) {
+  public Asset findOrCreateAsset(final StorageTx tx, final String path) {
     Bucket bucket = tx.findBucket(getRepository());
     Asset asset = findAsset(tx, bucket, path);
     if (asset == null) {

@@ -43,9 +43,9 @@ public interface RFacet
   Asset findOrCreateAsset(final StorageTx tx, final Component component, final String path, final Map<String, String> attributes);
 
   /**
-   * Find or Create Asset for metadata
+   * Find or Create Asset without Component
    *
    * @return Asset
    */
-  Asset findOrCreateMetadata(final StorageTx tx, final String path);
+  Asset findOrCreateAsset(final StorageTx tx, final String path);
 }

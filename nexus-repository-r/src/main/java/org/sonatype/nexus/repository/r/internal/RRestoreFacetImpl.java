@@ -61,7 +61,7 @@ public class RRestoreFacetImpl
       asset = facet.findOrCreateAsset(tx, component, path, attributes);
     }
     else {
-      asset = facet.findOrCreateMetadata(tx, path);
+      asset = facet.findOrCreateAsset(tx, path);
     }
     tx.attachBlob(asset, assetBlob);
 
