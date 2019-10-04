@@ -15,6 +15,8 @@ package org.sonatype.nexus.repository.r.internal;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
+import org.apache.commons.lang3.StringUtils;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -57,7 +59,7 @@ public final class RPathUtils
    * Builds a path to an archive for a particular path and filename.
    */
   static String path(final String path, final String filename) {
-    return  path.endsWith("/") ? path + filename : path + "/" + filename;
+    return StringUtils.appendIfMissing(path, "/") + filename;
   }
 
   /**
@@ -78,10 +80,7 @@ public final class RPathUtils
    * Removes slash if path starts with it
    */
   static String removeInitialSlashFromPath(final String path) {
-    if (path.startsWith("/")) {
-      return path.replaceFirst("/", "");
-    }
-    return path;
+    return StringUtils.stripStart(path, "/");
   }
 
   private RPathUtils() {
