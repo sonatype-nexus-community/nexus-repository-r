@@ -133,7 +133,6 @@ public class RHostedFacetImpl
     checkNotNull(path);
     checkNotNull(payload);
     StorageFacet storageFacet = facet(StorageFacet.class);
-    UnitOfWork.begin(storageFacet.txSupplier());
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
      return doPutArchive(path, tempBlob, payload);
     }

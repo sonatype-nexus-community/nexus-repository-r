@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.r.internal;
+package org.sonatype.nexus.repository.r.internal.upload;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,10 +24,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.r.internal.RFormat;
+import org.sonatype.nexus.repository.r.internal.RHostedFacet;
 import org.sonatype.nexus.repository.rest.UploadDefinitionExtension;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.VariableResolverAdapter;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.upload.AssetUpload;
 import org.sonatype.nexus.repository.upload.ComponentUpload;
 import org.sonatype.nexus.repository.upload.UploadDefinition;
@@ -36,6 +39,7 @@ import org.sonatype.nexus.repository.upload.UploadFieldDefinition.Type;
 import org.sonatype.nexus.repository.upload.UploadHandlerSupport;
 import org.sonatype.nexus.repository.upload.UploadResponse;
 import org.sonatype.nexus.repository.view.PartPayload;
+import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.removeInitialSlashFromPath;
@@ -54,9 +58,9 @@ public class RUploadHandler
 
   private UploadDefinition definition;
 
-  private final static String PATH_ID = "pathId";
+  final static String PATH_ID = "pathId";
 
-  private final static String PACKAGE_PATH_DISPLAY = "Package Path";
+  final static String PACKAGE_PATH_DISPLAY = "Package Path";
 
   @Inject
   public RUploadHandler(@Named("simple") final VariableResolverAdapter variableResolverAdapter,
@@ -74,9 +78,18 @@ public class RUploadHandler
     final PartPayload payload = assetUpload.getPayload();
     final Map<String, String> fields = assetUpload.getFields();
     final String uploadPath = removeInitialSlashFromPath(fields.get(PATH_ID));
+    final String assetPath = path(uploadPath, payload.getName());
 
-    Asset asset = repository.facet(RHostedFacet.class).upload(path(uploadPath, payload.getName()), payload);
-    return new UploadResponse(asset);
+    ensurePermitted(repository.getName(), RFormat.NAME, assetPath, Collections.emptyMap());
+
+    try {
+      UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
+      Asset asset = repository.facet(RHostedFacet.class).upload(assetPath, payload);
+      return new UploadResponse(asset);
+    }
+    finally {
+      UnitOfWork.end();
+    }
   }
 
   @Override
