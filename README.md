@@ -32,6 +32,7 @@
 
 ## Release notes
 * [1.1.0](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.1.0)
+* [1.0.5](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.0.5) 
 * [1.0.4](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.0.4) 
 
 ## Developing
