@@ -180,7 +180,7 @@ abstract class RRecipeSupport
   /**
    * Matcher for wrong upload mapping.
    */
-  static Builder nonRFileUploadMatcher() {
+  static Builder nonRArchiveUploadMatcher() {
     new Builder().matcher(
         and(
             new ActionMatcher(PUT),

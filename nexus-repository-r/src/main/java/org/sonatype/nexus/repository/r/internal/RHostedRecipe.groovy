@@ -110,8 +110,9 @@ class RHostedRecipe
         .handler(hostedHandlers.putArchive)
         .create())
 
-    builder.route(nonRFileUploadMatcher()
-        .handler(hostedHandlers.nonRFileUpload)
+    builder.route(nonRArchiveUploadMatcher()
+        .handler(securityHandler)
+        .handler(hostedHandlers.nonRArchiveUpload)
         .create())
 
     addBrowseUnsupportedRoute(builder)

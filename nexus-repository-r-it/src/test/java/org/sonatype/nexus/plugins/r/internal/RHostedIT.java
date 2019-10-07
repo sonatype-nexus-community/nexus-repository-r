@@ -96,7 +96,7 @@ public class RHostedIT
   }
 
   @Test
-  public void testFetchNotFoundPackage() throws Exception
+  public void testFetchNotExistingPackage() throws Exception
   {
     assertThat(client.fetch(AGRICOLAE_PATH_FULL_131_TARGZ).getStatusLine().getStatusCode(), is(NOT_FOUND));
   }

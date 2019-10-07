@@ -73,5 +73,5 @@ public final class HostedHandlers
   /**
    * Handle upload non-R file request.
    */
-  final Handler nonRFileUpload = context -> HttpResponses.badRequest("Non-R file extension or wrong upload path.");
+  final Handler nonRArchiveUpload = context -> HttpResponses.badRequest("Non-R archive extension or wrong upload path.");
 }
