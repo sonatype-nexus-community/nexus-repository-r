@@ -166,7 +166,7 @@ abstract class RRecipeSupport
     new Builder().matcher(
         and(
             new ActionMatcher(GET, HEAD),
-            allFilesTokenMatcher()
+            archivePathMatcher()
         ))
   }
 
