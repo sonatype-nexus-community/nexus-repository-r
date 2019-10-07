@@ -17,22 +17,8 @@
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=svg)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
-> **What's New** R is now part of Nexus Repository Manager. Version 3.20+ includes the R plugin by default. At the same time it is still open for community. 
-
-> **Filing issues:** If using 3.20+ or later please file any issues at https://issues.sonatype.org/.
-
-> **Upgrading to 3.20+:** After upgrading to 3.20+ your existing data will remain intact.
-> We have added new features to the community version of the plugin such as:
-* Search 
-* Cleanup Policies 
-* Tagging (PRO only)
-* Moving between repositories (PRO only)
-* Uploading R packages from UI to a hosted repository
-* Support of the 'Repair - Reconcile component database from blobstore' task
-* API for Repository creation via Groovy
-* Routing Rule support
-
 # Table Of Contents
+* [Release notes](#release-notes)
 * [Developing](#developing)
    * [Requirements](#requirements)
    * [Building](#building)
@@ -43,6 +29,10 @@
    * [Easiest Install](#easiest-install)
 * [The Fine Print](#the-fine-print)
 * [Getting Help](#getting-help)
+
+## Release notes
+* [1.1.0](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.1.0)
+* [1.0.4](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.0.4) 
 
 ## Developing
 
@@ -86,7 +76,7 @@ The table below outlines what version of Nexus Repository the plugin was built a
 All released versions can be found [here](https://github.com/sonatype-nexus-community/nexus-repository-r/releases).
 
 ## Installing the plugin
-Starting from Nexus Repository Manager 3.20+ `R` format is already included. So there are no need to install it.  But if you want to reinstall the plugin with your improvements then following instructions will be useful. <br> <b>Note:</b> Using an unofficial version of the plugin is not supported by the Sonatype Support team.
+In Nexus Repository Manager 3.20+ `R` format is already included. So there is no need to install it.  But if you want to reinstall the plugin with your improvements then following instructions will be useful. <br> <b>Note:</b> Using an unofficial version of the plugin is not supported by the Sonatype Support team.
 
 ### Permanent Reinstall
 
@@ -115,12 +105,12 @@ Nexus Repository Manager 3.20+ already includes the R plugin. If you want to ins
 
 Thanks to some upstream work in Nexus Repository (versions newer than 3.15), it's become a LOT easier to install a plugin. To install the `R` plugin, you can either build locally or download from The Central Repository:
 
-#### Option 1: Build a *.kar file locally from the GitHub Repo
+#### Option 1: Build a *.jar file locally from the GitHub Repo
 * Clone this repo and `cd` to the cloned directory location
 * Build the plugin with `mvn clean package`
 * There should now be a `nexus-repository-r-1.1.0.jar` file your `<cloned_repo>/target` directory 
 
-#### Option 2: Download a *.kar file from The Central Repository 
+#### Option 2: Download a *.jar file from The Central Repository 
 * Download `nexus-repository-r-1.1.0.jar` from [The Central Repository](https://search.maven.org/artifact/org.sonatype.nexus.plugins/nexus-repository-r/1.1.0/bundle)
 
 Once you've completed Option 1 or 2, copy the `nexus-repository-r-1.1.0.jar` file into the `<nexus_dir>/deploy` folder for your Nexus Repository installation.
@@ -142,6 +132,7 @@ Have fun creating and using this plugin and the Nexus platform, we are glad to h
 
 Looking to contribute to our code but need some help? There's a few ways to get information:
 
+* If using Nexus Repository Manager 3.20+ or later please file any issues at https://issues.sonatype.org/.
 * Chat with us on [Gitter](https://gitter.im/sonatype/nexus-developers)
 * Check out the [Nexus3](http://stackoverflow.com/questions/tagged/nexus3) tag on Stack Overflow
 * Check out the [Nexus Repository User List](https://groups.google.com/a/glists.sonatype.com/forum/?hl=en#!forum/nexus-users)
