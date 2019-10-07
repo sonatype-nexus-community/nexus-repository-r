@@ -96,9 +96,9 @@ public class RHostedIT
   }
 
   @Test
-  public void testFetchWrongExtensionNotFoundPackage() throws Exception
+  public void testFetchNotFoundPackage() throws Exception
   {
-    assertThat(client.fetch(AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX).getStatusLine().getStatusCode(), is(NOT_FOUND));
+    assertThat(client.fetch(AGRICOLAE_PATH_FULL_131_TARGZ).getStatusLine().getStatusCode(), is(NOT_FOUND));
   }
 
   @Test
