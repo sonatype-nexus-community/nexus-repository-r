@@ -69,4 +69,9 @@ public final class HostedHandlers
     context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();
   };
+
+  /**
+   * Handle upload non-R file request.
+   */
+  final Handler nonRFileUpload = context -> HttpResponses.badRequest("Non-R file extension or wrong upload path.");
 }

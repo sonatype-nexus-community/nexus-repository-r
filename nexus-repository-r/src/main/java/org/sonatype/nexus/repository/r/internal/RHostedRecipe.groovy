@@ -24,7 +24,7 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
+import org.sonatype.nexus.repository.view.Route.Builder
 import org.sonatype.nexus.repository.view.Router
 import org.sonatype.nexus.repository.view.ViewFacet
 import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
@@ -112,7 +112,11 @@ class RHostedRecipe
         .handler(hostedHandlers.putArchive)
         .create())
 
-    builder.route(new Route.Builder()
+    builder.route(nonRFileUploadMatcher()
+        .handler(hostedHandlers.nonRFileUpload)
+        .create())
+
+    builder.route(new Builder()
         .matcher(BrowseUnsupportedHandler.MATCHER)
         .handler(browseUnsupportedHandler)
         .create())
