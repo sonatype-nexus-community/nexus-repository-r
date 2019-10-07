@@ -187,6 +187,6 @@ public class RHostedIT
   }
 
   private HttpResponse uploadSinglePackage(String name) throws IOException {
-    return client.put(format("%s/%s", PKG_GZ_PATH, name), fileToHttpEntity(name));
+    return client.putAndClose(format("%s/%s", PKG_GZ_PATH, name), fileToHttpEntity(name));
   }
 }
