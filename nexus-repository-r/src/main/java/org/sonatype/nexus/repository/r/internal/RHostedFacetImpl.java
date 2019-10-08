@@ -57,7 +57,6 @@ import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extract
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.toContent;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 
 /**
  * {@link RHostedFacet} implementation.
@@ -128,9 +127,8 @@ public class RHostedFacetImpl
   }
 
   @Override
-  public Asset upload(final String path, final String filename, final Payload payload) throws IOException {
+  public Asset upload(final String path, final Payload payload) throws IOException {
     checkNotNull(path);
-    checkNotNull(filename);
     checkNotNull(payload);
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
@@ -140,27 +138,20 @@ public class RHostedFacetImpl
 
   @TransactionalStoreBlob
   protected Asset doPutArchive(final String path,
-                              final String filename,
                               final TempBlob archiveContent,
                               final Payload payload) throws IOException
   {
-    checkNotNull(path);
-    checkNotNull(filename);
-    checkNotNull(archiveContent);
-    checkNotNull(payload);
 
     StorageTx tx = UnitOfWork.currentTx();
     RFacet rFacet = facet(RFacet.class);
 
-    final String assetPath = path(path, filename);
-
     Map<String, String> attributes;
     try (InputStream is = archiveContent.get()) {
-      attributes = extractDescriptionFromArchive(assetPath, is);
+      attributes = extractDescriptionFromArchive(path, is);
     }
 
-    Component component = rFacet.findOrCreateComponent(tx, attributes, path);
-    Asset asset = rFacet.findOrCreateAsset(tx, component, assetPath, attributes);
+    Component component = rFacet.findOrCreateComponent(tx, path, attributes);
+    Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
     saveAsset(tx, asset, archiveContent, payload);
 
     return asset;

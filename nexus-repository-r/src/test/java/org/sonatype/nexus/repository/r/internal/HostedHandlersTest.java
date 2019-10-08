@@ -120,7 +120,7 @@ public class HostedHandlersTest
   @Test
   public void repositoryUploadWhenPut() throws Exception {
     underTest.putArchive.handle(context);
-    verify(rHostedFacet).upload(PATH_VALUE, FILENAME_VALUE, payload);
+    verify(rHostedFacet).upload(PATH_VALUE + "/" + FILENAME_VALUE, payload);
   }
 
   @Test(expected = IllegalStateException.class)

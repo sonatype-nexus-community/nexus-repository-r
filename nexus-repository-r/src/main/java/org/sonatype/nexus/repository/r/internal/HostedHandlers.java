@@ -66,8 +66,8 @@ public final class HostedHandlers
    */
   final Handler putArchive = context -> {
     State state = context.getAttributes().require(TokenMatcher.State.class);
-    context.getRepository().facet(RHostedFacet.class)
-        .upload(path(state), filename(state), context.getRequest().getPayload());
+    String path = path(path(state), filename(state));
+    context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();
   };
 

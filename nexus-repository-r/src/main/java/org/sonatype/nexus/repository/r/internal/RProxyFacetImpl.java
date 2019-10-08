@@ -88,7 +88,7 @@ public class RProxyFacetImpl
       case PACKAGES:
         return putMetadata(extractFullPath(context), content);
       case ARCHIVE:
-        return putArchive(path(matcherState), filename(matcherState), content);
+        return putArchive(path(path(matcherState), filename(matcherState)), content);
       default:
         throw new IllegalStateException();
     }
@@ -118,39 +118,34 @@ public class RProxyFacetImpl
     tx.saveAsset(asset);
   }
 
-  private Content putArchive(final String path, final String filename, final Content content) throws IOException {
+  private Content putArchive(final String path, final Content content) throws IOException {
     checkNotNull(path);
-    checkNotNull(filename);
     checkNotNull(content);
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(content.openInputStream(), RFacetUtils.HASH_ALGORITHMS)) {
-      return doPutArchive(path, filename, tempBlob, content);
+      return doPutArchive(path, tempBlob, content);
     }
   }
 
   @TransactionalStoreBlob
   protected Content doPutArchive(final String path,
-                                 final String filename,
                                  final TempBlob archiveContent,
                                  final Content content) throws IOException
   {
     checkNotNull(path);
-    checkNotNull(filename);
     checkNotNull(archiveContent);
     checkNotNull(content);
 
     RFacet rFacet = facet(RFacet.class);
     StorageTx tx = UnitOfWork.currentTx();
 
-    String assetPath = path(path, filename);
-
     Map<String, String> attributes;
     try (InputStream is = archiveContent.get()) {
-      attributes = extractDescriptionFromArchive(filename, is);
+      attributes = extractDescriptionFromArchive(path, is);
     }
 
-    Component component = rFacet.findOrCreateComponent(tx, attributes, path);
-    Asset asset = rFacet.findOrCreateAsset(tx, component, assetPath, attributes);
+    Component component = rFacet.findOrCreateComponent(tx, path, attributes);
+    Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
     return saveAsset(tx, asset, archiveContent, content);
   }
 

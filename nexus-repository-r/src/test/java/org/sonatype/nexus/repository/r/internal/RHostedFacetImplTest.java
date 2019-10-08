@@ -56,13 +56,13 @@ public class RHostedFacetImplTest
 {
   static final String PACKAGE_NAME = "package.gz";
 
-  static final String BASE_PATH = "packages/base/path";
+  static final String BASE_PATH = "packages/base/path/";
 
   static final String REAL_PACKAGE = "r-package.zip";
 
-  static final String PACKAGE_PATH = BASE_PATH + "/" + PACKAGE_NAME;
+  static final String PACKAGE_PATH = BASE_PATH + PACKAGE_NAME;
 
-  static final String REAL_PACKAGE_PATH = BASE_PATH + "/" + REAL_PACKAGE;
+  static final String REAL_PACKAGE_PATH = BASE_PATH + REAL_PACKAGE;
 
   static final String VERSION = "1.0.0";
 
@@ -185,13 +185,13 @@ public class RHostedFacetImplTest
         anyBoolean());
     when(storageTx.findComponents(any(), any()))
         .thenReturn(list);
-    when(rFacet.findOrCreateComponent(any(storageTx.getClass()), anyMapOf(String.class, String.class), anyString()))
+    when(rFacet.findOrCreateComponent(any(storageTx.getClass()), anyString(), anyMapOf(String.class, String.class)))
         .thenReturn(component);
     when(rFacet.findOrCreateAsset(any(storageTx.getClass()), any(component.getClass()), eq(REAL_PACKAGE_PATH),
         anyMapOf(String.class, String.class)))
         .thenReturn(asset);
 
-    underTest.doPutArchive(BASE_PATH, REAL_PACKAGE, tempBlob, payload);
+    underTest.doPutArchive(REAL_PACKAGE_PATH, tempBlob, payload);
     verify(storageTx).saveAsset(asset);
   }
 }
