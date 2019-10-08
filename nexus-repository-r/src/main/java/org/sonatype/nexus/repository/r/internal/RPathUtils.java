@@ -94,20 +94,17 @@ public final class RPathUtils
 
   /**
    * Determines asset kind by it's path
-   *
-   * @param assetPath asset path
-   * @return R {@link AssetKind}
    */
-  static String getAssetKind(final String assetPath) {
-    String assetKind = ARCHIVE.name();
+  static AssetKind determineAssetKind(final String assetPath) {
     if (Pattern.compile(PATTERN_PACKAGES).matcher(assetPath).matches()) {
-      assetKind = PACKAGES.name();
+      return PACKAGES;
     }
     else if (Pattern.compile(PATTERN_METADATA_RDS).matcher(assetPath).matches()) {
-      assetKind = RDS_METADATA.name();
+      return RDS_METADATA;
     }
-
-    return assetKind;
+    else {
+      return ARCHIVE;
+    }
   }
 
   private RPathUtils() {

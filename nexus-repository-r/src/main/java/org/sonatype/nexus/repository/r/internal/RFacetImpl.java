@@ -29,7 +29,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.cutFilenameFromPath;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.getAssetKind;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.determineAssetKind;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
@@ -80,7 +80,7 @@ public class RFacetImpl
       for (Entry<String, String> attribute : attributes.entrySet()) {
         asset.formatAttributes().set(attribute.getKey(), attribute.getValue());
       }
-      asset.formatAttributes().set(P_ASSET_KIND, getAssetKind(path));
+      asset.formatAttributes().set(P_ASSET_KIND, determineAssetKind(path).name());
       tx.saveAsset(asset);
     }
 
@@ -94,7 +94,7 @@ public class RFacetImpl
     if (asset == null) {
       asset = tx.createAsset(bucket, getRepository().getFormat());
       asset.name(path);
-      asset.formatAttributes().set(P_ASSET_KIND, getAssetKind(path));
+      asset.formatAttributes().set(P_ASSET_KIND, determineAssetKind(path).name());
       tx.saveAsset(asset);
     }
 
