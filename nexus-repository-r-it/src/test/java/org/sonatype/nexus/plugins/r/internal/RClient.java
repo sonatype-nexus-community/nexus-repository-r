@@ -41,6 +41,11 @@ public class RClient
     super(httpClient, httpClientContext, repositoryBaseUri);
   }
 
+  static HttpResponse consume(final HttpResponse response) throws IOException {
+    EntityUtils.consume(response.getEntity());
+    return response;
+  }
+
   public HttpResponse fetch(final String path) throws IOException {
     return execute(new HttpGet(resolve(path)));
   }
@@ -50,5 +55,9 @@ public class RClient
     put.setEntity(entity);
 
     return execute(put);
+  }
+
+  public HttpResponse putAndClose(String path, HttpEntity entity) throws IOException {
+    return consume(put(path, entity));
   }
 }

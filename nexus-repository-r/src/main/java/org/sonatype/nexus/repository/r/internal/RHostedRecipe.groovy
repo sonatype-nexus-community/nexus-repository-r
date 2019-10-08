@@ -24,10 +24,8 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
-import org.sonatype.nexus.repository.view.Router
+import org.sonatype.nexus.repository.view.Router.Builder
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
@@ -73,7 +71,7 @@ class RHostedRecipe
    * Configure {@link ViewFacet}.
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
-    Router.Builder builder = new Router.Builder()
+    Builder builder = new Builder()
 
     builder.route(packagesGzMatcher()
         .handler(highAvailabilitySupportHandler)
@@ -116,10 +114,12 @@ class RHostedRecipe
         .handler(hostedHandlers.putArchive)
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(BrowseUnsupportedHandler.MATCHER)
-        .handler(browseUnsupportedHandler)
+    builder.route(nonRArchiveUploadMatcher()
+        .handler(securityHandler)
+        .handler(hostedHandlers.nonRArchiveUpload)
         .create())
+
+    addBrowseUnsupportedRoute(builder)
 
     builder.defaultHandlers(HttpHandlers.notFound())
 

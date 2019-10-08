@@ -96,12 +96,6 @@ public class RProxyIT
   }
 
   @Test
-  public void fetchWrongTrgzPackageFileNotFound() throws Exception {
-    assertGetResponseStatus(client, repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX, NOT_FOUND);
-    Assert.assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX));
-  }
-
-  @Test
   public void fetchMetaData() throws Exception {
     assertSuccessResponseMatches(client.fetch(PACKAGES_GZ_PATH_FULL), PACKAGES_GZ_FILE_NAME);
     final Asset assetPackagesGz = findAsset(repository, PACKAGES_GZ_PATH_FULL);

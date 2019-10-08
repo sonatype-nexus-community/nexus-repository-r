@@ -30,7 +30,6 @@ import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
 import org.sonatype.nexus.repository.view.Matcher
 import org.sonatype.nexus.repository.view.Route.Builder
-import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
@@ -46,6 +45,7 @@ import static org.sonatype.nexus.repository.http.HttpMethods.GET
 import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT
 import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.not
 import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or
 
 /**
@@ -98,9 +98,6 @@ abstract class RRecipeSupport
 
   @Inject
   UnitOfWorkHandler unitOfWorkHandler
-
-  @Inject
-  BrowseUnsupportedHandler browseUnsupportedHandler
 
   @Inject
   HandlerContributor handlerContributor
@@ -182,7 +179,18 @@ abstract class RRecipeSupport
     new Builder().matcher(
         and(
             new ActionMatcher(PUT),
-            allFilesTokenMatcher()
+            archivePathMatcher()
+        ))
+  }
+
+  /**
+   * Matcher for wrong upload mapping.
+   */
+  static Builder nonRArchiveUploadMatcher() {
+    new Builder().matcher(
+        and(
+            new ActionMatcher(PUT),
+            not(archivePathMatcher())
         ))
   }
 
