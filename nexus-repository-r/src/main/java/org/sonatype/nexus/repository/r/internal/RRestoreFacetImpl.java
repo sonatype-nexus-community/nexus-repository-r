@@ -32,6 +32,7 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.cutFilenameFromPath;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
@@ -57,7 +58,8 @@ public class RRestoreFacetImpl
         attributes = extractDescriptionFromArchive(path, is);
       }
 
-      Component component = facet.findOrCreateComponent(tx, attributes);
+      String componentGroup = cutFilenameFromPath(path);
+      Component component = facet.findOrCreateComponent(tx, attributes, componentGroup);
       asset = facet.findOrCreateAsset(tx, component, path, attributes);
     }
     else {

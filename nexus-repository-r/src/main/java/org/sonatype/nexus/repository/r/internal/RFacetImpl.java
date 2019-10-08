@@ -13,7 +13,7 @@
 package org.sonatype.nexus.repository.r.internal;
 
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.Map.Entry;
 
 import javax.inject.Named;
 
@@ -24,17 +24,12 @@ import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.RDS_METADATA;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.PATTERN_METADATA_RDS;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.PATTERN_PACKAGES;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.getAssetKind;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
-import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
 /**
  * {@link RFacet} implementation.
@@ -48,7 +43,8 @@ public class RFacetImpl
 {
   @Override
   public Component findOrCreateComponent(final StorageTx tx,
-                                         final Map<String, String> attributes)
+                                         final Map<String, String> attributes,
+                                         final String componentGroup)
   {
     String name = attributes.get(P_PACKAGE);
     String version = attributes.get(P_VERSION);
@@ -56,7 +52,10 @@ public class RFacetImpl
     Component component = findComponent(tx, getRepository(), name, version);
     if (component == null) {
       Bucket bucket = tx.findBucket(getRepository());
-      component = tx.createComponent(bucket, getRepository().getFormat()).name(name).version(version);
+      component = tx.createComponent(bucket, getRepository().getFormat())
+          .name(name)
+          .version(version)
+          .group(componentGroup);
       tx.saveComponent(component);
     }
 
@@ -70,12 +69,14 @@ public class RFacetImpl
                                  final Map<String, String> attributes)
   {
     Bucket bucket = tx.findBucket(getRepository());
-    Asset asset = tx.findAssetWithProperty(P_NAME, path, bucket);
+    Asset asset = findAsset(tx, bucket, path);
     if (asset == null) {
       asset = tx.createAsset(bucket, component);
       asset.name(path);
-      for (Map.Entry attribute : attributes.entrySet()) {
-        asset.formatAttributes().set(attribute.getKey().toString(), attribute.getValue());
+
+      // TODO: Make this a bit more robust (could be problematic if keys are removed in later versions, or if keys clash)
+      for (Entry<String, String> attribute : attributes.entrySet()) {
+        asset.formatAttributes().set(attribute.getKey(), attribute.getValue());
       }
       asset.formatAttributes().set(P_ASSET_KIND, getAssetKind(path));
       tx.saveAsset(asset);
@@ -96,17 +97,5 @@ public class RFacetImpl
     }
 
     return asset;
-  }
-
-  private String getAssetKind(final String path) {
-    String assetKind = ARCHIVE.name();
-    if (Pattern.compile(PATTERN_PACKAGES).matcher(path).matches()) {
-      assetKind = PACKAGES.name();
-    }
-    else if (Pattern.compile(PATTERN_METADATA_RDS).matcher(path).matches()) {
-      assetKind = RDS_METADATA.name();
-    }
-
-    return assetKind;
   }
 }

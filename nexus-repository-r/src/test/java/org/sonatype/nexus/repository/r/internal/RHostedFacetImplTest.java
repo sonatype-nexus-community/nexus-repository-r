@@ -16,16 +16,17 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
 import org.sonatype.nexus.repository.r.RFacet;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
+
+import com.google.common.collect.ImmutableList;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -55,13 +56,13 @@ public class RHostedFacetImplTest
 {
   static final String PACKAGE_NAME = "package.gz";
 
-  static final String BASE_PATH = "packages/base/path/";
+  static final String BASE_PATH = "packages/base/path";
 
   static final String REAL_PACKAGE = "r-package.zip";
 
-  static final String PACKAGE_PATH = BASE_PATH + PACKAGE_NAME;
+  static final String PACKAGE_PATH = BASE_PATH + "/" + PACKAGE_NAME;
 
-  static final String REAL_PACKAGE_PATH = BASE_PATH + REAL_PACKAGE;
+  static final String REAL_PACKAGE_PATH = BASE_PATH + "/" + REAL_PACKAGE;
 
   static final String VERSION = "1.0.0";
 
@@ -184,13 +185,13 @@ public class RHostedFacetImplTest
         anyBoolean());
     when(storageTx.findComponents(any(), any()))
         .thenReturn(list);
-    when(rFacet.findOrCreateComponent(any(storageTx.getClass()), anyMapOf(String.class, String.class)))
+    when(rFacet.findOrCreateComponent(any(storageTx.getClass()), anyMapOf(String.class, String.class), anyString()))
         .thenReturn(component);
     when(rFacet.findOrCreateAsset(any(storageTx.getClass()), any(component.getClass()), eq(REAL_PACKAGE_PATH),
         anyMapOf(String.class, String.class)))
         .thenReturn(asset);
 
-    underTest.doPutArchive(REAL_PACKAGE_PATH, tempBlob, payload);
+    underTest.doPutArchive(BASE_PATH, REAL_PACKAGE, tempBlob, payload);
     verify(storageTx).saveAsset(asset);
   }
 }

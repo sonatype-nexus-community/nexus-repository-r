@@ -95,7 +95,7 @@ public class RRestoreBlobStrategy
       throws IOException
   {
     RRestoreFacet facet = getRestoreFacet(rRestoreBlobData);
-    final String path = rRestoreBlobData.getBlobData().getBlobName();
+    final String path = getAssetPath(rRestoreBlobData);
 
     facet.restore(assetBlob, path);
   }

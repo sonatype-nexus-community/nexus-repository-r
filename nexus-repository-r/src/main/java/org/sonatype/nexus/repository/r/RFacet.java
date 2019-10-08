@@ -33,14 +33,19 @@ public interface RFacet
    *
    * @return Component
    */
-  Component findOrCreateComponent(final StorageTx tx, final Map<String, String> attributes);
+  Component findOrCreateComponent(final StorageTx tx,
+                                  final Map<String, String> attributes,
+                                  final String componentGroup);
 
   /**
    * Find or Create Asset
    *
    * @return Asset
    */
-  Asset findOrCreateAsset(final StorageTx tx, final Component component, final String path, final Map<String, String> attributes);
+  Asset findOrCreateAsset(final StorageTx tx,
+                          final Component component,
+                          final String path,
+                          final Map<String, String> attributes);
 
   /**
    * Find or Create Asset without Component

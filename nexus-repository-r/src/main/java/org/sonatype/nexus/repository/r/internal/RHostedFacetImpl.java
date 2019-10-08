@@ -23,9 +23,6 @@ import java.util.Map.Entry;
 import javax.inject.Named;
 import javax.mail.internet.InternetHeaders;
 
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.r.RFacet;
 import org.sonatype.nexus.repository.r.RHostedFacet;
@@ -42,6 +39,10 @@ import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
@@ -56,6 +57,7 @@ import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extract
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.toContent;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 
 /**
  * {@link RHostedFacet} implementation.
@@ -126,40 +128,39 @@ public class RHostedFacetImpl
   }
 
   @Override
-  public Asset upload(final String path, final Payload payload) throws IOException {
+  public Asset upload(final String path, final String filename, final Payload payload) throws IOException {
     checkNotNull(path);
+    checkNotNull(filename);
     checkNotNull(payload);
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
-     return doPutArchive(path, tempBlob, payload);
+      return doPutArchive(path, filename, tempBlob, payload);
     }
   }
 
   @TransactionalStoreBlob
   protected Asset doPutArchive(final String path,
+                              final String filename,
                               final TempBlob archiveContent,
                               final Payload payload) throws IOException
   {
     checkNotNull(path);
+    checkNotNull(filename);
     checkNotNull(archiveContent);
     checkNotNull(payload);
+
     StorageTx tx = UnitOfWork.currentTx();
     RFacet rFacet = facet(RFacet.class);
 
+    final String assetPath = path(path, filename);
+
     Map<String, String> attributes;
     try (InputStream is = archiveContent.get()) {
-      attributes = extractDescriptionFromArchive(path, is);
+      attributes = extractDescriptionFromArchive(assetPath, is);
     }
 
-    Component component = rFacet.findOrCreateComponent(tx, attributes);
-
-    Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
-
-    // TODO: Make this a bit more robust (could be problematic if keys are removed in later versions, or if keys clash)
-    for (Entry<String, String> entry : attributes.entrySet()) {
-      asset.formatAttributes().set(entry.getKey(), entry.getValue());
-    }
-
+    Component component = rFacet.findOrCreateComponent(tx, attributes, path);
+    Asset asset = rFacet.findOrCreateAsset(tx, component, assetPath, attributes);
     saveAsset(tx, asset, archiveContent, payload);
 
     return asset;
