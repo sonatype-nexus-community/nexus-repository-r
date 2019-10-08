@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.r.internal.RFormat;
-import org.sonatype.nexus.repository.r.internal.RHostedFacet;
+import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.rest.UploadDefinitionExtension;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.VariableResolverAdapter;

@@ -20,7 +20,7 @@ import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.entity.DetachedEntityId;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.r.internal.RFormat;
-import org.sonatype.nexus.repository.r.internal.RHostedFacet;
+import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.r.internal.RHostedFacetImpl;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.internal.SimpleVariableResolverAdapter;
