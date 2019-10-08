@@ -39,6 +39,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
+import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 
 public class RHostedIT
     extends RITSupport
@@ -78,11 +80,25 @@ public class RHostedIT
   }
 
   @Test
+  public void testUploadFailedWrongPackageExtension() throws Exception
+  {
+    assertThat(uploadSinglePackage(AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX).getStatusLine().getStatusCode(),
+        is(BAD_REQUEST));
+    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX));
+  }
+
+  @Test
   public void testFetchPackage() throws Exception
   {
     HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
     assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_X_TGZ));
     assertSuccessResponseMatches(resp, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+  }
+
+  @Test
+  public void testFetchNotExistingPackage() throws Exception
+  {
+    assertThat(client.fetch(AGRICOLAE_PATH_FULL_131_TARGZ).getStatusLine().getStatusCode(), is(NOT_FOUND));
   }
 
   @Test
@@ -170,7 +186,7 @@ public class RHostedIT
     assertThat(getAllComponents(repository), hasSize(names.length));
   }
 
-  private void uploadSinglePackage(String name) throws IOException {
-    client.put(format("%s/%s", PKG_GZ_PATH, name), fileToHttpEntity(name));
+  private HttpResponse uploadSinglePackage(String name) throws IOException {
+    return client.putAndClose(format("%s/%s", PKG_GZ_PATH, name), fileToHttpEntity(name));
   }
 }

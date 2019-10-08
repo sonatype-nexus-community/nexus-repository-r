@@ -26,10 +26,8 @@ import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.types.GroupType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
-import org.sonatype.nexus.repository.view.Router
+import org.sonatype.nexus.repository.view.Router.Builder
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
 /**
  * R group repository recipe.
@@ -68,9 +66,10 @@ class RGroupRecipe
    * Configure {@link ViewFacet}.
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
-    Router.Builder builder = new Router.Builder()
+    Builder builder = new Builder()
 
     builder.route(packagesMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(AssetKind.PACKAGES))
         .handler(securityHandler)
@@ -80,6 +79,7 @@ class RGroupRecipe
         .create())
 
     builder.route(metadataRdsMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(AssetKind.RDS_METADATA))
         .handler(securityHandler)
@@ -89,6 +89,7 @@ class RGroupRecipe
         .create())
 
     builder.route(archiveMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(AssetKind.ARCHIVE))
         .handler(securityHandler)
@@ -97,10 +98,7 @@ class RGroupRecipe
         .handler(standardGroupHandler)
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(BrowseUnsupportedHandler.MATCHER)
-        .handler(browseUnsupportedHandler)
-        .create())
+    addBrowseUnsupportedRoute(builder)
 
     builder.defaultHandlers(HttpHandlers.notFound())
 

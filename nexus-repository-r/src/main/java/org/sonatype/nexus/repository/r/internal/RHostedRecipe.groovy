@@ -24,16 +24,16 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
-import org.sonatype.nexus.repository.view.Router
+import org.sonatype.nexus.repository.view.Router.Builder
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
 
 /**
  * R proxy repository recipe.
+ *
+ * @since 1.1.next
  */
 @Named(RHostedRecipe.NAME)
 @Singleton
@@ -43,7 +43,7 @@ class RHostedRecipe
   public static final String NAME = 'r-hosted'
 
   @Inject
-  Provider<RHostedFacet> hostedFacet
+  Provider<org.sonatype.nexus.repository.r.RHostedFacet> hostedFacet
 
   @Inject
   HostedHandlers hostedHandlers
@@ -60,6 +60,8 @@ class RHostedRecipe
     repository.attach(httpClientFacet.get())
     repository.attach(componentMaintenanceFacet.get())
     repository.attach(hostedFacet.get())
+    repository.attach(rFacet.get())
+    repository.attach(rRestoreFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(attributesFacet.get())
@@ -69,9 +71,10 @@ class RHostedRecipe
    * Configure {@link ViewFacet}.
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
-    Router.Builder builder = new Router.Builder()
+    Builder builder = new Builder()
 
     builder.route(packagesGzMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
         .handler(securityHandler)
@@ -84,6 +87,7 @@ class RHostedRecipe
         .create())
 
     builder.route(archiveMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
@@ -97,6 +101,7 @@ class RHostedRecipe
         .create())
 
     builder.route(uploadMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
@@ -109,10 +114,12 @@ class RHostedRecipe
         .handler(hostedHandlers.putArchive)
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(BrowseUnsupportedHandler.MATCHER)
-        .handler(browseUnsupportedHandler)
+    builder.route(nonRArchiveUploadMatcher()
+        .handler(securityHandler)
+        .handler(hostedHandlers.nonRArchiveUpload)
         .create())
+
+    addBrowseUnsupportedRoute(builder)
 
     builder.defaultHandlers(HttpHandlers.notFound())
 

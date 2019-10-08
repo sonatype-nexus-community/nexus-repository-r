@@ -16,16 +16,16 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.sonatype.nexus.repository.r.RFacet;
 import org.sonatype.nexus.repository.storage.AssetBlob;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
-
-import com.google.common.collect.ImmutableList;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -34,7 +34,9 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyMapOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -51,7 +53,6 @@ import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extract
 public class RHostedFacetImplTest
     extends RepositoryFacetTestSupport<RHostedFacetImpl>
 {
-
   static final String PACKAGE_NAME = "package.gz";
 
   static final String BASE_PATH = "packages/base/path/";
@@ -86,6 +87,9 @@ public class RHostedFacetImplTest
   @Mock
   Component component;
 
+  @Mock
+  RFacet rFacet;
+
   @Override
   protected RHostedFacetImpl initialiseSystemUnderTest() {
     return new RHostedFacetImpl();
@@ -101,8 +105,8 @@ public class RHostedFacetImplTest
     when(formatAttributes.get(P_LICENSE, String.class)).thenReturn(LICENSE);
     when(formatAttributes.get(P_NEEDS_COMPILATION, String.class)).thenReturn(NEEDS_COMPILATION);
     when(asset.name()).thenReturn(PACKAGE_PATH);
+    when(repository.facet(RFacet.class)).thenReturn(rFacet);
   }
-
 
   @Test
   public void getPackagesReturnsPackage() throws Exception {
@@ -180,6 +184,12 @@ public class RHostedFacetImplTest
         anyBoolean());
     when(storageTx.findComponents(any(), any()))
         .thenReturn(list);
+    when(rFacet.findOrCreateComponent(any(storageTx.getClass()), anyMapOf(String.class, String.class)))
+        .thenReturn(component);
+    when(rFacet.findOrCreateAsset(any(storageTx.getClass()), any(component.getClass()), eq(REAL_PACKAGE_PATH),
+        anyMapOf(String.class, String.class)))
+        .thenReturn(asset);
+
     underTest.doPutArchive(REAL_PACKAGE_PATH, tempBlob, payload);
     verify(storageTx).saveAsset(asset);
   }

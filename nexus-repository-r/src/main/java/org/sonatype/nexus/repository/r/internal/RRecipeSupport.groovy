@@ -28,20 +28,25 @@ import org.sonatype.nexus.repository.storage.StorageFacet
 import org.sonatype.nexus.repository.storage.UnitOfWorkHandler
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Context
+import org.sonatype.nexus.repository.view.Matcher
 import org.sonatype.nexus.repository.view.Route.Builder
-import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 import org.sonatype.nexus.repository.view.handlers.ConditionalRequestHandler
 import org.sonatype.nexus.repository.view.handlers.ContentHeadersHandler
 import org.sonatype.nexus.repository.view.handlers.ExceptionHandler
+import org.sonatype.nexus.repository.view.handlers.FormatHighAvailabilitySupportHandler
 import org.sonatype.nexus.repository.view.handlers.HandlerContributor
+import org.sonatype.nexus.repository.view.handlers.HighAvailabilitySupportChecker
 import org.sonatype.nexus.repository.view.handlers.TimingHandler
 import org.sonatype.nexus.repository.view.matchers.ActionMatcher
-import org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers
+import org.sonatype.nexus.repository.view.matchers.SuffixMatcher
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
 import static org.sonatype.nexus.repository.http.HttpMethods.GET
 import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
 import static org.sonatype.nexus.repository.http.HttpMethods.PUT
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.not
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or
 
 /**
  * Support for R recipes.
@@ -63,6 +68,12 @@ abstract class RRecipeSupport
 
   @Inject
   Provider<AttributesFacet> attributesFacet
+
+  @Inject
+  FormatHighAvailabilitySupportHandler highAvailabilitySupportHandler;
+
+  @Inject
+  HighAvailabilitySupportChecker highAvailabilitySupportChecker
 
   @Inject
   ExceptionHandler exceptionHandler
@@ -89,9 +100,6 @@ abstract class RRecipeSupport
   UnitOfWorkHandler unitOfWorkHandler
 
   @Inject
-  BrowseUnsupportedHandler browseUnsupportedHandler
-
-  @Inject
   HandlerContributor handlerContributor
 
   @Inject
@@ -100,8 +108,19 @@ abstract class RRecipeSupport
   @Inject
   Provider<HttpClientFacet> httpClientFacet
 
+  @Inject
+  Provider<org.sonatype.nexus.repository.r.RRestoreFacet> rRestoreFacet;
+
+  @Inject
+  Provider<org.sonatype.nexus.repository.r.RFacet> rFacet;
+
   protected RRecipeSupport(final Type type, final Format format) {
     super(type, format)
+  }
+
+  @Override
+  boolean isFeatureEnabled() {
+    return highAvailabilitySupportChecker.isSupported(getFormat().getValue());
   }
 
   Closure assetKindHandler = { Context context, AssetKind value ->
@@ -114,7 +133,7 @@ abstract class RRecipeSupport
    */
   static Builder packagesGzMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
             packagesGzTokenMatcher()
         ))
@@ -125,7 +144,7 @@ abstract class RRecipeSupport
    */
   static Builder packagesMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
             packagesTokenMatcher()
         ))
@@ -136,9 +155,9 @@ abstract class RRecipeSupport
    */
   static Builder metadataRdsMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
-            metadataRdsTokenMatcher()
+            metadataRdsPathMatcher()
         ))
   }
 
@@ -147,9 +166,9 @@ abstract class RRecipeSupport
    */
   static Builder archiveMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(GET, HEAD),
-            allFilesTokenMatcher()
+            archivePathMatcher()
         ))
   }
 
@@ -158,10 +177,45 @@ abstract class RRecipeSupport
    */
   static Builder uploadMatcher() {
     new Builder().matcher(
-        LogicMatchers.and(
+        and(
             new ActionMatcher(PUT),
-            allFilesTokenMatcher()
+            archivePathMatcher()
         ))
+  }
+
+  /**
+   * Matcher for wrong upload mapping.
+   */
+  static Builder nonRArchiveUploadMatcher() {
+    new Builder().matcher(
+        and(
+            new ActionMatcher(PUT),
+            not(archivePathMatcher())
+        ))
+  }
+
+  /**
+   * Path matcher for archive files.
+   */
+  static Matcher archivePathMatcher() {
+    return and(
+        allFilesTokenMatcher(),
+        or(
+            suffixMatcherForExtension('.zip'),
+            suffixMatcherForExtension('.tgz'),
+            suffixMatcherForExtension('.tar.gz')
+        )
+    )
+  }
+
+  /**
+   * Path matcher for .rds metadata files.
+   */
+  static Matcher metadataRdsPathMatcher() {
+    return and(
+        allFilesTokenMatcher(),
+        suffixMatcherForExtension('.rds')
+    )
   }
 
   /**
@@ -179,16 +233,16 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Token matcher for .rds metadata files.
-   */
-  static TokenMatcher metadataRdsTokenMatcher() {
-    return new TokenMatcher('/{path:.+}/{filename:.+}.rds')
-  }
-
-  /**
-   * Token matcher for all files.
+   * Token matcher for all files
    */
   static TokenMatcher allFilesTokenMatcher() {
     return new TokenMatcher('/{path:.+}/{filename:.+}')
+  }
+
+  /**
+   * Suffix matcher for files with given extension.
+   */
+  static SuffixMatcher suffixMatcherForExtension(final String extension) {
+    return new SuffixMatcher(extension)
   }
 }

@@ -28,10 +28,8 @@ import org.sonatype.nexus.repository.proxy.ProxyHandler
 import org.sonatype.nexus.repository.purge.PurgeUnusedFacet
 import org.sonatype.nexus.repository.types.ProxyType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
-import org.sonatype.nexus.repository.view.Route
-import org.sonatype.nexus.repository.view.Router
+import org.sonatype.nexus.repository.view.Router.Builder
 import org.sonatype.nexus.repository.view.ViewFacet
-import org.sonatype.nexus.repository.view.handlers.BrowseUnsupportedHandler
 
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
@@ -75,6 +73,8 @@ class RProxyRecipe
     repository.attach(negativeCacheFacet.get())
     repository.attach(componentMaintenanceFacet.get())
     repository.attach(proxyFacet.get())
+    repository.attach(rFacet.get())
+    repository.attach(rRestoreFacet.get())
     repository.attach(storageFacet.get())
     repository.attach(searchFacet.get())
     repository.attach(purgeUnusedFacet.get())
@@ -85,9 +85,10 @@ class RProxyRecipe
    * Configure {@link ViewFacet}.
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
-    Router.Builder builder = new Router.Builder()
+    Builder builder = new Builder()
 
     builder.route(packagesMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
         .handler(securityHandler)
@@ -102,6 +103,7 @@ class RProxyRecipe
         .create())
 
     builder.route(metadataRdsMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(RDS_METADATA))
         .handler(securityHandler)
@@ -116,6 +118,7 @@ class RProxyRecipe
         .create())
 
     builder.route(archiveMatcher()
+        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
@@ -130,10 +133,7 @@ class RProxyRecipe
         .handler(proxyHandler)
         .create())
 
-    builder.route(new Route.Builder()
-        .matcher(BrowseUnsupportedHandler.MATCHER)
-        .handler(browseUnsupportedHandler)
-        .create())
+    addBrowseUnsupportedRoute(builder)
 
     builder.defaultHandlers(HttpHandlers.notFound())
 

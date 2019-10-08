@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.repository.http.HttpResponses;
+import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
@@ -69,4 +70,9 @@ public final class HostedHandlers
     context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();
   };
+
+  /**
+   * Handle upload non-R file request.
+   */
+  final Handler nonRArchiveUpload = context -> HttpResponses.badRequest("Non-R archive extension or wrong upload path.");
 }

@@ -77,7 +77,7 @@ public class RGroupIT
     hostedClient = createRClient(repoHosted);
     groupClient = createRClient(repoGroup);
 
-    assertThat(status(hostedClient.put(AGRICOLAE_PATH_FULL_131_TARGZ,
+    assertThat(status(hostedClient.putAndClose(AGRICOLAE_PATH_FULL_131_TARGZ,
         fileToHttpEntity(AGRICOLAE_PKG_FILE_NAME_131_TARGZ))), is(OK));
   }
 

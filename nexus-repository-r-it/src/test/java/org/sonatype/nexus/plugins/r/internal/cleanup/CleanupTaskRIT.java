@@ -113,7 +113,8 @@ public class CleanupTaskRIT
 
       for (String name : names) {
         assertThat(
-            status(client.put(format("%s/%s", PKG_GZ_PATH, name), new ByteArrayEntity(getBytesFromTestData(name)))),
+            status(client
+                .putAndClose(format("%s/%s", PKG_GZ_PATH, name), new ByteArrayEntity(getBytesFromTestData(name)))),
             is(OK));
       }
 
