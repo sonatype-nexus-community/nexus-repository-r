@@ -36,6 +36,8 @@ import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
 import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.not
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.or
 
 /**
  * R proxy repository recipe.
@@ -122,7 +124,7 @@ class RHostedRecipe
         .handler(hostedHandlers.putArchive)
         .create())
 
-    builder.route(metadataMatcher()
+    builder.route(notSupportedMetadataMatcher()
         .handler(securityHandler)
         .handler(hostedHandlers.notSupportedMetadataRequest)
         .create())
@@ -145,7 +147,20 @@ class RHostedRecipe
     new Route.Builder().matcher(
         and(
             new ActionMatcher(GET, HEAD),
-            new TokenMatcher('/{path:.+}/PACKAGES.gz')
+            packagesGzTokenMatcher()
         ))
+  }
+
+  static Route.Builder notSupportedMetadataMatcher() {
+    new Route.Builder().matcher(
+        and(
+            new ActionMatcher(GET, HEAD),
+            or(metadataRdsPathMatcher(), packagesTokenMatcher()),
+            not(packagesGzTokenMatcher())
+        ))
+  }
+
+  static TokenMatcher packagesGzTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/PACKAGES.gz')
   }
 }

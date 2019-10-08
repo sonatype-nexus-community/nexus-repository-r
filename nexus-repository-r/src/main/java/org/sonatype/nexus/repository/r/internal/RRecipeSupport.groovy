@@ -153,17 +153,6 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Matcher for all metadata types mapping.
-   */
-  static Builder metadataMatcher() {
-    new Builder().matcher(
-        and(
-            new ActionMatcher(GET, HEAD),
-            or(metadataRdsPathMatcher(), packagesTokenMatcher())
-        ))
-  }
-
-  /**
    * Matcher for archive mapping.
    */
   static Builder archiveMatcher() {
