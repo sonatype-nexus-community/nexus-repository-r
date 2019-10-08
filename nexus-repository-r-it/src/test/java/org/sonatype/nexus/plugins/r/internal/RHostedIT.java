@@ -82,9 +82,9 @@ public class RHostedIT
   @Test
   public void testUploadFailedWrongPackageExtension() throws Exception
   {
-    assertThat(uploadSinglePackage(PACKAGES_RDS_FILE_NAME).getStatusLine().getStatusCode(),
+    assertThat(uploadSinglePackage(AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX).getStatusLine().getStatusCode(),
         is(BAD_REQUEST));
-    assertNull(findAsset(repository, PACKAGES_RDS_PATH_FULL));
+    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX));
   }
 
   @Test
