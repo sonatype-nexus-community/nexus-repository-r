@@ -82,9 +82,17 @@ public class RHostedIT
   @Test
   public void testUploadFailedWrongPackageExtension() throws Exception
   {
-    assertThat(uploadSinglePackage(AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX).getStatusLine().getStatusCode(),
+    assertThat(uploadSinglePackage(PACKAGES_RDS_FILE_NAME).getStatusLine().getStatusCode(),
         is(BAD_REQUEST));
-    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX));
+    assertNull(findAsset(repository, PACKAGES_RDS_PATH_FULL));
+  }
+
+  @Test
+  public void testFetchNotSupportedMetadata() throws Exception
+  {
+    HttpResponse resp = client.fetch(PACKAGES_RDS_PATH_FULL);
+    assertThat(resp.getStatusLine().getStatusCode(), is(NOT_FOUND));
+    assertThat(resp.getStatusLine().getReasonPhrase(), is("This metadata type is not supported for now."));
   }
 
   @Test

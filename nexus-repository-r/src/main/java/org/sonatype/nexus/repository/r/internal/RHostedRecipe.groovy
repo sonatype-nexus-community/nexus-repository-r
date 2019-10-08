@@ -22,13 +22,20 @@ import org.sonatype.nexus.repository.Format
 import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
+import org.sonatype.nexus.repository.r.RHostedFacet
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
+import org.sonatype.nexus.repository.view.Route
 import org.sonatype.nexus.repository.view.Router.Builder
 import org.sonatype.nexus.repository.view.ViewFacet
+import org.sonatype.nexus.repository.view.matchers.ActionMatcher
+import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher
 
+import static org.sonatype.nexus.repository.http.HttpMethods.GET
+import static org.sonatype.nexus.repository.http.HttpMethods.HEAD
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES
+import static org.sonatype.nexus.repository.view.matchers.logic.LogicMatchers.and
 
 /**
  * R proxy repository recipe.
@@ -43,7 +50,7 @@ class RHostedRecipe
   public static final String NAME = 'r-hosted'
 
   @Inject
-  Provider<org.sonatype.nexus.repository.r.RHostedFacet> hostedFacet
+  Provider<RHostedFacet> hostedFacet
 
   @Inject
   HostedHandlers hostedHandlers
@@ -73,6 +80,7 @@ class RHostedRecipe
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Builder builder = new Builder()
 
+    // PACKAGES.gz is the only supported metadata in hosted for now
     builder.route(packagesGzMatcher()
         .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
@@ -114,6 +122,11 @@ class RHostedRecipe
         .handler(hostedHandlers.putArchive)
         .create())
 
+    builder.route(metadataMatcher()
+        .handler(securityHandler)
+        .handler(hostedHandlers.notSupportedMetadataRequest)
+        .create())
+
     builder.route(nonRArchiveUploadMatcher()
         .handler(securityHandler)
         .handler(hostedHandlers.nonRArchiveUpload)
@@ -126,5 +139,13 @@ class RHostedRecipe
     facet.configure(builder.create())
 
     return facet
+  }
+
+  static Route.Builder packagesGzMatcher() {
+    new Route.Builder().matcher(
+        and(
+            new ActionMatcher(GET, HEAD),
+            new TokenMatcher('/{path:.+}/PACKAGES.gz')
+        ))
   }
 }
