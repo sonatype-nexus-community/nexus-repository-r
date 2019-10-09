@@ -132,10 +132,6 @@ public class RProxyFacetImpl
                                  final TempBlob archiveContent,
                                  final Content content) throws IOException
   {
-    checkNotNull(path);
-    checkNotNull(archiveContent);
-    checkNotNull(content);
-
     RFacet rFacet = facet(RFacet.class);
     StorageTx tx = UnitOfWork.currentTx();
 
