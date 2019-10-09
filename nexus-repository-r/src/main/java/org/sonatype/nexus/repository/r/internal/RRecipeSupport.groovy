@@ -21,6 +21,8 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.attributes.AttributesFacet
 import org.sonatype.nexus.repository.http.PartialFetchHandler
 import org.sonatype.nexus.repository.httpclient.HttpClientFacet
+import org.sonatype.nexus.repository.r.RFacet
+import org.sonatype.nexus.repository.r.RRestoreFacet
 import org.sonatype.nexus.repository.routing.RoutingRuleHandler
 import org.sonatype.nexus.repository.search.SearchFacet
 import org.sonatype.nexus.repository.security.SecurityHandler
@@ -109,10 +111,10 @@ abstract class RRecipeSupport
   Provider<HttpClientFacet> httpClientFacet
 
   @Inject
-  Provider<org.sonatype.nexus.repository.r.RRestoreFacet> rRestoreFacet;
+  Provider<RRestoreFacet> rRestoreFacet;
 
   @Inject
-  Provider<org.sonatype.nexus.repository.r.RFacet> rFacet;
+  Provider<RFacet> rFacet;
 
   protected RRecipeSupport(final Type type, final Format format) {
     super(type, format)
@@ -126,17 +128,6 @@ abstract class RRecipeSupport
   Closure assetKindHandler = { Context context, AssetKind value ->
     context.attributes.set(AssetKind, value)
     return context.proceed()
-  }
-
-  /**
-   * Matcher for packages.gz mapping.
-   */
-  static Builder packagesGzMatcher() {
-    new Builder().matcher(
-        and(
-            new ActionMatcher(GET, HEAD),
-            packagesGzTokenMatcher()
-        ))
   }
 
   /**
@@ -216,13 +207,6 @@ abstract class RRecipeSupport
         allFilesTokenMatcher(),
         suffixMatcherForExtension('.rds')
     )
-  }
-
-  /**
-   * Token matcher for PACKAGES.gz files.
-   */
-  static TokenMatcher packagesGzTokenMatcher() {
-    return new TokenMatcher('/{path:.+}/PACKAGES.gz')
   }
 
   /**

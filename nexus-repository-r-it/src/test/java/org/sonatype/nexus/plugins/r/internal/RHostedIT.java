@@ -88,6 +88,14 @@ public class RHostedIT
   }
 
   @Test
+  public void testFetchNotSupportedMetadata() throws Exception
+  {
+    HttpResponse resp = client.fetch(PACKAGES_RDS_PATH_FULL);
+    assertThat(resp.getStatusLine().getStatusCode(), is(NOT_FOUND));
+    assertThat(resp.getStatusLine().getReasonPhrase(), is("This metadata type is not supported for now."));
+  }
+
+  @Test
   public void testFetchPackage() throws Exception
   {
     HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
