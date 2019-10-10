@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
@@ -68,7 +68,7 @@ public final class RPathUtils
    * Builds a path to an archive for a particular path and filename.
    */
   public static String path(final String path, final String filename) {
-    return path + "/" + filename;
+    return StringUtils.appendIfMissing(path, "/") + filename;
   }
 
   /**
