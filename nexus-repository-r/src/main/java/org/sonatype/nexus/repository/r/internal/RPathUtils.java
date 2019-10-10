@@ -36,21 +36,21 @@ public final class RPathUtils
   /**
    * Returns the {@link TokenMatcher.State} for the content.
    */
-  static TokenMatcher.State matcherState(final Context context) {
+  public static TokenMatcher.State matcherState(final Context context) {
     return context.getAttributes().require(TokenMatcher.State.class);
   }
 
   /**
    * Returns the filename from a {@link TokenMatcher.State}.
    */
-  static String filename(final TokenMatcher.State state) {
+  public static String filename(final TokenMatcher.State state) {
     return match(state, "filename");
   }
 
   /**
    * Returns the name from a {@link TokenMatcher.State}.
    */
-  static String path(final TokenMatcher.State state) {
+  public static String path(final TokenMatcher.State state) {
     return match(state, "path");
   }
 
@@ -67,14 +67,14 @@ public final class RPathUtils
   /**
    * Builds a path to an archive for a particular path and filename.
    */
-  static String path(final String path, final String filename) {
+  public static String path(final String path, final String filename) {
     return path + "/" + filename;
   }
 
   /**
    * Builds a path to a package.gz for a particular path.
    */
-  static String packagesGzPath(final String path) {
+  public static String packagesGzPath(final String path) {
     return path + "/PACKAGES.gz";
   }
 
@@ -93,9 +93,17 @@ public final class RPathUtils
   }
 
   /**
+   * Extracts full path from {@link Context}
+   */
+  public static String cutFilenameFromPath(final String path) {
+    final int pathEndCharIndex = StringUtils.stripEnd(path, "/").lastIndexOf('/');
+    return path.substring(0, pathEndCharIndex);
+  }
+
+  /**
    * Determines asset kind by it's path
    */
-  static AssetKind getAssetKind(final String path) {
+  public static AssetKind getAssetKind(final String path) {
     AssetKind assetKind = ARCHIVE;
     if (Pattern.compile(PATTERN_PACKAGES).matcher(path).matches()) {
       assetKind = PACKAGES;

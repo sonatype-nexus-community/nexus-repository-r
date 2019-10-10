@@ -132,7 +132,7 @@ public class RHostedFacetImpl
     checkNotNull(payload);
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
-      return doPutArchive(path, filename, tempBlob, payload);
+      return doPutArchive(path, tempBlob, payload);
     }
   }
 
