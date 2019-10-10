@@ -126,17 +126,17 @@ public class RHostedFacetImpl
   }
 
   @Override
-  public void upload(final String path, final Payload payload) throws IOException {
+  public Asset upload(final String path, final Payload payload) throws IOException {
     checkNotNull(path);
     checkNotNull(payload);
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
-      doPutArchive(path, tempBlob, payload);
+     return doPutArchive(path, tempBlob, payload);
     }
   }
 
   @TransactionalStoreBlob
-  protected void doPutArchive(final String path,
+  protected Asset doPutArchive(final String path,
                               final TempBlob archiveContent,
                               final Payload payload) throws IOException
   {
@@ -161,5 +161,7 @@ public class RHostedFacetImpl
     }
 
     saveAsset(tx, asset, archiveContent, payload);
+
+    return asset;
   }
 }
