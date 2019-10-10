@@ -12,12 +12,17 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.util.regex.Pattern;
+
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 
 import org.apache.commons.lang3.StringUtils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.RDS_METADATA;
 
 /**
  * Utility methods for working with R routes and paths.
@@ -85,6 +90,29 @@ public final class RPathUtils
    */
   public static String removeInitialSlashFromPath(final String path) {
     return StringUtils.stripStart(path, "/");
+  }
+
+  /**
+   * Extracts full path from {@link Context}
+   */
+  public static String cutFilenameFromPath(final String path) {
+    final int pathEndCharIndex = StringUtils.stripEnd(path, "/").lastIndexOf('/');
+    return path.substring(0, pathEndCharIndex);
+  }
+
+  /**
+   * Determines asset kind by it's path
+   */
+  public static AssetKind getAssetKind(final String path) {
+    AssetKind assetKind = ARCHIVE;
+    if (Pattern.compile(PATTERN_PACKAGES).matcher(path).matches()) {
+      assetKind = PACKAGES;
+    }
+    else if (Pattern.compile(PATTERN_METADATA_RDS).matcher(path).matches()) {
+      assetKind = RDS_METADATA;
+    }
+
+    return assetKind;
   }
 
   private RPathUtils() {

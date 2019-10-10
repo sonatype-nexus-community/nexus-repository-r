@@ -129,7 +129,7 @@ public class RProxyIT
     final Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
     Assert.assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
     Assert.assertThat(component.format(), is(equalTo(R_FORMAT_NAME)));
-    Assert.assertThat(component.group(), is(nullValue()));
+    Assert.assertThat(component.group(), is(PKG_GZ_PATH));
     Assert.assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_131)));
   }
 

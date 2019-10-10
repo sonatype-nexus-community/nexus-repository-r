@@ -72,6 +72,7 @@ public class RHostedIT
     Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
     assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
     assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_121)));
+    assertThat(component.group(), is(equalTo(PKG_GZ_PATH)));
 
     //Verify Asset is created.
     Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);

@@ -57,7 +57,7 @@ public class RRestoreFacetImpl
         attributes = extractDescriptionFromArchive(path, is);
       }
 
-      Component component = facet.findOrCreateComponent(tx, attributes);
+      Component component = facet.findOrCreateComponent(tx, path, attributes);
       asset = facet.findOrCreateAsset(tx, component, path, attributes);
     }
     else {

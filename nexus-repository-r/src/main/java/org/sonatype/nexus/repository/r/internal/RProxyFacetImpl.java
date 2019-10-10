@@ -15,7 +15,6 @@ package org.sonatype.nexus.repository.r.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,8 +25,8 @@ import org.sonatype.nexus.repository.cache.CacheInfo;
 import org.sonatype.nexus.repository.config.Configuration;
 import org.sonatype.nexus.repository.proxy.ProxyFacet;
 import org.sonatype.nexus.repository.proxy.ProxyFacetSupport;
+import org.sonatype.nexus.repository.r.RFacet;
 import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -42,19 +41,14 @@ import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
-import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
-import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
-import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.toContent;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractFullPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.filename;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.matcherState;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
-import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
  * R {@link ProxyFacet} implementation.
@@ -92,9 +86,9 @@ public class RProxyFacetImpl
     switch (assetKind) {
       case RDS_METADATA:
       case PACKAGES:
-        return putMetadata(extractFullPath(context), content, assetKind.name());
+        return putMetadata(extractFullPath(context), content);
       case ARCHIVE:
-        return putArchive(path(matcherState), filename(matcherState), content);
+        return putArchive(path(path(matcherState), filename(matcherState)), content);
       default:
         throw new IllegalStateException();
     }
@@ -124,76 +118,51 @@ public class RProxyFacetImpl
     tx.saveAsset(asset);
   }
 
-  private Content putArchive(final String path, final String filename, final Content content) throws IOException {
+  private Content putArchive(final String path, final Content content) throws IOException {
+    checkNotNull(path);
+    checkNotNull(content);
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(content.openInputStream(), RFacetUtils.HASH_ALGORITHMS)) {
-      return doPutArchive(path, filename, tempBlob, content);
+      return doPutArchive(path, tempBlob, content);
     }
   }
 
   @TransactionalStoreBlob
   protected Content doPutArchive(final String path,
-                                 final String filename,
                                  final TempBlob archiveContent,
-                                 final Payload payload) throws IOException
+                                 final Content content) throws IOException
   {
+    RFacet rFacet = facet(RFacet.class);
     StorageTx tx = UnitOfWork.currentTx();
-    Bucket bucket = tx.findBucket(getRepository());
-
-    String assetPath = path(path, filename);
 
     Map<String, String> attributes;
     try (InputStream is = archiveContent.get()) {
-      attributes = extractDescriptionFromArchive(filename, is);
+      attributes = extractDescriptionFromArchive(path, is);
     }
 
-    String name = attributes.get(P_PACKAGE);
-    String version = attributes.get(P_VERSION);
-
-    Component component = findComponent(tx, getRepository(), name, version);
-    if (component == null) {
-      component = tx.createComponent(bucket, getRepository().getFormat()).name(name).version(version);
-    }
-    tx.saveComponent(component);
-
-    Asset asset = findAsset(tx, bucket, assetPath);
-    if (asset == null) {
-      asset = tx.createAsset(bucket, component);
-      asset.name(assetPath);
-      asset.formatAttributes().set(P_ASSET_KIND, ARCHIVE.name());
-    }
-
-    // TODO: Make this a bit more robust (could be problematic if keys are removed in later versions, or if keys clash)
-    for (Entry<String, String> entry : attributes.entrySet()) {
-      asset.formatAttributes().set(entry.getKey(), entry.getValue());
-    }
-
-    return saveAsset(tx, asset, archiveContent, payload);
+    Component component = rFacet.findOrCreateComponent(tx, path, attributes);
+    Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
+    return saveAsset(tx, asset, archiveContent, content);
   }
 
-  private Content putMetadata(final String path, final Content content, final String metadataKind)
+  private Content putMetadata(final String path, final Content content)
       throws IOException
   {
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(content.openInputStream(), RFacetUtils.HASH_ALGORITHMS)) {
-      return doPutMetadata(path, tempBlob, content, metadataKind);
+      return doPutMetadata(path, tempBlob, content);
     }
   }
 
   @TransactionalStoreBlob
   protected Content doPutMetadata(final String path,
                                   final TempBlob packagesContent,
-                                  final Payload payload,
-                                  final String metadataKind) throws IOException
+                                  final Payload payload) throws IOException
   {
     StorageTx tx = UnitOfWork.currentTx();
-    Bucket bucket = tx.findBucket(getRepository());
-    Asset asset = findAsset(tx, bucket, path);
-    if (asset == null) {
-      asset = tx.createAsset(bucket, getRepository().getFormat());
-      asset.name(path);
-      asset.formatAttributes().set(P_ASSET_KIND, metadataKind);
-    }
+    RFacet rFacet = facet(RFacet.class);
+
+    Asset asset = rFacet.findOrCreateAsset(tx, path);
     return saveAsset(tx, asset, packagesContent, payload);
   }
 

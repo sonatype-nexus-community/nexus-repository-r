@@ -23,9 +23,6 @@ import java.util.Map.Entry;
 import javax.inject.Named;
 import javax.mail.internet.InternetHeaders;
 
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorOutputStream;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.r.RFacet;
 import org.sonatype.nexus.repository.r.RHostedFacet;
@@ -41,6 +38,10 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
+
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -131,7 +132,7 @@ public class RHostedFacetImpl
     checkNotNull(payload);
     StorageFacet storageFacet = facet(StorageFacet.class);
     try (TempBlob tempBlob = storageFacet.createTempBlob(payload, RFacetUtils.HASH_ALGORITHMS)) {
-     return doPutArchive(path, tempBlob, payload);
+      return doPutArchive(path, tempBlob, payload);
     }
   }
 
@@ -140,9 +141,7 @@ public class RHostedFacetImpl
                               final TempBlob archiveContent,
                               final Payload payload) throws IOException
   {
-    checkNotNull(path);
-    checkNotNull(archiveContent);
-    checkNotNull(payload);
+
     StorageTx tx = UnitOfWork.currentTx();
     RFacet rFacet = facet(RFacet.class);
 
@@ -151,15 +150,8 @@ public class RHostedFacetImpl
       attributes = extractDescriptionFromArchive(path, is);
     }
 
-    Component component = rFacet.findOrCreateComponent(tx, attributes);
-
+    Component component = rFacet.findOrCreateComponent(tx, path, attributes);
     Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
-
-    // TODO: Make this a bit more robust (could be problematic if keys are removed in later versions, or if keys clash)
-    for (Entry<String, String> entry : attributes.entrySet()) {
-      asset.formatAttributes().set(entry.getKey(), entry.getValue());
-    }
-
     saveAsset(tx, asset, archiveContent, payload);
 
     return asset;
