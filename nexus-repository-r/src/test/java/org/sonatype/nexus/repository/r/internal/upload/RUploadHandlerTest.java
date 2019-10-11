@@ -145,35 +145,24 @@ public class RUploadHandlerTest
         .thenReturn(false);
 
     ComponentUpload component = createComponentUpload(PACKAGE_PATH, PACKAGE_NAME);
-
-    try {
-      underTest.handle(repository, component);
-      fail("Expected validation exception");
-    }
-    catch (ValidationErrorsException e) {
-      assertThat(e.getValidationErrors().size(), is(1));
-      assertThat(e.getValidationErrors().get(0).getMessage(),
-          is(String.format("Not authorized for requested path '%s'", PACKAGE_PATH_FULL)));
-    }
+    checkValidationFailed(component, String.format("Not authorized for requested path '%s'", PACKAGE_PATH_FULL));
   }
 
   @Test
   public void testHandleValidationExceptionWrongPath() throws IOException {
     ComponentUpload component = createComponentUpload(WRONG_PACKAGE_PATH, PACKAGE_NAME);
-    try {
-      underTest.handle(repository, component);
-      fail("Expected validation exception");
-    }
-    catch (ValidationErrorsException e) {
-      assertThat(e.getValidationErrors().size(), is(1));
-      assertThat(e.getValidationErrors().get(0).getMessage(),
-          is("Non-R archive extension or wrong upload path."));
-    }
+    checkValidationFailed(component, "Non-R archive extension or wrong upload path.");
   }
 
   @Test
   public void testHandleValidationExceptionWrongName() throws IOException {
     ComponentUpload component = createComponentUpload(PACKAGE_PATH, WRONG_PACKAGE_NAME);
+    checkValidationFailed(component, "Non-R archive extension or wrong upload path.");
+  }
+
+  private void checkValidationFailed(final ComponentUpload component, final String expectedErrorMessage)
+      throws IOException
+  {
     try {
       underTest.handle(repository, component);
       fail("Expected validation exception");
@@ -181,7 +170,7 @@ public class RUploadHandlerTest
     catch (ValidationErrorsException e) {
       assertThat(e.getValidationErrors().size(), is(1));
       assertThat(e.getValidationErrors().get(0).getMessage(),
-          is("Non-R archive extension or wrong upload path."));
+          is(expectedErrorMessage));
     }
   }
 
