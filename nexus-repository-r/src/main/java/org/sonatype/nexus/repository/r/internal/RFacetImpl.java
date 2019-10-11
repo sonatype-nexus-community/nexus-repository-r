@@ -51,7 +51,7 @@ public class RFacetImpl
     String version = attributes.get(P_VERSION);
     String group = cutFilenameFromPath(path);
 
-    Component component = findComponent(tx, getRepository(), name, version);
+    Component component = findComponent(tx, getRepository(), name, version, group);
     if (component == null) {
       Bucket bucket = tx.findBucket(getRepository());
       component = tx.createComponent(bucket, getRepository().getFormat())
