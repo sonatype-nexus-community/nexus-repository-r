@@ -33,6 +33,8 @@ public final class RPathUtils
 
   static final String PATTERN_METADATA_RDS = ".*/.+/.+.rds";
 
+  static final String PATTERN_ARCHIVE = ".*/.+/.+.(.zip|.tgz|.tar.gz)";
+
   /**
    * Returns the {@link TokenMatcher.State} for the content.
    */
@@ -113,6 +115,13 @@ public final class RPathUtils
     }
 
     return assetKind;
+  }
+
+  /**
+   * Determines if it's a valid path for archive
+   */
+  public static boolean isValidArchivePath(final String path) {
+    return Pattern.compile(PATTERN_ARCHIVE).matcher(path).matches();
   }
 
   private RPathUtils() {

@@ -19,8 +19,8 @@ import java.util.Optional;
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.entity.DetachedEntityId;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.r.RHostedFacet;
+import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.r.internal.RHostedFacetImpl;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.internal.SimpleVariableResolverAdapter;
@@ -45,16 +45,16 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 
 import static java.util.Collections.emptySet;
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.repository.upload.UploadFieldDefinition.Type.STRING;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.upload.UploadFieldDefinition.Type.STRING;
 
 public class RUploadHandlerTest
     extends TestSupport
@@ -88,6 +88,10 @@ public class RUploadHandlerTest
 
   private static final String PACKAGE_NAME = "r-package.tar.gz";
 
+  private static final String WRONG_PACKAGE_PATH = "";
+
+  private static final String WRONG_PACKAGE_NAME = "r-package.xxx";
+
   private final String PACKAGE_PATH_FULL = String.format("%s/%s", PACKAGE_PATH, PACKAGE_NAME);
 
   private static final String NU_ID = "nuId";
@@ -102,8 +106,6 @@ public class RUploadHandlerTest
     when(repository.getName()).thenReturn(REPO_NAME);
     when(storageFacet.txSupplier()).thenReturn(() -> storageTx);
     when(repository.facet(StorageFacet.class)).thenReturn(storageFacet);
-
-    when(payload.getName()).thenReturn(PACKAGE_NAME);
     when(repository.facet(RHostedFacet.class)).thenReturn(rHostedFacet);
 
     Asset asset = mockAsset(PACKAGE_PATH_FULL);
@@ -122,7 +124,7 @@ public class RUploadHandlerTest
 
   @Test
   public void testHandle() throws IOException {
-    ComponentUpload component = createComponentUpload(PACKAGE_PATH);
+    ComponentUpload component = createComponentUpload(PACKAGE_PATH, PACKAGE_NAME);
 
     UploadResponse uploadResponse = underTest.handle(repository, component);
     assertThat(uploadResponse.getAssetPaths(), contains(PACKAGE_PATH_FULL));
@@ -142,7 +144,7 @@ public class RUploadHandlerTest
     when(contentPermissionChecker.isPermitted(eq(REPO_NAME), eq(RFormat.NAME), eq(BreadActions.EDIT), any()))
         .thenReturn(false);
 
-    ComponentUpload component = createComponentUpload(PACKAGE_PATH);
+    ComponentUpload component = createComponentUpload(PACKAGE_PATH, PACKAGE_NAME);
 
     try {
       underTest.handle(repository, component);
@@ -155,10 +157,39 @@ public class RUploadHandlerTest
     }
   }
 
-  private ComponentUpload createComponentUpload(final String packagePath) {
+  @Test
+  public void testHandleValidationExceptionWrongPath() throws IOException {
+    ComponentUpload component = createComponentUpload(WRONG_PACKAGE_PATH, PACKAGE_NAME);
+    try {
+      underTest.handle(repository, component);
+      fail("Expected validation exception");
+    }
+    catch (ValidationErrorsException e) {
+      assertThat(e.getValidationErrors().size(), is(1));
+      assertThat(e.getValidationErrors().get(0).getMessage(),
+          is("Non-R archive extension or wrong upload path."));
+    }
+  }
+
+  @Test
+  public void testHandleValidationExceptionWrongName() throws IOException {
+    ComponentUpload component = createComponentUpload(PACKAGE_PATH, WRONG_PACKAGE_NAME);
+    try {
+      underTest.handle(repository, component);
+      fail("Expected validation exception");
+    }
+    catch (ValidationErrorsException e) {
+      assertThat(e.getValidationErrors().size(), is(1));
+      assertThat(e.getValidationErrors().get(0).getMessage(),
+          is("Non-R archive extension or wrong upload path."));
+    }
+  }
+
+  private ComponentUpload createComponentUpload(final String packagePath, final String packageName) {
+    when(payload.getName()).thenReturn(packageName);
     ComponentUpload component = new ComponentUpload();
     AssetUpload asset = new AssetUpload();
-    asset.setFields(Collections.singletonMap(RUploadHandler.PATH_ID, PACKAGE_PATH));
+    asset.setFields(Collections.singletonMap(RUploadHandler.PATH_ID, packagePath));
     asset.setPayload(payload);
     component.getAssetUploads().add(asset);
     return component;
