@@ -117,7 +117,7 @@ public class RUploadHandler
 
   private void validateUploadRequest(final String path) {
     if (!isValidArchivePath(path)) {
-      throw new ValidationErrorsException("Non-R archive extension or wrong upload path.");
+      throw new ValidationErrorsException("Extension not zip, tar.gz or tgz, or wrong upload path.");
     }
   }
 
