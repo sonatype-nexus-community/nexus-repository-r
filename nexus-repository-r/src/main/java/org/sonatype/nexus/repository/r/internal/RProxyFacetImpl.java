@@ -37,7 +37,6 @@ import org.sonatype.nexus.repository.transaction.TransactionalTouchMetadata;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,10 +44,7 @@ import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extract
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.toContent;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractFullPath;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.filename;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.matcherState;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractRequestPath;
 
 /**
  * R {@link ProxyFacet} implementation.
@@ -67,13 +63,11 @@ public class RProxyFacetImpl
   @Override
   protected Content getCachedContent(final Context context) {
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
-    TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
       case RDS_METADATA:
       case PACKAGES:
-        return getAsset(extractFullPath(context));
       case ARCHIVE:
-        return getAsset(path(path(matcherState), filename(matcherState)));
+        return getAsset(extractRequestPath(context));
       default:
         throw new IllegalStateException();
     }
@@ -82,13 +76,12 @@ public class RProxyFacetImpl
   @Override
   protected Content store(final Context context, final Content content) throws IOException {
     AssetKind assetKind = context.getAttributes().require(AssetKind.class);
-    TokenMatcher.State matcherState = matcherState(context);
     switch (assetKind) {
       case RDS_METADATA:
       case PACKAGES:
-        return putMetadata(extractFullPath(context), content);
+        return putMetadata(extractRequestPath(context), content);
       case ARCHIVE:
-        return putArchive(path(path(matcherState), filename(matcherState)), content);
+        return putArchive(extractRequestPath(context), content);
       default:
         throw new IllegalStateException();
     }

@@ -45,6 +45,8 @@ public class HostedHandlersTest
 
   public static final String FILENAME_VALUE = "Filename-value";
 
+  public static final String FULL_PATH_VALUE = PATH_VALUE + "/" + FILENAME_VALUE;
+
   @Mock
   Context context;
 
@@ -82,18 +84,13 @@ public class HostedHandlersTest
 
   @Test
   public void okWhenPackagesFound() throws Exception {
-    assertStatus(underTest.getPackages, 200);
+    assertStatus(underTest.getPackagesGz, 200);
   }
 
   @Test
   public void notFoundWhenPackagesNotFound() throws Exception {
     when(rHostedFacet.getPackages(anyString())).thenReturn(null);
-    assertStatus(underTest.getPackages, 404);
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void validateTokenMatcherStateWhenGetPackages() throws Exception {
-    passAttributesWithoutMatcherTo(underTest.getPackages);
+    assertStatus(underTest.getPackagesGz, 404);
   }
 
   @Test
@@ -107,11 +104,6 @@ public class HostedHandlersTest
     assertStatus(underTest.getArchive, 404);
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void validateTokenMatcherStateWhenGetArchive() throws Exception {
-    passAttributesWithoutMatcherTo(underTest.getArchive);
-  }
-
   @Test
   public void okWhenPut() throws Exception {
     assertStatus(underTest.putArchive, 200);
@@ -120,22 +112,12 @@ public class HostedHandlersTest
   @Test
   public void repositoryUploadWhenPut() throws Exception {
     underTest.putArchive.handle(context);
-    verify(rHostedFacet).upload(PATH_VALUE + "/" + FILENAME_VALUE, payload);
-  }
-
-  @Test(expected = IllegalStateException.class)
-  public void validateTokenMatcherStateWhenPut() throws Exception {
-    passAttributesWithoutMatcherTo(underTest.putArchive);
+    verify(rHostedFacet).upload(FULL_PATH_VALUE, payload);
   }
 
   private void assertStatus(final Handler handler, final int status) throws Exception {
     Response response = handler.handle(context);
     assertThat(response.getStatus().getCode(), is(equalTo(status)));
-  }
-
-  private void passAttributesWithoutMatcherTo(final Handler handler) throws Exception {
-    when(context.getAttributes()).thenReturn(new AttributesMap());
-    handler.handle(context);
   }
 
   private void initialiseTestFixtures() {
@@ -150,6 +132,7 @@ public class HostedHandlersTest
     when(context.getRepository()).thenReturn(repository);
     when(context.getRequest()).thenReturn(request);
     when(request.getPayload()).thenReturn(payload);
+    when(request.getPath()).thenReturn(FULL_PATH_VALUE);
     when(repository.facet(RHostedFacet.class)).thenReturn(rHostedFacet);
   }
 

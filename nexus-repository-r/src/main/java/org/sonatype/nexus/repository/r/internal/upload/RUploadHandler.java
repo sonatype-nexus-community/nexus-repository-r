@@ -42,8 +42,8 @@ import org.sonatype.nexus.repository.view.PartPayload;
 import org.sonatype.nexus.rest.ValidationErrorsException;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.buildPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidArchivePath;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.removeInitialSlashFromPath;
 
 /**
@@ -80,7 +80,7 @@ public class RUploadHandler
     final PartPayload payload = assetUpload.getPayload();
     final Map<String, String> fields = assetUpload.getFields();
     final String uploadPath = removeInitialSlashFromPath(fields.get(PATH_ID));
-    final String assetPath = path(uploadPath, payload.getName());
+    final String assetPath = buildPath(uploadPath, payload.getName());
 
     ensurePermitted(repository.getName(), RFormat.NAME, assetPath, Collections.emptyMap());
     validateUploadRequest(assetPath);
@@ -120,5 +120,4 @@ public class RUploadHandler
       throw new ValidationErrorsException("Extension not zip, tar.gz or tgz, or wrong upload path.");
     }
   }
-
 }

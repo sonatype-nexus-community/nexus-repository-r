@@ -20,12 +20,8 @@ import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Handler;
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher;
-import org.sonatype.nexus.repository.view.matchers.token.TokenMatcher.State;
 
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.filename;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.packagesGzPath;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractRequestPath;
 
 /**
  * R hosted handlers.
@@ -38,9 +34,8 @@ public final class HostedHandlers
   /**
    * Handle request for packages.
    */
-  final Handler getPackages = context -> {
-    State state = context.getAttributes().require(TokenMatcher.State.class);
-    String path = packagesGzPath(path(state));
+  final Handler getPackagesGz = context -> {
+    String path = extractRequestPath(context);
     Content content = context.getRepository().facet(RHostedFacet.class).getPackages(path);
     if (content != null) {
       return HttpResponses.ok(content);
@@ -52,8 +47,7 @@ public final class HostedHandlers
    * Handle request for archive.
    */
   final Handler getArchive = context -> {
-    State state = context.getAttributes().require(TokenMatcher.State.class);
-    String path = path(path(state), filename(state));
+    String path = extractRequestPath(context);
     Content content = context.getRepository().facet(RHostedFacet.class).getArchive(path);
     if (content != null) {
       return HttpResponses.ok(content);
@@ -65,8 +59,7 @@ public final class HostedHandlers
    * Handle request for upload.
    */
   final Handler putArchive = context -> {
-    State state = context.getAttributes().require(TokenMatcher.State.class);
-    String path = path(path(state), filename(state));
+    String path = extractRequestPath(context);
     context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();
   };
