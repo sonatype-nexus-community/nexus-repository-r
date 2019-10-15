@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 
 import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
+import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_GROUP;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
 
@@ -64,7 +65,7 @@ public final class RFacetUtils
   }
 
   /**
-   * Find a component by its name and tag (version)
+   * Find a component by its name, tag (version) and group
    *
    * @return found component of null if not found
    */
@@ -72,12 +73,14 @@ public final class RFacetUtils
   static Component findComponent(final StorageTx tx,
                                  final Repository repository,
                                  final String name,
-                                 final String version)
+                                 final String version,
+                                 final String group)
   {
     Iterable<Component> components = tx.findComponents(
         Query.builder()
             .where(P_NAME).eq(name)
             .and(P_VERSION).eq(version)
+            .and(P_GROUP).eq(group)
             .build(),
         singletonList(repository)
     );

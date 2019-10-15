@@ -112,14 +112,14 @@ public class RFacetUtilsTest
 
   @Test
   public void returnFirstComponent() throws Exception {
-    Component component = findComponent(tx, repository, "name", "version");
+    Component component = findComponent(tx, repository, "name", "version", "group");
     assertThat(component, is(notNullValue()));
   }
 
   @Test
   public void findNoComponents() throws Exception {
     components.clear();
-    Component component = findComponent(tx, repository, "name", "version");
+    Component component = findComponent(tx, repository, "name", "version", "group");
     assertThat(component, is(equalTo(component)));
   }
 
