@@ -93,7 +93,7 @@ class RHostedRecipe
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
-        .handler(hostedHandlers.getPackages)
+        .handler(hostedHandlers.getPackagesGz)
         .create())
 
     builder.route(archiveMatcher()
