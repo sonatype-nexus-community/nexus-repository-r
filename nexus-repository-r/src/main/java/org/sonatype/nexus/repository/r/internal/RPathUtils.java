@@ -29,9 +29,11 @@ import static org.sonatype.nexus.repository.r.internal.AssetKind.RDS_METADATA;
  */
 public final class RPathUtils
 {
-  static final String PATTERN_PACKAGES = ".*/.+/PACKAGES.*";
+  public static final Pattern PATTERN_PACKAGES = Pattern.compile(".*/.+/PACKAGES.*");
 
-  static final String PATTERN_METADATA_RDS = ".*/.+/.+.rds";
+  public static final Pattern PATTERN_METADATA_RDS = Pattern.compile(".*/.+/.+.rds");
+
+  public static final Pattern PATTERN_ARCHIVE = Pattern.compile(".*/.+/.+(.zip|.tgz|.tar.gz)");
 
   /**
    * Returns the {@link TokenMatcher.State} for the content.
@@ -105,14 +107,21 @@ public final class RPathUtils
    */
   public static AssetKind getAssetKind(final String path) {
     AssetKind assetKind = ARCHIVE;
-    if (Pattern.compile(PATTERN_PACKAGES).matcher(path).matches()) {
+    if (PATTERN_PACKAGES.matcher(path).matches()) {
       assetKind = PACKAGES;
     }
-    else if (Pattern.compile(PATTERN_METADATA_RDS).matcher(path).matches()) {
+    else if (PATTERN_METADATA_RDS.matcher(path).matches()) {
       assetKind = RDS_METADATA;
     }
 
     return assetKind;
+  }
+
+  /**
+   * Determines if it's a valid path for archive
+   */
+  public static boolean isValidArchivePath(final String path) {
+    return PATTERN_ARCHIVE.matcher(path).matches();
   }
 
   private RPathUtils() {

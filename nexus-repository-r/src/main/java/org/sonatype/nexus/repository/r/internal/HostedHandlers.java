@@ -74,7 +74,8 @@ public final class HostedHandlers
   /**
    * Handle upload non-R file request.
    */
-  final Handler nonRArchiveUpload = context -> HttpResponses.badRequest("Non-R archive extension or wrong upload path.");
+  final Handler nonRArchiveUpload =
+      context -> HttpResponses.badRequest("Extension not zip, tar.gz or tgz, or wrong upload path.");
 
   /**
    * Handle request of currently not supported metadata

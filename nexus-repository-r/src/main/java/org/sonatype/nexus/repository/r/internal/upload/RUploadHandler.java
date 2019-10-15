@@ -24,8 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.r.RHostedFacet;
+import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.rest.UploadDefinitionExtension;
 import org.sonatype.nexus.repository.security.ContentPermissionChecker;
 import org.sonatype.nexus.repository.security.VariableResolverAdapter;
@@ -39,8 +39,10 @@ import org.sonatype.nexus.repository.upload.UploadFieldDefinition.Type;
 import org.sonatype.nexus.repository.upload.UploadHandlerSupport;
 import org.sonatype.nexus.repository.upload.UploadResponse;
 import org.sonatype.nexus.repository.view.PartPayload;
+import org.sonatype.nexus.rest.ValidationErrorsException;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidArchivePath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.path;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.removeInitialSlashFromPath;
 
@@ -81,6 +83,7 @@ public class RUploadHandler
     final String assetPath = path(uploadPath, payload.getName());
 
     ensurePermitted(repository.getName(), RFormat.NAME, assetPath, Collections.emptyMap());
+    validateUploadRequest(assetPath);
 
     try {
       UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
@@ -111,4 +114,11 @@ public class RUploadHandler
   public ContentPermissionChecker contentPermissionChecker() {
     return contentPermissionChecker;
   }
+
+  private void validateUploadRequest(final String path) {
+    if (!isValidArchivePath(path)) {
+      throw new ValidationErrorsException("Extension not zip, tar.gz or tgz, or wrong upload path.");
+    }
+  }
+
 }
