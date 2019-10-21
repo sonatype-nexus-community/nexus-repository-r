@@ -36,7 +36,7 @@ public final class HostedHandlers
    */
   final Handler getPackagesGz = context -> {
     String path = extractRequestPath(context);
-    Content content = context.getRepository().facet(RHostedFacet.class).getPackages(path);
+    Content content = context.getRepository().facet(RHostedFacet.class).getPackagesGz(path);
     if (content != null) {
       return HttpResponses.ok(content);
     }

@@ -28,8 +28,8 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
 import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.cutFilenameFromPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.getAssetKind;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
@@ -49,7 +49,7 @@ public class RFacetImpl
   {
     String name = attributes.get(P_PACKAGE);
     String version = attributes.get(P_VERSION);
-    String group = cutFilenameFromPath(path);
+    String group = getBasePath(path);
 
     Component component = findComponent(tx, getRepository(), name, version, group);
     if (component == null) {

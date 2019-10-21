@@ -33,6 +33,8 @@ public final class RPathUtils
 
   public static final Pattern PATTERN_ARCHIVE = Pattern.compile(".*/.+/.+(.zip|.tgz|.tar.gz)");
 
+  public static final String PACKAGES_GZ_FILENAME = "PACKAGES.gz";
+
   /**
    * Builds a path to an asset for a particular path and filename.
    */
@@ -55,9 +57,9 @@ public final class RPathUtils
   }
 
   /**
-   * Removes filename from path
+   * Returns base path of the package (without filename)
    */
-  public static String cutFilenameFromPath(final String path) {
+  public static String getBasePath(final String path) {
     final int pathEndCharIndex = StringUtils.stripEnd(path, "/").lastIndexOf('/');
     return path.substring(0, pathEndCharIndex);
   }

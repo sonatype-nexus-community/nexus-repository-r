@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableList;
 
 import static java.util.Collections.singletonList;
 import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_GROUP;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
@@ -138,5 +139,14 @@ public final class RFacetUtils
     asset.markAsDownloaded();
     tx.saveAsset(asset);
     return toContent(asset, assetBlob.getBlob());
+  }
+
+  /**
+   * Extracts {@link AssetKind} from asset attributes.
+   *
+   * @return {@link AssetKind} of this asset.
+   */
+  static AssetKind extractAssetKind(final Asset asset) {
+    return AssetKind.valueOf(asset.formatAttributes().get(P_ASSET_KIND, String.class));
   }
 }

@@ -112,7 +112,7 @@ public class RHostedFacetImplTest
   @Test
   public void getPackagesReturnsPackage() throws Exception {
     assets.add(asset);
-    Content packages = underTest.getPackages(PACKAGE_PATH);
+    Content packages = underTest.getPackagesGz(PACKAGE_PATH);
     try (InputStream in = packages.openInputStream()) {
       Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
       assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
@@ -127,13 +127,13 @@ public class RHostedFacetImplTest
 
   @Test
   public void getPackagesReturnsCorrectContentType() throws Exception {
-    Content packages = underTest.getPackages(PACKAGE_PATH);
+    Content packages = underTest.getPackagesGz(PACKAGE_PATH);
     assertThat(packages.getContentType(), is(equalTo("application/x-gzip")));
   }
 
   @Test(expected = NullPointerException.class)
   public void failFastOnGetPackagesWithNull() throws Exception {
-    underTest.getPackages(null);
+    underTest.getPackagesGz(null);
   }
 
   @Test

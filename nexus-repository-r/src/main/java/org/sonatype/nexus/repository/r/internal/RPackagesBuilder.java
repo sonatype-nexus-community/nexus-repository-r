@@ -27,6 +27,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPI
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
 
 /**
  * Builds the contents of a PACKAGES file based on the provided assets, taking into account the greatest version of a
@@ -51,17 +52,17 @@ public class RPackagesBuilder
   private final Map<String, Map<String, String>> packageInformation = new TreeMap<>();
 
   /**
-   * The path to the PACKAGES file that is being generated.
+   * The base path to the PACKAGES file that is being generated.
    */
-  private final String packagesPath;
+  private final String packagesBasePath;
 
   /**
    * Constructor.
    *
-   * @param packagesPath The path to the PACKAGES file that is being generated.
+   * @param packagesBasePath The base path to the PACKAGES file that is being generated.
    */
-  public RPackagesBuilder(final String packagesPath) {
-    this.packagesPath = checkNotNull(packagesPath);
+  public RPackagesBuilder(final String packagesBasePath) {
+    this.packagesBasePath = checkNotNull(packagesBasePath);
   }
 
   /**
@@ -71,8 +72,7 @@ public class RPackagesBuilder
    */
   public void append(final Asset asset) {
     // is this asset at this particular path?
-    String base = basePath(packagesPath);
-    if (base.equals(basePath(asset.name()))) {
+    if (packagesBasePath.equals(getBasePath(asset.name()))) {
 
       // is this a newer version of this asset's package than the one we currently have (if we have one)?
       String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
@@ -104,15 +104,5 @@ public class RPackagesBuilder
    */
   public Map<String, Map<String, String>> getPackageInformation() {
     return unmodifiableMap(packageInformation);
-  }
-
-  /**
-   * Returns a base path for a particular path (the path excluding the filename and last trailing slash).
-   *
-   * @param path The input path.
-   * @return The base path.
-   */
-  private String basePath(final String path) {
-    return path.substring(0, path.lastIndexOf('/'));
   }
 }

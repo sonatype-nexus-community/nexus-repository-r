@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +37,6 @@ import org.sonatype.nexus.repository.transaction.TransactionalTouchBlob;
 import org.sonatype.nexus.repository.transaction.TransactionalTouchMetadata;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
-import org.sonatype.nexus.repository.view.payloads.BytesPayload;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import org.apache.commons.compress.compressors.CompressorException;
@@ -68,46 +68,32 @@ public class RHostedFacetImpl
 {
   @Override
   @TransactionalTouchMetadata
-  public Content getPackages(final String packagesPath) {
-    checkNotNull(packagesPath);
-    try {
-      // TODO: Do NOT do this on each request as there is at least some overhead, and memory usage is proportional to
-      // the number of packages contained in a particular path. We should be able to generate this when something has
-      // changed or via a scheduled task using an approach similar to the Yum implementation rather than this method.
-      StorageTx tx = UnitOfWork.currentTx();
-      RPackagesBuilder packagesBuilder = new RPackagesBuilder(packagesPath);
-      for (Asset asset : tx.browseAssets(tx.findBucket(getRepository()))) {
-        packagesBuilder.append(asset);
-      }
-      CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
-      ByteArrayOutputStream os = new ByteArrayOutputStream();
-      try (CompressorOutputStream cos = compressorStreamFactory.createCompressorOutputStream(GZIP, os)) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(cos, UTF_8)) {
-          for (Entry<String, Map<String, String>> eachPackage : packagesBuilder.getPackageInformation().entrySet()) {
-            Map<String, String> packageInfo = eachPackage.getValue();
-            InternetHeaders headers = new InternetHeaders();
-            headers.addHeader(P_PACKAGE, packageInfo.get(P_PACKAGE));
-            headers.addHeader(P_VERSION, packageInfo.get(P_VERSION));
-            headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
-            headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
-            headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
-            headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
-            headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
-            Enumeration<String> headerLines = headers.getAllHeaderLines();
-            while (headerLines.hasMoreElements()) {
-              String line = headerLines.nextElement();
-              writer.write(line, 0, line.length());
-              writer.write('\n');
-            }
-            writer.write('\n');
-          }
-        }
-      }
-      return new Content(new BytesPayload(os.toByteArray(), "application/x-gzip"));
+  public Content getPackagesGz(final String packagesGzPath) {
+    checkNotNull(packagesGzPath);
+    StorageTx tx = UnitOfWork.currentTx();
+
+    Asset asset = findAsset(tx, tx.findBucket(getRepository()), packagesGzPath);
+    if (asset == null) {
+      return null;
     }
-    catch (CompressorException | IOException e) {
-      throw new RException(packagesPath, e);
+    if (asset.markAsDownloaded()) {
+      tx.saveAsset(asset);
     }
+    return toContent(asset, tx.requireBlob(asset.requireBlobRef()));
+  }
+
+  @Override
+  @TransactionalStoreBlob
+  public void putPackagesGz(final String path, final TempBlob content) throws IOException {
+    checkNotNull(path);
+    checkNotNull(content);
+
+    StorageTx tx = UnitOfWork.currentTx();
+    RFacet rFacet = facet(RFacet.class);
+
+    Asset asset = rFacet.findOrCreateAsset(tx, path);
+
+    saveAsset(tx, asset, content, "", null);
   }
 
   @Override
@@ -138,8 +124,8 @@ public class RHostedFacetImpl
 
   @TransactionalStoreBlob
   protected Asset doPutArchive(final String path,
-                              final TempBlob archiveContent,
-                              final Payload payload) throws IOException
+                               final TempBlob archiveContent,
+                               final Payload payload) throws IOException
   {
 
     StorageTx tx = UnitOfWork.currentTx();
@@ -155,5 +141,51 @@ public class RHostedFacetImpl
     saveAsset(tx, asset, archiveContent, payload);
 
     return asset;
+  }
+
+  @Override
+  @TransactionalTouchMetadata
+  public TempBlob buildPackagesGz(final String basePath) throws IOException {
+    checkNotNull(basePath);
+    try {
+      // TODO: Change this to use a temp file or other alternative mechanism (at least until the blob store functions
+      // are expanded to allow us to create a blob by writing into an output stream as well).
+      StorageTx tx = UnitOfWork.currentTx();
+      RPackagesBuilder packagesBuilder = new RPackagesBuilder(basePath);
+      for (Asset asset : tx.browseAssets(tx.findBucket(getRepository()))) {
+        packagesBuilder.append(asset);
+      }
+      CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      try (CompressorOutputStream cos = compressorStreamFactory.createCompressorOutputStream(GZIP, os)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(cos, UTF_8)) {
+          for (Entry<String, Map<String, String>> eachPackage : packagesBuilder.getPackageInformation().entrySet()) {
+            Map<String, String> packageInfo = eachPackage.getValue();
+            InternetHeaders headers = new InternetHeaders();
+            headers.addHeader(P_PACKAGE, packageInfo.get(P_PACKAGE));
+            headers.addHeader(P_VERSION, packageInfo.get(P_VERSION));
+            headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
+            headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
+            headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
+            headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
+            headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
+            Enumeration<String> headerLines = headers.getAllHeaderLines();
+            while (headerLines.hasMoreElements()) {
+              String line = headerLines.nextElement();
+              writer.write(line, 0, line.length());
+              writer.write('\n');
+            }
+            writer.write('\n');
+          }
+        }
+      }
+      StorageFacet storageFacet = getRepository().facet(StorageFacet.class);
+      try (InputStream is = new ByteArrayInputStream(os.toByteArray())) {
+        return storageFacet.createTempBlob(is, RFacetUtils.HASH_ALGORITHMS);
+      }
+    }
+    catch (CompressorException e) {
+      throw new IOException("Error compressing metadata", e);
+    }
   }
 }

@@ -89,7 +89,7 @@ public class HostedHandlersTest
 
   @Test
   public void notFoundWhenPackagesNotFound() throws Exception {
-    when(rHostedFacet.getPackages(anyString())).thenReturn(null);
+    when(rHostedFacet.getPackagesGz(anyString())).thenReturn(null);
     assertStatus(underTest.getPackagesGz, 404);
   }
 
@@ -138,7 +138,7 @@ public class HostedHandlersTest
 
   private void setupForGetPackagesTest() {
     tokens.put("path", PATH_VALUE);
-    when(rHostedFacet.getPackages(anyString())).thenReturn(content);
+    when(rHostedFacet.getPackagesGz(anyString())).thenReturn(content);
   }
 
   private void setupForGetArchiveTest() {

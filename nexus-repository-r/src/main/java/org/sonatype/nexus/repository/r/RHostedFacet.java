@@ -16,6 +16,7 @@ import java.io.IOException;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -27,12 +28,20 @@ public interface RHostedFacet
     extends Facet
 {
   /**
-   * Retrieve packages.
+   * Retrieve PACKAGES.gz.
    *
-   * @param packagesPath the full packages path
+   * @param packagesGzPath the full PACKAGES.gz path
    * @return simple package HTML
    */
-  Content getPackages(String packagesPath);
+  Content getPackagesGz(String packagesGzPath);
+
+  /**
+   * Store a PACKAGES.gz file at a particular path.
+   *
+   * @param packagesGzPath the upload path
+   * @param content        the temp blob containing the PACKAGES.gz content
+   */
+  void putPackagesGz(String packagesGzPath, TempBlob content) throws IOException;
 
   /**
    * Retrieve package.
@@ -49,4 +58,12 @@ public interface RHostedFacet
    * @param payload uploaded file content
    */
   Asset upload(String path, Payload payload) throws IOException;
+
+  /**
+   * Build metadata for path.
+   *
+   * @param basePath the path to build the metadata for
+   * @return the metadata as a {@code TempBlob}
+   */
+  TempBlob buildPackagesGz(String basePath) throws IOException;
 }
