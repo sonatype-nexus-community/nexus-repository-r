@@ -28,6 +28,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
  * Builds the contents of a PACKAGES file based on the provided assets, taking into account the greatest version of a
@@ -35,8 +36,6 @@ import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
  *
  * Note that this maintains all pertinent information for the "latest" version of each package in memory, though the
  * actual amount of information for each package is rather small.
- *
- * TODO: Ensure that we build this information and actually cache it, rather than doing this for each request.
  */
 public class RPackagesBuilder
 {
@@ -71,8 +70,8 @@ public class RPackagesBuilder
    * @param asset The asset to process.
    */
   public void append(final Asset asset) {
-    // is this asset at this particular path?
-    if (packagesBasePath.equals(getBasePath(asset.name()))) {
+    // is this asset at this particular path and not a metadata kind?
+    if (packagesBasePath.equals(getBasePath(asset.name())) && !isMetadataAsset(asset)) {
 
       // is this a newer version of this asset's package than the one we currently have (if we have one)?
       String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
@@ -104,5 +103,15 @@ public class RPackagesBuilder
    */
   public Map<String, Map<String, String>> getPackageInformation() {
     return unmodifiableMap(packageInformation);
+  }
+
+  /**
+   * Determines if asset kind is metadata
+   *
+   * @param asset The asset to process.
+   * @return true if asset kind is metadata
+   */
+  private boolean isMetadataAsset(final Asset asset) {
+    return AssetKind.valueOf(asset.formatAttributes().get(P_ASSET_KIND, String.class)).isMetadata();
   }
 }

@@ -22,18 +22,25 @@ import org.sonatype.nexus.repository.cache.CacheControllerHolder.CacheType;
  */
 enum AssetKind
 {
-  PACKAGES(CacheControllerHolder.METADATA),
-  RDS_METADATA(CacheControllerHolder.METADATA),
-  ARCHIVE(CacheControllerHolder.CONTENT);
+  PACKAGES(CacheControllerHolder.METADATA, true),
+  RDS_METADATA(CacheControllerHolder.METADATA, true),
+  ARCHIVE(CacheControllerHolder.CONTENT, false);
 
   private final CacheType cacheType;
 
-  AssetKind(final CacheType cacheType) {
+  private final boolean isMetadata;
+
+  AssetKind(final CacheType cacheType, final boolean isMetadata) {
     this.cacheType = cacheType;
+    this.isMetadata = isMetadata;
   }
 
   @Nonnull
   public CacheType getCacheType() {
     return cacheType;
+  }
+
+  public boolean isMetadata() {
+    return isMetadata;
   }
 }
