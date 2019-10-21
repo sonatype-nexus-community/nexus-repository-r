@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.ByteStreams;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -42,6 +44,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -50,19 +53,24 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 public class RHostedFacetImplTest
     extends RepositoryFacetTestSupport<RHostedFacetImpl>
 {
-  static final String PACKAGE_NAME = "package.gz";
+  static final String PACKAGES_GZ = "PACKAGES.gz";
 
-  static final String BASE_PATH = "packages/base/path/";
+  static final String PACKAGE_NAME = "package.gz";
 
   static final String REAL_PACKAGE = "r-package.zip";
 
-  static final String PACKAGE_PATH = BASE_PATH + PACKAGE_NAME;
+  static final String BASE_PATH = "packages/base/path";
 
-  static final String REAL_PACKAGE_PATH = BASE_PATH + REAL_PACKAGE;
+  static final String PACKAGE_PATH = BASE_PATH + "/" + PACKAGE_NAME;
+
+  static final String REAL_PACKAGE_PATH = BASE_PATH + "/" + REAL_PACKAGE;
+
+  static final String PACKAGES_GZ_PATH = BASE_PATH + "/" + PACKAGES_GZ;
 
   static final String VERSION = "1.0.0";
 
@@ -107,26 +115,19 @@ public class RHostedFacetImplTest
     when(formatAttributes.get(P_NEEDS_COMPILATION, String.class)).thenReturn(NEEDS_COMPILATION);
     when(asset.name()).thenReturn(PACKAGE_PATH);
     when(repository.facet(RFacet.class)).thenReturn(rFacet);
+    when(rFacet.findOrCreateAsset(any(), any())).thenReturn(asset);
+    when(rFacet.findOrCreateAsset(any(), any(), any(), any())).thenReturn(asset);
   }
 
   @Test
   public void getPackagesReturnsPackage() throws Exception {
-    assets.add(asset);
-    Content packages = underTest.getPackagesGz(PACKAGE_PATH);
-    try (InputStream in = packages.openInputStream()) {
-      Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
-      assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
-      assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
-      assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
-      assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
-      assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
-      assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
-      assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
-    }
+    Content archive = underTest.getArchive(PACKAGES_GZ_PATH);
+    assertThat(archive, is(notNullValue()));
   }
 
   @Test
   public void getPackagesReturnsCorrectContentType() throws Exception {
+    when(asset.requireContentType()).thenReturn("application/x-gzip");
     Content packages = underTest.getPackagesGz(PACKAGE_PATH);
     assertThat(packages.getContentType(), is(equalTo("application/x-gzip")));
   }
@@ -145,6 +146,27 @@ public class RHostedFacetImplTest
   @Test(expected = NullPointerException.class)
   public void failFastOnGetArchiveWithNull() throws Exception {
     underTest.getArchive(null);
+  }
+
+  @Test
+  public void nullWhenAssetNullOnGetPackages() throws Exception {
+    when(storageTx.findAssetWithProperty(anyString(), anyString(), any(Bucket.class))).thenReturn(null);
+    Content archive = underTest.getArchive(PACKAGES_GZ_PATH);
+    assertThat(archive, is(nullValue()));
+  }
+
+  @Test
+  public void markAssetAsDownloadedAndSaveOnGetPackages() throws Exception {
+    when(asset.markAsDownloaded()).thenReturn(true);
+    underTest.getPackagesGz(PACKAGES_GZ_PATH);
+    verify(storageTx).saveAsset(asset);
+  }
+
+  @Test
+  public void doNotSaveAssetWhenPackagesNotMarkedAsDownloaded() throws Exception {
+    when(asset.markAsDownloaded()).thenReturn(false);
+    underTest.getPackagesGz(PACKAGES_GZ_PATH);
+    verify(storageTx, never()).saveAsset(asset);
   }
 
   @Test
@@ -192,6 +214,52 @@ public class RHostedFacetImplTest
         .thenReturn(asset);
 
     underTest.doPutArchive(REAL_PACKAGE_PATH, tempBlob, payload);
+    verify(storageTx).saveAsset(asset);
+  }
+
+  @Test
+  public void shouldBuildPackagesGz() throws Exception {
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
+    when(storageFacet.createTempBlob(any(InputStream.class), eq(RFacetUtils.HASH_ALGORITHMS))).thenAnswer(
+        invocation -> {
+          InputStream is = (InputStream) invocation.getArguments()[0];
+          byte[] content = ByteStreams.toByteArray(is);
+          when(tempBlob.get()).thenAnswer(i -> new ByteArrayInputStream(content));
+          return tempBlob;
+        });
+    assets.add(asset);
+    try (TempBlob metadataTempBlob = underTest.buildPackagesGz(BASE_PATH)) {
+      try (InputStream in = metadataTempBlob.get()) {
+        Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
+        assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
+        assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
+        assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
+        assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
+        assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
+        assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
+        assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
+      }
+    }
+  }
+
+  @Test
+  public void shouldPutPackagesGz() throws Exception {
+    List<Component> list = ImmutableList.of(component);
+    when(tempBlob.get()).thenReturn(getClass().getResourceAsStream(PACKAGES_GZ));
+    when(asset.name()).thenReturn(PACKAGES_GZ_PATH);
+    when(assetBlob.getBlob())
+        .thenReturn(blob);
+    doReturn(assetBlob)
+        .when(storageTx).setBlob(any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        anyBoolean());
+    when(storageTx.findComponents(any(), any()))
+        .thenReturn(list);
+    underTest.putPackagesGz(PACKAGES_GZ_PATH, tempBlob);
     verify(storageTx).saveAsset(asset);
   }
 }

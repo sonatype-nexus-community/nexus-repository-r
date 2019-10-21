@@ -20,6 +20,7 @@ import org.sonatype.nexus.repository.storage.Asset;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableMap;
+import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -27,8 +28,8 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPI
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
+import static org.sonatype.nexus.repository.r.internal.RFacetUtils.extractAssetKind;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
-import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
  * Builds the contents of a PACKAGES file based on the provided assets, taking into account the greatest version of a
@@ -70,8 +71,8 @@ public class RPackagesBuilder
    * @param asset The asset to process.
    */
   public void append(final Asset asset) {
-    // is this asset at this particular path and not a metadata kind?
-    if (packagesBasePath.equals(getBasePath(asset.name())) && !isMetadataAsset(asset)) {
+    // is this asset at this particular path and archive kind?
+    if (packagesBasePath.equals(getBasePath(asset.name())) && extractAssetKind(asset) == ARCHIVE) {
 
       // is this a newer version of this asset's package than the one we currently have (if we have one)?
       String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
@@ -103,15 +104,5 @@ public class RPackagesBuilder
    */
   public Map<String, Map<String, String>> getPackageInformation() {
     return unmodifiableMap(packageInformation);
-  }
-
-  /**
-   * Determines if asset kind is metadata
-   *
-   * @param asset The asset to process.
-   * @return true if asset kind is metadata
-   */
-  private boolean isMetadataAsset(final Asset asset) {
-    return AssetKind.valueOf(asset.formatAttributes().get(P_ASSET_KIND, String.class)).isMetadata();
   }
 }

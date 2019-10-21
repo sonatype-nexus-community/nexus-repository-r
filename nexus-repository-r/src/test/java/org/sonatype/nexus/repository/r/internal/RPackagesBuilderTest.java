@@ -32,6 +32,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPI
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
+import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**
  * {@link RPackagesBuilder} unit tests.
@@ -39,15 +40,20 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 public class RPackagesBuilderTest
     extends TestSupport
 {
+  private static final String ARCHIVE = "ARCHIVE";
+
+  private static final String PACKAGES = "PACKAGES";
+
   @Test
   public void buildPackages() {
-    RPackagesBuilder underTest = new RPackagesBuilder("/foo/bar/PACKAGES");
-    underTest.append(createAsset("/foo/x", "x", "1.0.0"));
-    underTest.append(createAsset("/foo/bar/b-4", "b", "4.0.0"));
-    underTest.append(createAsset("/foo/bar/a-1", "a", "1.0.0"));
-    underTest.append(createAsset("/foo/bar/a-3", "a", "3.0.0"));
-    underTest.append(createAsset("/foo/bar/a-2", "a", "2.0.0"));
-    underTest.append(createAsset("/foo/bar/baz/x", "x", "1.0.0"));
+    RPackagesBuilder underTest = new RPackagesBuilder("/foo/bar");
+    underTest.append(createAsset("/foo/x", "x", "1.0.0", ARCHIVE));
+    underTest.append(createAsset("/foo/bar/b-4", "b", "4.0.0", ARCHIVE));
+    underTest.append(createAsset("/foo/bar/a-1", "a", "1.0.0", ARCHIVE));
+    underTest.append(createAsset("/foo/bar/a-3", "a", "3.0.0", ARCHIVE));
+    underTest.append(createAsset("/foo/bar/a-2", "a", "2.0.0", ARCHIVE));
+    underTest.append(createAsset("/foo/bar/PACKAGES.gz", null, null, PACKAGES));
+    underTest.append(createAsset("/foo/bar/baz/x", "x", "1.0.0", ARCHIVE));
 
     Map<String, Map<String, String>> packageInformation = underTest.getPackageInformation();
     assertThat(packageInformation.keySet(), contains("a", "b"));
@@ -71,7 +77,11 @@ public class RPackagesBuilderTest
     assertThat(packageB.get(P_NEEDS_COMPILATION), is("NeedsCompilation:/foo/bar/b-4"));
   }
 
-  private Asset createAsset(final String assetName, final String packageName, final String packageVersion) {
+  private Asset createAsset(final String assetName,
+                            final String packageName,
+                            final String packageVersion,
+                            final String assetKind)
+  {
     NestedAttributesMap formatAttributes = mock(NestedAttributesMap.class);
     when(formatAttributes.get(P_PACKAGE, String.class)).thenReturn(packageName);
     when(formatAttributes.get(P_VERSION, String.class)).thenReturn(packageVersion);
@@ -80,6 +90,7 @@ public class RPackagesBuilderTest
     when(formatAttributes.get(P_SUGGESTS, String.class)).thenReturn("Suggests:" + assetName);
     when(formatAttributes.get(P_LICENSE, String.class)).thenReturn("License:" + assetName);
     when(formatAttributes.get(P_NEEDS_COMPILATION, String.class)).thenReturn("NeedsCompilation:" + assetName);
+    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(assetKind);
 
     Asset asset = mock(Asset.class);
     when(asset.formatAttributes()).thenReturn(formatAttributes);
