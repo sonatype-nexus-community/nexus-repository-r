@@ -23,6 +23,7 @@ import org.sonatype.nexus.common.event.EventManager;
 import org.sonatype.nexus.common.stateguard.Guarded;
 import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.r.RHostedFacet;
+import org.sonatype.nexus.repository.r.RPackagesBuilderFacet;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
 import org.sonatype.nexus.repository.storage.AssetDeletedEvent;

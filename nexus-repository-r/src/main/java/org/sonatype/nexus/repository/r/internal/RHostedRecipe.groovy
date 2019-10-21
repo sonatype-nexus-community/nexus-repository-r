@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.r.RHostedFacet
+import org.sonatype.nexus.repository.r.RPackagesBuilderFacet
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
