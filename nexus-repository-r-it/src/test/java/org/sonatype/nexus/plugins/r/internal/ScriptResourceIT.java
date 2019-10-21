@@ -52,10 +52,10 @@ public class ScriptResourceIT
     BaseUrlHolder.set(this.nexusUrl.toString());
 
     final CloseableHttpClient build = clientBuilder().build();
-    Client client2 = restClientFactory.create(
+    Client client = restClientFactory.create(
         RestClientConfiguration.DEFAULTS.withHttpClient(() -> build));
-    client2.register(new BasicAuthentication("admin", "admin123"));
-    scriptClient = restClientFactory.proxy(ScriptClient.class, client2,
+    client.register(new BasicAuthentication("admin", "admin123"));
+    scriptClient = restClientFactory.proxy(ScriptClient.class, client,
         UriBuilder.fromUri(nexusUrl.toURI()).path("service/rest").build());
   }
 
