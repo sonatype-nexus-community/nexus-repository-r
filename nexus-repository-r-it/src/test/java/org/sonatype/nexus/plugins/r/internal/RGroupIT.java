@@ -32,6 +32,7 @@ import org.ops4j.pax.exam.Option;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
@@ -57,7 +58,8 @@ public class RGroupIT
   public static Option[] configureNexus() {
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
+        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval", "1")
     );
   }
 
@@ -107,6 +109,9 @@ public class RGroupIT
   public void whenRequestMetadataFromGroup_ShouldReturnSuccess() throws Exception {
     final String agricolae131Content =
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_FILENAME).toPath()));
+
+    // Wait till metadata is created
+    Thread.sleep(1000);
 
     final InputStream content = groupClient.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), content);

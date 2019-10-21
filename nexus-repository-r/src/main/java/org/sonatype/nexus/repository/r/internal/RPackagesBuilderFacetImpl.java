@@ -76,7 +76,7 @@ public class RPackagesBuilderFacetImpl
   @Inject
   public RPackagesBuilderFacetImpl(
       final EventManager eventManager,
-      @Named("${nexus.r.packagesBuilder.interval:-5000}") final long interval)
+      @Named("${nexus.r.packagesBuilder.interval:-1000}") final long interval)
   {
     this.eventManager = checkNotNull(eventManager);
     this.interval = interval;

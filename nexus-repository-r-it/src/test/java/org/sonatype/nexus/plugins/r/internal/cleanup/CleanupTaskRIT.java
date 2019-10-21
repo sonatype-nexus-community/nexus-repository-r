@@ -37,6 +37,7 @@ import org.ops4j.pax.exam.Option;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_101_TARGZ;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_121_TARGZ;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_131_TARGZ;
@@ -57,12 +58,13 @@ public class CleanupTaskRIT
   public static Option[] configureNexus() {
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
+        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval", "1")
     );
   }
 
   @Before
-  public void setup() {
+  public void setup() throws InterruptedException {
     testData.addDirectory(NexusPaxExamSupport.resolveBaseFile("target/test-classes/r"));
     repository = repos.createRHosted(testName.getMethodName());
     deployArtifacts(NAMES);
@@ -121,6 +123,9 @@ public class CleanupTaskRIT
                 .putAndClose(testPackage.fullPath, new ByteArrayEntity(getBytesFromTestData(testPackage.filename)))),
             is(OK));
       }
+
+      // Wait till metadata is recreated
+      Thread.sleep(1000);
 
       return packages.length;
     }
