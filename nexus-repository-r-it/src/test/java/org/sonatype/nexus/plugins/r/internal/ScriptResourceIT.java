@@ -61,11 +61,12 @@ public class ScriptResourceIT
 
   @Test
   public void createRProxyScript() {
-    String repoName = "r-script-repo";
+    String repoName = "r-proxy-repository";
+    String scriptName = "r-proxy-script";
     String content = format("repository.createRProxy('%s','http://someurl')", repoName);
 
-    scriptClient.add(new ScriptXO(repoName, content, "groovy"));
-    scriptClient.run(repoName, "");
+    scriptClient.add(new ScriptXO(scriptName, content, "groovy"));
+    scriptClient.run(scriptName, "");
     Repository repo = repositoryManager.get(repoName);
     assertThat(repo.getFormat().getValue(), is("r"));
     assertThat(repo.getName(), is(repoName));
@@ -74,11 +75,12 @@ public class ScriptResourceIT
 
   @Test
   public void createRHostedScript() {
-    String repoName = "r-script-hosted-repo";
+    String repoName = "r-hosted-repository";
+    String scriptName = "r-hosted-script";
     String content = format("repository.createRHosted('%s')", repoName);
 
-    scriptClient.add(new ScriptXO(repoName, content, "groovy"));
-    scriptClient.run(repoName, "");
+    scriptClient.add(new ScriptXO(scriptName, content, "groovy"));
+    scriptClient.run(scriptName, "");
     Repository repo = repositoryManager.get(repoName);
     assertThat(repo.getFormat().getValue(), is("r"));
     assertThat(repo.getName(), is(repoName));
@@ -90,14 +92,15 @@ public class ScriptResourceIT
     String proxyName = "r-proxy-for-group";
     String hostedName = "r-hosted-for-group";
     String repoName = "r-script-group-repo";
+    String scriptName = "r-group-script";
     String content =
         format("repository.createRGroup('%s', Arrays.asList('%s', '%s'))", repoName, proxyName, hostedName);
 
     repos.createRProxy(proxyName, "http://someurl");
     repos.createRHosted(hostedName);
 
-    scriptClient.add(new ScriptXO(repoName, content, "groovy"));
-    scriptClient.run(repoName, "");
+    scriptClient.add(new ScriptXO(scriptName, content, "groovy"));
+    scriptClient.run(scriptName, "");
     Repository repo = repositoryManager.get(repoName);
     assertThat(repo.getFormat().getValue(), is("r"));
     assertThat(repo.getName(), is(repoName));
