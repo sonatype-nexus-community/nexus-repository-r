@@ -28,12 +28,12 @@ public interface RHostedFacet
     extends Facet
 {
   /**
-   * Retrieve PACKAGES.gz.
+   * Retrieve stored content
    *
-   * @param packagesGzPath the full PACKAGES.gz path
-   * @return simple package HTML
+   * @param contentPath the full path to stored content
+   * @return the package content
    */
-  Content getPackagesGz(String packagesGzPath);
+  Content getStoredContent(String contentPath);
 
   /**
    * Store a PACKAGES.gz file at a particular path.
@@ -42,14 +42,6 @@ public interface RHostedFacet
    * @param content        the temp blob containing the PACKAGES.gz content
    */
   void putPackagesGz(String packagesGzPath, TempBlob content) throws IOException;
-
-  /**
-   * Retrieve package.
-   *
-   * @param archivePath the full archive path
-   * @return the package content
-   */
-  Content getArchive(String archivePath);
 
   /**
    * Perform upload.

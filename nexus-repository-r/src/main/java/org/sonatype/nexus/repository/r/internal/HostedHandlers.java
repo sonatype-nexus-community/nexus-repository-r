@@ -32,23 +32,11 @@ public final class HostedHandlers
     extends ComponentSupport
 {
   /**
-   * Handle request for packages.
-   */
-  final Handler getPackagesGz = context -> {
-    String path = extractRequestPath(context);
-    Content content = context.getRepository().facet(RHostedFacet.class).getPackagesGz(path);
-    if (content != null) {
-      return HttpResponses.ok(content);
-    }
-    return HttpResponses.notFound();
-  };
-
-  /**
    * Handle request for archive.
    */
-  final Handler getArchive = context -> {
+  final Handler getContent = context -> {
     String path = extractRequestPath(context);
-    Content content = context.getRepository().facet(RHostedFacet.class).getArchive(path);
+    Content content = context.getRepository().facet(RHostedFacet.class).getStoredContent(path);
     if (content != null) {
       return HttpResponses.ok(content);
     }

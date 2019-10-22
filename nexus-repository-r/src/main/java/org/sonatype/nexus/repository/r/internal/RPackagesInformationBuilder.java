@@ -18,9 +18,7 @@ import java.util.TreeMap;
 
 import org.sonatype.nexus.repository.storage.Asset;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableMap;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -28,8 +26,6 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPI
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
-import static org.sonatype.nexus.repository.r.internal.RFacetUtils.extractAssetKind;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
 
 /**
  * Builds the contents of a PACKAGES file based on the provided assets, taking into account the greatest version of a
@@ -38,7 +34,7 @@ import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
  * Note that this maintains all pertinent information for the "latest" version of each package in memory, though the
  * actual amount of information for each package is rather small.
  */
-public class RPackagesBuilder
+public class RPackagesInformationBuilder
 {
   /**
    * The greatest version of each package currently encountered during this run.
@@ -52,47 +48,29 @@ public class RPackagesBuilder
   private final Map<String, Map<String, String>> packageInformation = new TreeMap<>();
 
   /**
-   * The base path to the PACKAGES file that is being generated.
-   */
-  private final String packagesBasePath;
-
-  /**
-   * Constructor.
-   *
-   * @param packagesBasePath The base path to the PACKAGES file that is being generated.
-   */
-  public RPackagesBuilder(final String packagesBasePath) {
-    this.packagesBasePath = checkNotNull(packagesBasePath);
-  }
-
-  /**
    * Processes an asset, updating the greatest version and details for the package if appropriate.
    *
    * @param asset The asset to process.
    */
   public void append(final Asset asset) {
-    // is this asset at this particular path and archive kind?
-    if (packagesBasePath.equals(getBasePath(asset.name())) && extractAssetKind(asset) == ARCHIVE) {
+    // is this a newer version of this asset's package than the one we currently have (if we have one)?
+    String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
+    RPackageVersion oldVersion = packageVersions.get(packageName);
+    RPackageVersion newVersion = new RPackageVersion(asset.formatAttributes().get(P_VERSION, String.class));
+    if (oldVersion == null || newVersion.compareTo(oldVersion) > 0) {
 
-      // is this a newer version of this asset's package than the one we currently have (if we have one)?
-      String packageName = asset.formatAttributes().get(P_PACKAGE, String.class);
-      RPackageVersion oldVersion = packageVersions.get(packageName);
-      RPackageVersion newVersion = new RPackageVersion(asset.formatAttributes().get(P_VERSION, String.class));
-      if (oldVersion == null || newVersion.compareTo(oldVersion) > 0) {
+      // if so, use the most recent information instead and update the greatest version encountered
+      Map<String, String> newInformation = new HashMap<>();
+      newInformation.put(P_PACKAGE, asset.formatAttributes().get(P_PACKAGE, String.class));
+      newInformation.put(P_VERSION, asset.formatAttributes().get(P_VERSION, String.class));
+      newInformation.put(P_DEPENDS, asset.formatAttributes().get(P_DEPENDS, String.class));
+      newInformation.put(P_IMPORTS, asset.formatAttributes().get(P_IMPORTS, String.class));
+      newInformation.put(P_SUGGESTS, asset.formatAttributes().get(P_SUGGESTS, String.class));
+      newInformation.put(P_LICENSE, asset.formatAttributes().get(P_LICENSE, String.class));
+      newInformation.put(P_NEEDS_COMPILATION, asset.formatAttributes().get(P_NEEDS_COMPILATION, String.class));
 
-        // if so, use the most recent information instead and update the greatest version encountered
-        Map<String, String> newInformation = new HashMap<>();
-        newInformation.put(P_PACKAGE, asset.formatAttributes().get(P_PACKAGE, String.class));
-        newInformation.put(P_VERSION, asset.formatAttributes().get(P_VERSION, String.class));
-        newInformation.put(P_DEPENDS, asset.formatAttributes().get(P_DEPENDS, String.class));
-        newInformation.put(P_IMPORTS, asset.formatAttributes().get(P_IMPORTS, String.class));
-        newInformation.put(P_SUGGESTS, asset.formatAttributes().get(P_SUGGESTS, String.class));
-        newInformation.put(P_LICENSE, asset.formatAttributes().get(P_LICENSE, String.class));
-        newInformation.put(P_NEEDS_COMPILATION, asset.formatAttributes().get(P_NEEDS_COMPILATION, String.class));
-
-        packageVersions.put(packageName, newVersion);
-        packageInformation.put(packageName, newInformation);
-      }
+      packageVersions.put(packageName, newVersion);
+      packageInformation.put(packageName, newInformation);
     }
   }
 

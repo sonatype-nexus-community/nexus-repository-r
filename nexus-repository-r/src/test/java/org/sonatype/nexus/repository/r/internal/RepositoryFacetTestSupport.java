@@ -71,6 +71,7 @@ public abstract class RepositoryFacetTestSupport<T extends Facet>
     assets = new ArrayList<>();
     UnitOfWork.beginBatch(storageTx);
     when(storageTx.browseAssets(any(Bucket.class))).thenReturn(assets);
+    when(storageTx.browseAssets(any(), any(Bucket.class))).thenReturn(assets);
     when(storageTx.findAssetWithProperty(anyString(), anyString(), any(Bucket.class))).thenReturn(asset);
     when(storageTx.findBucket(repository)).thenReturn(bucket);
     when(storageTx.requireBlob(any())).thenReturn(blob);

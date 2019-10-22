@@ -78,30 +78,18 @@ public class HostedHandlersTest
     underTest = new HostedHandlers();
     initialiseTestFixtures();
     initialiseMockBehaviour();
-    setupForGetPackagesTest();
-    setupForGetArchiveTest();
+    setupForGetContentTest();
   }
 
   @Test
-  public void okWhenPackagesFound() throws Exception {
-    assertStatus(underTest.getPackagesGz, 200);
+  public void okWhenContentFound() throws Exception {
+    assertStatus(underTest.getContent, 200);
   }
 
   @Test
-  public void notFoundWhenPackagesNotFound() throws Exception {
-    when(rHostedFacet.getPackagesGz(anyString())).thenReturn(null);
-    assertStatus(underTest.getPackagesGz, 404);
-  }
-
-  @Test
-  public void okWhenArchiveFound() throws Exception {
-    assertStatus(underTest.getArchive, 200);
-  }
-
-  @Test
-  public void notFoundWhenArchiveNotFound() throws Exception {
-    when(rHostedFacet.getArchive(anyString())).thenReturn(null);
-    assertStatus(underTest.getArchive, 404);
+  public void notFoundWhenContentNotFound() throws Exception {
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
+    assertStatus(underTest.getContent, 404);
   }
 
   @Test
@@ -136,14 +124,9 @@ public class HostedHandlersTest
     when(repository.facet(RHostedFacet.class)).thenReturn(rHostedFacet);
   }
 
-  private void setupForGetPackagesTest() {
-    tokens.put("path", PATH_VALUE);
-    when(rHostedFacet.getPackagesGz(anyString())).thenReturn(content);
-  }
-
-  private void setupForGetArchiveTest() {
+  private void setupForGetContentTest() {
     tokens.put("filename", FILENAME_VALUE);
-    when(rHostedFacet.getArchive(anyString())).thenReturn(content);
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(content);
   }
 
   class TestState

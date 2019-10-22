@@ -44,7 +44,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -53,7 +52,6 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
-import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 public class RHostedFacetImplTest
     extends RepositoryFacetTestSupport<RHostedFacetImpl>
@@ -120,73 +118,41 @@ public class RHostedFacetImplTest
   }
 
   @Test
-  public void getPackagesReturnsPackage() throws Exception {
-    Content archive = underTest.getArchive(PACKAGES_GZ_PATH);
-    assertThat(archive, is(notNullValue()));
-  }
-
-  @Test
-  public void getPackagesReturnsCorrectContentType() throws Exception {
+  public void getContentReturnsCorrectContentType() throws Exception {
     when(asset.requireContentType()).thenReturn("application/x-gzip");
-    Content packages = underTest.getPackagesGz(PACKAGE_PATH);
+    Content packages = underTest.getStoredContent(PACKAGE_PATH);
     assertThat(packages.getContentType(), is(equalTo("application/x-gzip")));
   }
 
-  @Test(expected = NullPointerException.class)
-  public void failFastOnGetPackagesWithNull() throws Exception {
-    underTest.getPackagesGz(null);
-  }
-
   @Test
-  public void getArchive() throws Exception {
-    Content archive = underTest.getArchive(PACKAGE_PATH);
+  public void getStoredContent() throws Exception {
+    Content archive = underTest.getStoredContent(PACKAGE_PATH);
     assertThat(archive, is(notNullValue()));
   }
 
   @Test(expected = NullPointerException.class)
-  public void failFastOnGetArchiveWithNull() throws Exception {
-    underTest.getArchive(null);
+  public void failFastOnGetContentWithNull() throws Exception {
+    underTest.getStoredContent(null);
   }
 
   @Test
-  public void nullWhenAssetNullOnGetPackages() throws Exception {
+  public void nullWhenAssetNullOnGetContent() throws Exception {
     when(storageTx.findAssetWithProperty(anyString(), anyString(), any(Bucket.class))).thenReturn(null);
-    Content archive = underTest.getArchive(PACKAGES_GZ_PATH);
+    Content archive = underTest.getStoredContent(PACKAGES_GZ_PATH);
     assertThat(archive, is(nullValue()));
   }
 
   @Test
-  public void markAssetAsDownloadedAndSaveOnGetPackages() throws Exception {
+  public void markAssetAsDownloadedAndSaveOnGetContent() throws Exception {
     when(asset.markAsDownloaded()).thenReturn(true);
-    underTest.getPackagesGz(PACKAGES_GZ_PATH);
+    underTest.getStoredContent(PACKAGES_GZ_PATH);
     verify(storageTx).saveAsset(asset);
   }
 
   @Test
-  public void doNotSaveAssetWhenPackagesNotMarkedAsDownloaded() throws Exception {
+  public void doNotSaveAssetWhenContentNotMarkedAsDownloaded() throws Exception {
     when(asset.markAsDownloaded()).thenReturn(false);
-    underTest.getPackagesGz(PACKAGES_GZ_PATH);
-    verify(storageTx, never()).saveAsset(asset);
-  }
-
-  @Test
-  public void nullWhenAssetNullOnGetArchive() throws Exception {
-    when(storageTx.findAssetWithProperty(anyString(), anyString(), any(Bucket.class))).thenReturn(null);
-    Content archive = underTest.getArchive(PACKAGE_PATH);
-    assertThat(archive, is(nullValue()));
-  }
-
-  @Test
-  public void markAssetAsDownloadedAndSaveOnGetArchive() throws Exception {
-    when(asset.markAsDownloaded()).thenReturn(true);
-    underTest.getArchive(PACKAGE_PATH);
-    verify(storageTx).saveAsset(asset);
-  }
-
-  @Test
-  public void doNotSaveWhenNotMarkedAsDownloaded() throws Exception {
-    when(asset.markAsDownloaded()).thenReturn(false);
-    underTest.getArchive(PACKAGE_PATH);
+    underTest.getStoredContent(PACKAGES_GZ_PATH);
     verify(storageTx, never()).saveAsset(asset);
   }
 
@@ -219,7 +185,6 @@ public class RHostedFacetImplTest
 
   @Test
   public void shouldBuildPackagesGz() throws Exception {
-    when(formatAttributes.get(P_ASSET_KIND, String.class)).thenReturn(ARCHIVE.name());
     when(storageFacet.createTempBlob(any(InputStream.class), eq(RFacetUtils.HASH_ALGORITHMS))).thenAnswer(
         invocation -> {
           InputStream is = (InputStream) invocation.getArguments()[0];

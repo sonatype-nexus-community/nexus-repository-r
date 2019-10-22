@@ -157,6 +157,7 @@ public class RPackagesBuilderFacetImpl
       catch (InterruptedException e) {
         log.warn("R invalidation thread interrupted on repository {}, proceeding with invalidation",
             getRepository().getName());
+        Thread.currentThread().interrupt();
       }
       waiting = false;
       log.info("Rebuilding R PACKAGES.gz metadata for repository {}", getRepository().getName());

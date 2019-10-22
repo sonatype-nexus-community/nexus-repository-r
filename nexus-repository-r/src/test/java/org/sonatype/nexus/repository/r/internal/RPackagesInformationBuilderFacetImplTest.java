@@ -39,7 +39,7 @@ import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.PACKAGES;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
-public class RPackagesBuilderFacetImplTest
+public class RPackagesInformationBuilderFacetImplTest
     extends TestSupport
 {
   static final String REPOSITORY_NAME = "repository-name";

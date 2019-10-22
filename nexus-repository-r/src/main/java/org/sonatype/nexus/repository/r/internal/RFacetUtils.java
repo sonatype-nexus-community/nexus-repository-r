@@ -41,7 +41,9 @@ import static org.sonatype.nexus.common.hash.HashAlgorithm.SHA1;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_GROUP;
 import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
+import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_ATTRIBUTES;
 import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
+import static org.sonatype.nexus.repository.storage.Query.builder;
 
 /**
  * Shared code between R facets.
@@ -99,6 +101,19 @@ public final class RFacetUtils
   @Nullable
   static Asset findAsset(final StorageTx tx, final Bucket bucket, final String assetName) {
     return tx.findAssetWithProperty(MetadataNodeEntityAdapter.P_NAME, assetName, bucket);
+  }
+
+  /**
+   * Browse all assets in bucket by asset kind
+   *
+   * @return {@link Iterable} of assets or empty one
+   */
+  static Iterable<Asset> browseAllAssetsByKind(final StorageTx tx, final Bucket bucket, final AssetKind assetKind) {
+    final Query query = builder()
+        .where(P_ATTRIBUTES + "." + RFormat.NAME + "." + P_ASSET_KIND)
+        .eq(assetKind.name())
+        .build();
+    return tx.browseAssets(query, bucket);
   }
 
   /**

@@ -128,6 +128,7 @@ public class RHostedIT
     //Verify PACKAGES(metadata) contain appropriate content about R package.
     final InputStream content = client.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
+    assertNotNull(findAsset(repository, PACKAGES_GZ_PATH_FULL));
 
     // Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
@@ -139,9 +140,11 @@ public class RHostedIT
 
     final InputStream contentSrcAfterDelete = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo("")), contentSrcAfterDelete);
+    assertNotNull(findAsset(repository, PACKAGES_SRC_GZ.fullPath));
 
     final InputStream contentBinAfterDelete = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo("")), contentBinAfterDelete);
+    assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
   }
 
   @Test
