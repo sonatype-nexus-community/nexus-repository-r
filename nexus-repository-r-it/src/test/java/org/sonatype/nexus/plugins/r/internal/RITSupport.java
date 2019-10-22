@@ -143,6 +143,8 @@ public class RITSupport
 
   public static final String ARCHIVE_RDS_PATH_FULL = format("%s/%s", ARCHIVE_RDS_PATH, ARCHIVE_RDS_FILE_NAME);
 
+  private RClientFactory rClientFactory = new RClientFactory();
+
   @Rule
   public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);
 
@@ -159,7 +161,7 @@ public class RITSupport
 
   @Nonnull
   protected RClient createRClient(final Repository repository) throws Exception {
-    return new RClient(
+    return  rClientFactory.createClient(
         clientBuilder().build(),
         clientContext(),
         resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()
@@ -167,7 +169,7 @@ public class RITSupport
   }
 
   protected RClient rClient(final URL repositoryUrl) throws Exception {
-    return new RClient(
+    return rClientFactory.createClient(
         clientBuilder(repositoryUrl).build(),
         clientContext(),
         repositoryUrl.toURI()

@@ -19,6 +19,7 @@ import java.nio.file.Paths;
 
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.plugins.r.internal.RClient;
+import org.sonatype.nexus.plugins.r.internal.RClientFactory;
 import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Component;
@@ -47,6 +48,8 @@ public class CleanupTaskRIT
     extends CleanupITSupport
 {
   public static final String[] NAMES = {AGRICOLAE_PKG_FILE_NAME_101_TARGZ};
+
+  private RClientFactory rClientFactory = new RClientFactory();
 
   public Repository repository;
 
@@ -106,7 +109,7 @@ public class CleanupTaskRIT
 
   private int deployArtifacts(final String... names) {
     try {
-      RClient client = new RClient(clientBuilder().build(),
+      RClient client = rClientFactory.createClient(clientBuilder().build(),
           clientContext(),
           resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()
       );
