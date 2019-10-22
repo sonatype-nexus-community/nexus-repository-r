@@ -161,7 +161,7 @@ public class RITSupport
 
   @Nonnull
   protected RClient createRClient(final Repository repository) throws Exception {
-    return  rClientFactory.createClient(
+    return rClientFactory.createClient(
         clientBuilder().build(),
         clientContext(),
         resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()

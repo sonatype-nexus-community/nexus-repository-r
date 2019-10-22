@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * @since 1.1.next
+ * @since 1.next
  */
 public class RComponentDirectorTest
     extends TestSupport
