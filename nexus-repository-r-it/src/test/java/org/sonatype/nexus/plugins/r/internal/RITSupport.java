@@ -44,9 +44,13 @@ import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
+import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
+import static org.sonatype.nexus.repository.storage.Query.builder;
 
 /**
  * Support class for R ITs.
@@ -58,58 +62,15 @@ public class RITSupport
 {
   public static final String R_FORMAT_NAME = "r";
 
-  public static final String PKG_GZ_PATH = "bin/macosx/el-capitan/contrib/3.6";
+  public static final String PKG_BIN_PATH = "bin/macosx/el-capitan/contrib/3.6";
 
-  public static final String PKG_RDS_PATH = "src/contrib";
+  public static final String PKG_SRC_PATH = "src/contrib";
 
-  public static final String ARCHIVE_RDS_PATH = "src/contrib/Meta";
+  public static final String PKG_SRC_META_PATH = "src/contrib/Meta";
 
-  public static final String AGRICOLAE_PKG_NAME = "agricolae";
+  public static final String PACKAGES_AGRICOLAE_121_FILENAME = "PACKAGES_agricolae_121";
 
-  public static final String PACKAGES_NAME = "PACKAGES";
-
-  public static final String ARCHIVE_RDS_NAME = "archive";
-
-  public static final String RDS_METADATA_KIND = "RDS_METADATA";
-
-  public static final String PACKAGES_KIND = "PACKAGES";
-
-  public static final String PACKAGES_AGRICOLAE_121_NAME = "PACKAGES_agricolae_121";
-
-  public static final String PACKAGES_AGRICOLAE_131_NAME = "PACKAGES_agricolae_131";
-
-  public static final String AGRICOLAE_PKG_VERSION_101 = "1.0-1";
-
-  public static final String AGRICOLAE_PKG_VERSION_121 = "1.2-1";
-
-  public static final String AGRICOLAE_PKG_VERSION_131 = "1.3-1";
-
-  public static final String TARGZ_EXT = ".tar.gz";
-
-  public static final String XXX_EXT = ".xxx";
-
-  public static final String TGZ_EXT = ".tgz";
-
-  public static final String GZ_EXT = ".gz";
-
-  public static final String RDS_EXT = ".rds";
-
-  public static final String DOES_NOT_EXIST_PKG_TGZ = format("%s/%s%s", PKG_GZ_PATH, "doesnt_exist", TGZ_EXT);
-
-  public static final String AGRICOLAE_PKG_FILE_NAME_131_TGZ = format("%s_%s%s",
-      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TGZ_EXT);
-
-  public static final String AGRICOLAE_PKG_FILE_NAME_101_TARGZ = format("%s_%s%s",
-      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_101, TARGZ_EXT);
-
-  public static final String AGRICOLAE_PKG_FILE_NAME_121_TARGZ = format("%s_%s%s",
-      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_121, TARGZ_EXT);
-
-  public static final String AGRICOLAE_PKG_FILE_NAME_131_TARGZ = format("%s_%s%s",
-      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, TARGZ_EXT);
-
-  public static final String AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX = format("%s_%s%s",
-      AGRICOLAE_PKG_NAME, AGRICOLAE_PKG_VERSION_131, XXX_EXT);
+  public static final String PACKAGES_AGRICOLAE_131_FILENAME = "PACKAGES_agricolae_131";
 
   public static final String CONTENT_TYPE_X_TGZ = "application/x-tgz";
 
@@ -119,29 +80,99 @@ public class RITSupport
 
   public static final String CONTENT_TYPE_X_XZ = "application/x-xz";
 
-  public static final String PACKAGES_GZ_FILE_NAME = format("%s%s", PACKAGES_NAME, GZ_EXT);
+  public static final String RDS_METADATA_KIND = "RDS_METADATA";
 
-  public static final String PACKAGES_RDS_FILE_NAME = format("%s%s", PACKAGES_NAME, RDS_EXT);
+  public static final String PACKAGES_KIND = "PACKAGES";
 
-  public static final String ARCHIVE_RDS_FILE_NAME = format("%s%s", ARCHIVE_RDS_NAME, RDS_EXT);
+  public static final TestPackage AGRICOLAE_131_TGZ = new TestPackage(
+      "agricolae_1.3-1.tgz",
+      PKG_BIN_PATH,
+      "agricolae",
+      "1.3-1",
+      ".tgz",
+      CONTENT_TYPE_X_TGZ
+  );
 
-  public static final String AGRICOLAE_PATH_FULL_131_TGZ =
-      String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+  public static final TestPackage AGRICOLAE_131_TARGZ = new TestPackage(
+      "agricolae_1.3-1.tar.gz",
+      PKG_SRC_PATH,
+      "agricolae",
+      "1.3-1",
+      ".tar.gz",
+      CONTENT_TYPE_X_GZIP
+  );
 
-  public static final String AGRICOLAE_PATH_FULL_131_TARGZ =
-      String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
+  public static final TestPackage AGRICOLAE_121_TARGZ = new TestPackage(
+      "agricolae_1.2-1.tar.gz",
+      PKG_SRC_PATH,
+      "agricolae",
+      "1.2-1",
+      ".tar.gz",
+      CONTENT_TYPE_X_GZIP
+  );
 
-  public static final String AGRICOLAE_PATH_FULL_121_TARGZ =
-      String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
+  public static final TestPackage AGRICOLAE_101_TARGZ = new TestPackage(
+      "agricolae_1.0-1.tar.gz",
+      PKG_SRC_PATH,
+      "agricolae",
+      "1.0-1",
+      ".tar.gz",
+      CONTENT_TYPE_X_GZIP
+  );
 
-  public static final String AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX =
-      String.format("%s/%s", PKG_GZ_PATH, AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX);
+  public static final TestPackage AGRICOLAE_131_XXX = new TestPackage(
+      "agricolae_1.3-1.xxx",
+      PKG_SRC_PATH,
+      "agricolae",
+      "1.3-1",
+      ".xxx",
+      CONTENT_TYPE_X_GZIP
+  );
 
-  public static final String PACKAGES_GZ_PATH_FULL = format("%s/%s", PKG_GZ_PATH, PACKAGES_GZ_FILE_NAME);
+  public static final TestPackage PACKAGES_SRC_GZ = new TestPackage(
+      "PACKAGES.gz",
+      PKG_SRC_PATH,
+      null,
+      null,
+      ".gz",
+      CONTENT_TYPE_X_GZIP
+  );
 
-  public static final String PACKAGES_RDS_PATH_FULL = format("%s/%s", PKG_RDS_PATH, PACKAGES_RDS_FILE_NAME);
+  public static final TestPackage PACKAGES_BIN_GZ = new TestPackage(
+      "PACKAGES.gz",
+      PKG_BIN_PATH,
+      null,
+      null,
+      ".gz",
+      CONTENT_TYPE_X_GZIP
+  );
 
-  public static final String ARCHIVE_RDS_PATH_FULL = format("%s/%s", ARCHIVE_RDS_PATH, ARCHIVE_RDS_FILE_NAME);
+  public static final TestPackage PACKAGES_RDS = new TestPackage(
+      "PACKAGES.rds",
+      PKG_SRC_PATH,
+      null,
+      null,
+      ".rds",
+      CONTENT_TYPE_X_XZ // PACKAGE.rds is compressed in xz
+  );
+
+  public static final TestPackage ARCHIVE_RDS = new TestPackage(
+      "archive.rds",
+      PKG_SRC_META_PATH,
+      null,
+      null,
+      ".rds",
+      CONTENT_TYPE_GZIP // archive.rds is compressed in gzip
+  );
+
+  public static final TestPackage DOES_NOT_EXIST_TGZ = new TestPackage(
+      "doesnotexist.tgz",
+      PKG_BIN_PATH,
+      null,
+      null,
+      ".tgz",
+      CONTENT_TYPE_X_TGZ
+  );
 
   @Rule
   public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);
@@ -189,6 +220,23 @@ public class RITSupport
     return Paths.get(testData.resolveFile(fileName).getAbsolutePath());
   }
 
+  protected Component findFirstComponentByNameAndVersion(
+      final Repository repository,
+      final String name,
+      final String version)
+  {
+    try (StorageTx tx = getStorageTx(repository)) {
+      tx.begin();
+      return tx.findComponents(
+          builder()
+              .where(P_NAME).eq(name)
+              .and(P_VERSION).eq(version)
+              .build(),
+          singletonList(repository)
+      ).iterator().next();
+    }
+  }
+
   protected Component findComponentById(final Repository repository, final EntityId componentId) {
     try (StorageTx tx = getStorageTx(repository)) {
       tx.begin();
@@ -214,6 +262,40 @@ public class RITSupport
       Assert.assertThat("Repository:" + repository.getName() + " Path:" + path,
           statusLine.getStatusCode(),
           is(responseCode));
+    }
+  }
+
+  public static class TestPackage
+  {
+    public final String filename;
+
+    public final String path;
+
+    public final String fullPath;
+
+    public final String packageName;
+
+    public final String packageVersion;
+
+    public final String extension;
+
+    public final String contentType;
+
+    public TestPackage(
+        final String filename,
+        final String path,
+        final String packageName,
+        final String packageVersion,
+        final String extension,
+        final String contentType)
+    {
+      this.filename = filename;
+      this.path = path;
+      this.fullPath = path + "/" + filename;
+      this.packageName = packageName;
+      this.packageVersion = packageVersion;
+      this.extension = extension;
+      this.contentType = contentType;
     }
   }
 }

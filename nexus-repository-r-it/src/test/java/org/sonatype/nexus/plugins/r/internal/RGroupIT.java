@@ -66,8 +66,8 @@ public class RGroupIT
     ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
     remote = Server.withPort(0)
         .serve("/*").withBehaviours(error(NOT_FOUND))
-        .serve("/" + AGRICOLAE_PATH_FULL_121_TARGZ)
-        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_121_TARGZ)))
+        .serve("/" + AGRICOLAE_121_TARGZ.fullPath)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_121_TARGZ.filename)))
         .start();
 
     repoProxy = repos.createRProxy(testName.getMethodName() + "-proxy", remote.getUrl().toExternalForm());
@@ -77,8 +77,8 @@ public class RGroupIT
     hostedClient = createRClient(repoHosted);
     groupClient = createRClient(repoGroup);
 
-    assertThat(status(hostedClient.putAndClose(AGRICOLAE_PATH_FULL_131_TARGZ,
-        fileToHttpEntity(AGRICOLAE_PKG_FILE_NAME_131_TARGZ))), is(OK));
+    assertThat(status(hostedClient.putAndClose(AGRICOLAE_131_TARGZ.fullPath,
+        fileToHttpEntity(AGRICOLAE_131_TARGZ.filename))), is(OK));
   }
 
   @After
@@ -88,27 +88,27 @@ public class RGroupIT
 
   @Test
   public void whenRequestUnknownR_ShouldReturnError() throws Exception {
-    assertThat(status(groupClient.fetch(DOES_NOT_EXIST_PKG_TGZ)), is(NOT_FOUND));
+    assertThat(status(groupClient.fetch(DOES_NOT_EXIST_TGZ.fullPath)), is(NOT_FOUND));
   }
 
   @Test
   public void whenRequestValidRPackageFromProxy_ShouldReturnSuccess() throws Exception {
-    final HttpResponse response = groupClient.fetch(AGRICOLAE_PATH_FULL_121_TARGZ);
-    assertSuccessResponseMatches(response, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
+    final HttpResponse response = groupClient.fetch(AGRICOLAE_121_TARGZ.fullPath);
+    assertSuccessResponseMatches(response, AGRICOLAE_121_TARGZ.filename);
   }
 
   @Test
   public void whenRequestValidRPackageFromHosted_ShouldReturnSuccess() throws Exception {
-    final HttpResponse response = groupClient.fetch(AGRICOLAE_PATH_FULL_131_TARGZ);
-    assertSuccessResponseMatches(response, AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
+    final HttpResponse response = groupClient.fetch(AGRICOLAE_131_TARGZ.fullPath);
+    assertSuccessResponseMatches(response, AGRICOLAE_131_TARGZ.filename);
   }
 
   @Test
   public void whenRequestMetadataFromGroup_ShouldReturnSuccess() throws Exception {
     final String agricolae131Content =
-        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME).toPath()));
+        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_FILENAME).toPath()));
 
-    final InputStream content = groupClient.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
+    final InputStream content = groupClient.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
   }
 }

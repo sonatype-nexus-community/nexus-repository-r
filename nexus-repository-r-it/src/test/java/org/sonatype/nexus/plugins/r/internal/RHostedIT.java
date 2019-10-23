@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
-import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -62,36 +61,36 @@ public class RHostedIT
     BaseUrlHolder.set(this.nexusUrl.toString());
     repository = repos.createRHosted("r-hosted-test");
     client = createRClient(repository);
-    uploadPackages(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    uploadPackages(AGRICOLAE_121_TARGZ, AGRICOLAE_131_TGZ);
   }
 
   @Test
   public void testPackageUpload() throws Exception
   {
     //Verify DB contains data about uploaded component and asset
-    Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
-    assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
-    assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_121)));
-    assertThat(component.group(), is(equalTo(PKG_GZ_PATH)));
+    Component component = findComponent(repository, AGRICOLAE_121_TARGZ.packageName);
+    assertThat(component.name(), is(equalTo(AGRICOLAE_121_TARGZ.packageName)));
+    assertThat(component.version(), is(equalTo(AGRICOLAE_121_TARGZ.packageVersion)));
+    assertThat(component.group(), is(equalTo(AGRICOLAE_121_TARGZ.path)));
 
     //Verify Asset is created.
-    Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
-    assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_121_TARGZ)));
+    Asset asset = findAsset(repository, AGRICOLAE_121_TARGZ.fullPath);
+    assertThat(asset.name(), is(equalTo(AGRICOLAE_121_TARGZ.fullPath)));
     assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
   }
 
   @Test
   public void testUploadFailedWrongPackageExtension() throws Exception
   {
-    assertThat(uploadSinglePackage(AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX).getStatusLine().getStatusCode(),
+    assertThat(uploadSinglePackage(AGRICOLAE_131_XXX).getStatusLine().getStatusCode(),
         is(BAD_REQUEST));
-    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX));
+    assertNull(findAsset(repository, AGRICOLAE_131_XXX.fullPath));
   }
 
   @Test
   public void testFetchNotSupportedMetadata() throws Exception
   {
-    HttpResponse resp = client.fetch(PACKAGES_RDS_PATH_FULL);
+    HttpResponse resp = client.fetch(PACKAGES_RDS.fullPath);
     assertThat(resp.getStatusLine().getStatusCode(), is(NOT_FOUND));
     assertThat(resp.getStatusLine().getReasonPhrase(), is("This metadata type is not supported for now."));
   }
@@ -99,41 +98,51 @@ public class RHostedIT
   @Test
   public void testFetchPackage() throws Exception
   {
-    HttpResponse resp = client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
-    assertThat(resp.getEntity().getContentType().getValue(), equalTo(CONTENT_TYPE_X_TGZ));
-    assertSuccessResponseMatches(resp, AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    HttpResponse resp = client.fetch(AGRICOLAE_131_TGZ.fullPath);
+    assertThat(resp.getEntity().getContentType().getValue(), equalTo(AGRICOLAE_131_TGZ.contentType));
+    assertSuccessResponseMatches(resp, AGRICOLAE_131_TGZ.filename);
   }
 
   @Test
   public void testFetchNotExistingPackage() throws Exception
   {
-    assertThat(client.fetch(AGRICOLAE_PATH_FULL_131_TARGZ).getStatusLine().getStatusCode(), is(NOT_FOUND));
+    assertThat(client.fetch(AGRICOLAE_131_TARGZ.fullPath).getStatusLine().getStatusCode(), is(NOT_FOUND));
   }
 
   @Test
   public void testMetadataProcessing() throws Exception
   {
+    // Uploading package with same name and lower version that should be skipped in src metadata
+    uploadSinglePackage(AGRICOLAE_101_TARGZ);
+
     final String agricolae121Content =
-        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_121_NAME).toPath()));
+        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_121_FILENAME).toPath()));
     final String agricolae131Content =
-        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME).toPath()));
+        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_FILENAME).toPath()));
 
-    //Verify PACKAGES(metadata) contain appropriate content about R package.
-    final InputStream content = client.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
-    verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
+    // Verify PACKAGES(metadata) contain appropriate content about source R package (version 1.0-1 is skipped)
+    final InputStream contentSrc = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
+    verifyTextGzipContent(is(equalTo(agricolae121Content)), contentSrc);
 
-    //Verify PACKAGES(metadata) is clean if component has been deleted
+    // Verify PACKAGES(metadata) contain appropriate content about bin R package
+    final InputStream contentBin = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
+    verifyTextGzipContent(is(equalTo(agricolae131Content)), contentBin);
+
+    // Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
-    maintenanceFacet.deleteComponent(components.get(1).getEntityMetadata().getId());
+    components.forEach(component -> maintenanceFacet.deleteComponent(component.getEntityMetadata().getId()));
 
-    final InputStream contentAfterDelete = client.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
-    verifyTextGzipContent(is(equalTo(agricolae121Content)), contentAfterDelete);
+    final InputStream contentSrcAfterDelete = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
+    verifyTextGzipContent(is(equalTo("")), contentSrcAfterDelete);
+
+    final InputStream contentBinAfterDelete = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
+    verifyTextGzipContent(is(equalTo("")), contentBinAfterDelete);
   }
 
   @Test
   public void testDeletingRemainingAssetAlsoDeletesComponent() {
-    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
+    final Asset asset = findAsset(repository, AGRICOLAE_121_TARGZ.fullPath);
     assertNotNull(asset);
     assertNotNull(asset.componentId());
 
@@ -144,36 +153,13 @@ public class RHostedIT
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteAsset(asset.getEntityMetadata().getId(), true);
 
-    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ));
+    assertNull(findAsset(repository, AGRICOLAE_121_TARGZ.fullPath));
     assertNull(findComponentById(repository, asset.componentId()));
   }
 
   @Test
-  public void testDeletingAssetWhenMultipleExistDoesNotDeleteComponent() throws IOException {
-    uploadSinglePackage(AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
-
-    final Asset assetTgz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
-    assertNotNull(assetTgz);
-    assertNotNull(assetTgz.componentId());
-
-    final Asset assetTargz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TARGZ);
-    assertNotNull(assetTargz);
-    assertNotNull(assetTargz.componentId());
-
-    final Component component = findComponentById(repository, assetTargz.componentId());
-    assertNotNull(component);
-    assertEquals(2, findAssetsByComponent(repository, component).size());
-
-    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
-    maintenanceFacet.deleteAsset(assetTargz.getEntityMetadata().getId(), true);
-
-    assertNull(findAsset(repository, AGRICOLAE_PKG_FILE_NAME_131_TARGZ));
-    assertNotNull(findComponentById(repository, assetTargz.componentId()));
-  }
-
-  @Test
   public void testDeletingComponentDeletesAllAssociatedAssets() {
-    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ);
+    final Asset asset = findAsset(repository, AGRICOLAE_121_TARGZ.fullPath);
     assertNotNull(asset);
     assertNotNull(asset.componentId());
 
@@ -183,19 +169,19 @@ public class RHostedIT
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteComponent(component.getEntityMetadata().getId(), true);
 
-    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_121_TARGZ));
+    assertNull(findAsset(repository, AGRICOLAE_121_TARGZ.fullPath));
     assertNull(findComponentById(repository, asset.componentId()));
   }
 
-  private void uploadPackages(String... names) throws IOException {
+  private void uploadPackages(TestPackage... packages) throws IOException {
     assertThat(getAllComponents(repository), hasSize(0));
-    for (String name : names) {
-      uploadSinglePackage(name);
+    for (TestPackage testPackage : packages) {
+      uploadSinglePackage(testPackage);
     }
-    assertThat(getAllComponents(repository), hasSize(names.length));
+    assertThat(getAllComponents(repository), hasSize(packages.length));
   }
 
-  private HttpResponse uploadSinglePackage(String name) throws IOException {
-    return client.putAndClose(format("%s/%s", PKG_GZ_PATH, name), fileToHttpEntity(name));
+  private HttpResponse uploadSinglePackage(TestPackage testPackage) throws IOException {
+    return client.putAndClose(testPackage.fullPath, fileToHttpEntity(testPackage.filename));
   }
 }

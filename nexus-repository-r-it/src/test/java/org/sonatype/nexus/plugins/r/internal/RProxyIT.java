@@ -64,18 +64,18 @@ public class RProxyIT
     server = Server.withPort(0)
         .serve("/*")
         .withBehaviours(error(NOT_FOUND))
-        .serve("/" + AGRICOLAE_PATH_FULL_131_TGZ)
-        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TGZ)))
-        .serve("/" + AGRICOLAE_PATH_FULL_131_TARGZ)
-        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TARGZ)))
-        .serve("/" + AGRICOLAE_PATH_FULL_WRONG_EXTENSION_XXX)
-        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_WRONG_EXTENSION_XXX)))
-        .serve("/" + PACKAGES_GZ_PATH_FULL)
-        .withBehaviours(file(testData.resolveFile(PACKAGES_GZ_FILE_NAME)))
-        .serve("/" + PACKAGES_RDS_PATH_FULL)
-        .withBehaviours(file(testData.resolveFile(PACKAGES_RDS_FILE_NAME)))
-        .serve("/" + ARCHIVE_RDS_PATH_FULL)
-        .withBehaviours(file(testData.resolveFile(ARCHIVE_RDS_FILE_NAME)))
+        .serve("/" + AGRICOLAE_131_TGZ.fullPath)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_131_TGZ.filename)))
+        .serve("/" + AGRICOLAE_131_TARGZ.fullPath)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_131_TARGZ.filename)))
+        .serve("/" + AGRICOLAE_131_XXX.fullPath)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_131_XXX.filename)))
+        .serve("/" + PACKAGES_SRC_GZ.fullPath)
+        .withBehaviours(file(testData.resolveFile(PACKAGES_SRC_GZ.filename)))
+        .serve("/" + PACKAGES_RDS.fullPath)
+        .withBehaviours(file(testData.resolveFile(PACKAGES_RDS.filename)))
+        .serve("/" + ARCHIVE_RDS.fullPath)
+        .withBehaviours(file(testData.resolveFile(ARCHIVE_RDS.filename)))
         .start();
     repository = repos.createRProxy("r-proxy-test", server.getUrl().toExternalForm());
     client = rClient(repository);
@@ -88,33 +88,33 @@ public class RProxyIT
 
   @Test
   public void fetchTgzPackageFile() throws Exception {
-    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
-    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
-    Assert.assertThat(asset.name(), is(equalTo(AGRICOLAE_PATH_FULL_131_TGZ)));
+    assertSuccessResponseMatches(client.fetch(AGRICOLAE_131_TGZ.fullPath), AGRICOLAE_131_TGZ.filename);
+    final Asset asset = findAsset(repository, AGRICOLAE_131_TGZ.fullPath);
+    Assert.assertThat(asset.name(), is(equalTo(AGRICOLAE_131_TGZ.fullPath)));
     Assert.assertThat(asset.contentType(), is(equalTo(CONTENT_TYPE_X_TGZ)));
     Assert.assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
   }
 
   @Test
   public void fetchMetaData() throws Exception {
-    assertSuccessResponseMatches(client.fetch(PACKAGES_GZ_PATH_FULL), PACKAGES_GZ_FILE_NAME);
-    final Asset assetPackagesGz = findAsset(repository, PACKAGES_GZ_PATH_FULL);
-    Assert.assertEquals(PACKAGES_GZ_PATH_FULL, assetPackagesGz.name());
-    Assert.assertThat(assetPackagesGz.contentType(), is(equalTo(CONTENT_TYPE_X_GZIP)));
+    assertSuccessResponseMatches(client.fetch(PACKAGES_SRC_GZ.fullPath), PACKAGES_SRC_GZ.filename);
+    final Asset assetPackagesGz = findAsset(repository, PACKAGES_SRC_GZ.fullPath);
+    Assert.assertEquals(PACKAGES_SRC_GZ.fullPath, assetPackagesGz.name());
+    Assert.assertThat(assetPackagesGz.contentType(), is(equalTo(PACKAGES_SRC_GZ.contentType)));
     Assert.assertThat(assetPackagesGz.format(), is(equalTo(R_FORMAT_NAME)));
     Assert.assertThat(assetPackagesGz.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(PACKAGES_KIND)));
 
-    assertSuccessResponseMatches(client.fetch(PACKAGES_RDS_PATH_FULL), PACKAGES_RDS_FILE_NAME);
-    final Asset assetPackagesRds = findAsset(repository, PACKAGES_RDS_PATH_FULL);
-    Assert.assertEquals(PACKAGES_RDS_PATH_FULL, assetPackagesRds.name());
-    Assert.assertThat(assetPackagesRds.contentType(), is(equalTo(CONTENT_TYPE_X_XZ))); //PACKAGE.rds is compressed in XZ
+    assertSuccessResponseMatches(client.fetch(PACKAGES_RDS.fullPath), PACKAGES_RDS.filename);
+    final Asset assetPackagesRds = findAsset(repository, PACKAGES_RDS.fullPath);
+    Assert.assertEquals(PACKAGES_RDS.fullPath, assetPackagesRds.name());
+    Assert.assertThat(assetPackagesRds.contentType(), is(equalTo(PACKAGES_RDS.contentType)));
     Assert.assertThat(assetPackagesRds.format(), is(equalTo(R_FORMAT_NAME)));
     Assert.assertThat(assetPackagesRds.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND), is(equalTo(PACKAGES_KIND)));
 
-    assertSuccessResponseMatches(client.fetch(ARCHIVE_RDS_PATH_FULL), ARCHIVE_RDS_FILE_NAME);
-    final Asset assetArchiveRds = findAsset(repository, ARCHIVE_RDS_PATH_FULL);
-    Assert.assertEquals(ARCHIVE_RDS_PATH_FULL, assetArchiveRds.name());
-    Assert.assertThat(assetArchiveRds.contentType(), is(equalTo(CONTENT_TYPE_GZIP)));
+    assertSuccessResponseMatches(client.fetch(ARCHIVE_RDS.fullPath), ARCHIVE_RDS.filename);
+    final Asset assetArchiveRds = findAsset(repository, ARCHIVE_RDS.fullPath);
+    Assert.assertEquals(ARCHIVE_RDS.fullPath, assetArchiveRds.name());
+    Assert.assertThat(assetArchiveRds.contentType(), is(equalTo(ARCHIVE_RDS.contentType)));
     Assert.assertThat(assetArchiveRds.format(), is(equalTo(R_FORMAT_NAME)));
     Assert.assertThat(assetArchiveRds.attributes().child(R_FORMAT_NAME).get(P_ASSET_KIND),
         is(equalTo(RDS_METADATA_KIND)));
@@ -122,43 +122,43 @@ public class RProxyIT
 
   @Test
   public void checkComponentCreated() throws Exception {
-    final Component nullComponent = findComponent(repository, AGRICOLAE_PKG_NAME);
+    final Component nullComponent = findComponent(repository, AGRICOLAE_131_TGZ.packageName);
     Assert.assertThat(nullComponent, is(nullValue()));
-    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+    client.fetch(AGRICOLAE_131_TGZ.fullPath);
 
-    final Component component = findComponent(repository, AGRICOLAE_PKG_NAME);
-    Assert.assertThat(component.name(), is(equalTo(AGRICOLAE_PKG_NAME)));
+    final Component component = findComponent(repository, AGRICOLAE_131_TGZ.packageName);
+    Assert.assertThat(component.name(), is(equalTo(AGRICOLAE_131_TGZ.packageName)));
     Assert.assertThat(component.format(), is(equalTo(R_FORMAT_NAME)));
-    Assert.assertThat(component.group(), is(PKG_GZ_PATH));
-    Assert.assertThat(component.version(), is(equalTo(AGRICOLAE_PKG_VERSION_131)));
+    Assert.assertThat(component.group(), is(AGRICOLAE_131_TGZ.path));
+    Assert.assertThat(component.version(), is(equalTo(AGRICOLAE_131_TGZ.packageVersion)));
   }
 
   @Test
   public void shouldCachePackageGz() throws Exception {
-    client.fetch(PACKAGES_GZ_PATH_FULL);
+    client.fetch(PACKAGES_SRC_GZ.fullPath);
     server.stop();
-    assertSuccessResponseMatches(client.fetch(PACKAGES_GZ_PATH_FULL), PACKAGES_GZ_FILE_NAME);
+    assertSuccessResponseMatches(client.fetch(PACKAGES_SRC_GZ.fullPath), PACKAGES_SRC_GZ.filename);
   }
 
   @Test
   public void shouldCachePackageRds() throws Exception {
-    client.fetch(PACKAGES_RDS_PATH_FULL);
+    client.fetch(PACKAGES_RDS.fullPath);
     server.stop();
-    assertSuccessResponseMatches(client.fetch(PACKAGES_RDS_PATH_FULL), PACKAGES_RDS_FILE_NAME);
+    assertSuccessResponseMatches(client.fetch(PACKAGES_RDS.fullPath), PACKAGES_RDS.filename);
   }
 
   @Test
   public void shouldCacheTgzPackageFile() throws Exception {
-    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+    client.fetch(AGRICOLAE_131_TGZ.fullPath);
     server.stop();
-    assertSuccessResponseMatches(client.fetch(AGRICOLAE_PATH_FULL_131_TGZ), AGRICOLAE_PKG_FILE_NAME_131_TGZ);
+    assertSuccessResponseMatches(client.fetch(AGRICOLAE_131_TGZ.fullPath), AGRICOLAE_131_TGZ.filename);
   }
 
   @Test
   public void testDeletingRemainingAssetAlsoDeletesComponent() throws IOException {
-    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+    client.fetch(AGRICOLAE_131_TGZ.fullPath);
 
-    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    final Asset asset = findAsset(repository, AGRICOLAE_131_TGZ.fullPath);
     assertNotNull(asset);
     assertNotNull(asset.componentId());
 
@@ -169,39 +169,15 @@ public class RProxyIT
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteAsset(asset.getEntityMetadata().getId(), true);
 
-    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ));
+    assertNull(findAsset(repository, AGRICOLAE_131_TGZ.fullPath));
     assertNull(findComponentById(repository, asset.componentId()));
   }
 
   @Test
-  public void testDeletingAssetWhenMultipleExistDoesNotDeleteComponent() throws IOException {
-    client.fetch(AGRICOLAE_PATH_FULL_131_TARGZ);
-    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
-
-    final Asset assetTgz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
-    assertNotNull(assetTgz);
-    assertNotNull(assetTgz.componentId());
-
-    final Asset assetTargz = findAsset(repository, AGRICOLAE_PATH_FULL_131_TARGZ);
-    assertNotNull(assetTargz);
-    assertNotNull(assetTargz.componentId());
-
-    final Component component = findComponentById(repository, assetTargz.componentId());
-    assertNotNull(component);
-    assertEquals(2, findAssetsByComponent(repository, component).size());
-
-    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
-    maintenanceFacet.deleteAsset(assetTargz.getEntityMetadata().getId(), true);
-
-    assertNull(findAsset(repository, AGRICOLAE_PKG_FILE_NAME_131_TARGZ));
-    assertNotNull(findComponentById(repository, assetTargz.componentId()));
-  }
-
-  @Test
   public void testDeletingComponentDeletesAllAssociatedAssets() throws IOException {
-    client.fetch(AGRICOLAE_PATH_FULL_131_TGZ);
+    client.fetch(AGRICOLAE_131_TGZ.fullPath);
 
-    final Asset asset = findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ);
+    final Asset asset = findAsset(repository, AGRICOLAE_131_TGZ.fullPath);
     assertNotNull(asset);
     assertNotNull(asset.componentId());
 
@@ -211,7 +187,7 @@ public class RProxyIT
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteComponent(component.getEntityMetadata().getId(), true);
 
-    assertNull(findAsset(repository, AGRICOLAE_PATH_FULL_131_TGZ));
+    assertNull(findAsset(repository, AGRICOLAE_131_TGZ.fullPath));
     assertNull(findComponentById(repository, asset.componentId()));
   }
 }
