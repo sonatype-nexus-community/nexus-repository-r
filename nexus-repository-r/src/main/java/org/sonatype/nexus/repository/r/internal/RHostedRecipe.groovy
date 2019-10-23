@@ -84,10 +84,10 @@ class RHostedRecipe
 
     // PACKAGES.gz is the only supported metadata in hosted for now
     builder.route(packagesGzMatcher()
-        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
         .handler(securityHandler)
+        .handler(highAvailabilitySupportHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(partialFetchHandler)
@@ -97,10 +97,10 @@ class RHostedRecipe
         .create())
 
     builder.route(archiveMatcher()
-        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
+        .handler(highAvailabilitySupportHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(conditionalRequestHandler)
@@ -111,10 +111,10 @@ class RHostedRecipe
         .create())
 
     builder.route(uploadMatcher()
-        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
+        .handler(highAvailabilitySupportHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(conditionalRequestHandler)
