@@ -121,7 +121,7 @@ public class RITSupport
   );
 
   public static final TestPackage AGRICOLAE_131_XXX = new TestPackage(
-      "agricolae_1.3-1.xxx",
+      "agricolae_1.3-1.xxx", // Wrong extension for R package
       PKG_SRC_PATH,
       "agricolae",
       "1.3-1",
