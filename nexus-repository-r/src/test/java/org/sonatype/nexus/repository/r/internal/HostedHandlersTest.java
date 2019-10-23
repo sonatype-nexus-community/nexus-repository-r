@@ -35,17 +35,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
 
 public class HostedHandlersTest
     extends TestSupport
 {
-  public static final String PATH_VALUE = "Path-value";
+  public static final String PATH_VALUE = "part1/part2";
 
-  public static final String FILENAME_VALUE = "Filename-value";
+  public static final String FILENAME_VALUE = "Filename.tgz";
+
+  public static final String WRONG_PATH_VALUE = "part1only";
+
+  public static final String WRONG_FILENAME_VALUE = "Filename.xxx";
 
   public static final String FULL_PATH_VALUE = PATH_VALUE + "/" + FILENAME_VALUE;
+
+  public static final String WRONG_PATH_FULL_PATH_VALUE = WRONG_PATH_VALUE + "/" + FILENAME_VALUE;
+
+  public static final String WRONG_EXTENSION_FULL_PATH_VALUE = PATH_VALUE + "/" + WRONG_FILENAME_VALUE;
 
   @Mock
   Context context;
@@ -101,6 +111,26 @@ public class HostedHandlersTest
   public void repositoryUploadWhenPut() throws Exception {
     underTest.putArchive.handle(context);
     verify(rHostedFacet).upload(FULL_PATH_VALUE, payload);
+  }
+
+  @Test
+  public void repositoryUploadFailedWrongExtension() throws Exception {
+    when(request.getPath()).thenReturn(WRONG_EXTENSION_FULL_PATH_VALUE);
+    Response response = underTest.putArchive.handle(context);
+    verify(rHostedFacet, times(0)).upload(WRONG_EXTENSION_FULL_PATH_VALUE, payload);
+    assertThat(response.getStatus().getCode(), is(equalTo(BAD_REQUEST)));
+    assertThat(response.getStatus().getMessage(),
+        is(equalTo("Extension not .zip, .tar.gz or .tgz.")));
+  }
+
+  @Test
+  public void repositoryUploadFailedWrongPath() throws Exception {
+    when(request.getPath()).thenReturn(WRONG_PATH_FULL_PATH_VALUE);
+    Response response = underTest.putArchive.handle(context);
+    verify(rHostedFacet, times(0)).upload(WRONG_PATH_FULL_PATH_VALUE, payload);
+    assertThat(response.getStatus().getCode(), is(equalTo(BAD_REQUEST)));
+    assertThat(response.getStatus().getMessage(),
+        is(equalTo("Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>.")));
   }
 
   private void assertStatus(final Handler handler, final int status) throws Exception {

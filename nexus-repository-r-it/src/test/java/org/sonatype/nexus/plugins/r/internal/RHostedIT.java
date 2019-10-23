@@ -85,9 +85,21 @@ public class RHostedIT
   @Test
   public void testUploadFailedWrongPackageExtension() throws Exception
   {
-    assertThat(uploadSinglePackage(AGRICOLAE_131_XXX).getStatusLine().getStatusCode(),
-        is(BAD_REQUEST));
+    HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_XXX);
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
+    assertThat(httpResponse.getStatusLine().getReasonPhrase(),
+        is("Extension not .zip, .tar.gz or .tgz."));
     assertNull(findAsset(repository, AGRICOLAE_131_XXX.fullPath));
+  }
+
+  @Test
+  public void testUploadFailedWrongPackagePath() throws Exception
+  {
+    HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_TARGZ_WRONG_PATH);
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
+    assertThat(httpResponse.getStatusLine().getReasonPhrase(),
+        is("Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>."));
+    assertNull(findAsset(repository, AGRICOLAE_131_TARGZ_WRONG_PATH.fullPath));
   }
 
   @Test

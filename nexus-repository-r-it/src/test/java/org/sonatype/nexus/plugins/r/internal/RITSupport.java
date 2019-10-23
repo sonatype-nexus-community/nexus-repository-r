@@ -139,6 +139,15 @@ public class RITSupport
       CONTENT_TYPE_X_GZIP
   );
 
+  public static final TestPackage AGRICOLAE_131_TARGZ_WRONG_PATH = new TestPackage(
+      "agricolae_1.3-1.tar.gz",
+      "wrongpath",
+      "agricolae",
+      "1.3-1",
+      TARGZ_EXT,
+      CONTENT_TYPE_X_GZIP
+  );
+
   public static final TestPackage PACKAGES_SRC_GZ = new TestPackage(
       "PACKAGES.gz",
       PKG_SRC_PATH,

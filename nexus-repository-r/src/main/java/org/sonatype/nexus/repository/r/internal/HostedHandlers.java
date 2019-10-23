@@ -22,6 +22,8 @@ import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Handler;
 
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractRequestPath;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidArchiveExtension;
+import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidRepoPath;
 
 /**
  * R hosted handlers.
@@ -48,15 +50,16 @@ public final class HostedHandlers
    */
   final Handler putArchive = context -> {
     String path = extractRequestPath(context);
+    if (!isValidRepoPath(path)) {
+      return HttpResponses
+          .badRequest("Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>.");
+    }
+    if (!isValidArchiveExtension(path)) {
+      return HttpResponses.badRequest("Extension not .zip, .tar.gz or .tgz.");
+    }
     context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();
   };
-
-  /**
-   * Handle upload non-R file request.
-   */
-  final Handler nonRArchiveUpload =
-      context -> HttpResponses.badRequest("Extension not zip, tar.gz or tgz, or wrong upload path.");
 
   /**
    * Handle request of currently not supported metadata

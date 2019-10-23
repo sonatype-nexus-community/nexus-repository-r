@@ -151,13 +151,14 @@ public class RUploadHandlerTest
   @Test
   public void testHandleValidationExceptionWrongPath() throws IOException {
     ComponentUpload component = createComponentUpload(WRONG_PACKAGE_PATH, PACKAGE_NAME);
-    checkValidationFailed(component, "Extension not zip, tar.gz or tgz, or wrong upload path.");
+    checkValidationFailed(component,
+        "Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>.");
   }
 
   @Test
-  public void testHandleValidationExceptionWrongName() throws IOException {
+  public void testHandleValidationExceptionWrongExtension() throws IOException {
     ComponentUpload component = createComponentUpload(PACKAGE_PATH, WRONG_PACKAGE_NAME);
-    checkValidationFailed(component, "Extension not zip, tar.gz or tgz, or wrong upload path.");
+    checkValidationFailed(component, "Extension not .zip, .tar.gz or .tgz.");
   }
 
   private void checkValidationFailed(final ComponentUpload component, final String expectedErrorMessage)

@@ -134,11 +134,6 @@ class RHostedRecipe
         .handler(hostedHandlers.notSupportedMetadataRequest)
         .create())
 
-    builder.route(nonRArchiveUploadMatcher()
-        .handler(securityHandler)
-        .handler(hostedHandlers.nonRArchiveUpload)
-        .create())
-
     addBrowseUnsupportedRoute(builder)
 
     builder.defaultHandlers(HttpHandlers.notFound())
