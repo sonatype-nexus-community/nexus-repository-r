@@ -16,9 +16,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.plugins.r.internal.RClient;
+import org.sonatype.nexus.plugins.r.internal.RITSupport.TestPackage;
 import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Component;
@@ -35,18 +37,16 @@ import org.ops4j.pax.exam.Option;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_PKG_FILE_NAME_101_TARGZ;
-import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_PKG_FILE_NAME_121_TARGZ;
-import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_PKG_FILE_NAME_131_TARGZ;
-import static org.sonatype.nexus.plugins.r.internal.RITSupport.PKG_GZ_PATH;
-import static org.sonatype.nexus.plugins.r.internal.RITSupport.TARGZ_EXT;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_101_TARGZ;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_121_TARGZ;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_131_TARGZ;
 import static org.sonatype.nexus.repository.http.HttpStatus.OK;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 
 public class CleanupTaskRIT
     extends CleanupITSupport
 {
-  public static final String[] NAMES = {AGRICOLAE_PKG_FILE_NAME_101_TARGZ};
+  public static final TestPackage[] NAMES = {AGRICOLAE_101_TARGZ};
 
   public Repository repository;
 
@@ -71,54 +71,58 @@ public class CleanupTaskRIT
   @Test
   public void cleanupByLastBlobUpdated() throws Exception {
     assertLastBlobUpdatedComponentsCleanedUp(repository, (long) NAMES.length,
-        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_131_TARGZ), 1L);
+        () -> deployArtifacts(AGRICOLAE_131_TARGZ), 1L);
   }
 
   @Test
   public void cleanupByLastDownloaded() throws Exception {
     assertLastDownloadedComponentsCleanedUp(repository, (long) NAMES.length,
-        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_131_TARGZ), 1L);
+        () -> deployArtifacts(AGRICOLAE_131_TARGZ), 1L);
   }
 
   @Test
   public void cleanupByRegex() throws Exception {
-    assertCleanupByRegex(repository, NAMES.length, "bin.*1.[0,3]-1.tar.gz",
-        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_121_TARGZ, AGRICOLAE_PKG_FILE_NAME_131_TARGZ), 1L);
+    assertCleanupByRegex(repository, NAMES.length, "src.*1.[0,3]-1.tar.gz",
+        () -> deployArtifacts(AGRICOLAE_121_TARGZ, AGRICOLAE_131_TARGZ), 1L);
   }
 
   @Test
   public void cleanupByLastBlobUpdatedAndLastDownloadedPolicies() throws Exception {
-    String[] versionsOfComponentsToKeep = {AGRICOLAE_PKG_FILE_NAME_121_TARGZ};
+    TestPackage[] versionsOfComponentsToKeep = {AGRICOLAE_121_TARGZ};
 
     assertLastBlobUpdatedAndLastDownloadedComponentsCleanUp(
         repository,
         (long) NAMES.length,
-        () -> deployArtifacts(AGRICOLAE_PKG_FILE_NAME_131_TARGZ),
+        () -> deployArtifacts(AGRICOLAE_131_TARGZ),
         () -> deployArtifacts(versionsOfComponentsToKeep),
-        versionsOfComponentsToKeep);
+        Arrays.stream(versionsOfComponentsToKeep).map(testPackage -> testPackage.filename).toArray(String[]::new));
   }
 
   @Override
   protected boolean componentMatchesByVersion(final Component component, final String version) {
     return version
-        .equals(format("%s_%s%s", component.name().toLowerCase(), component.version().toLowerCase(), TARGZ_EXT));
+        .equals(format("%s_%s%s",
+            component.name().toLowerCase(),
+            component.version().toLowerCase(),
+            ".tar.gz") // Only tar.gz packages deployed
+        );
   }
 
-  private int deployArtifacts(final String... names) {
+  private int deployArtifacts(final TestPackage... packages) {
     try {
       RClient client = new RClient(clientBuilder().build(),
           clientContext(),
           resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()
       );
 
-      for (String name : names) {
+      for (TestPackage testPackage : packages) {
         assertThat(
             status(client
-                .putAndClose(format("%s/%s", PKG_GZ_PATH, name), new ByteArrayEntity(getBytesFromTestData(name)))),
+                .putAndClose(testPackage.fullPath, new ByteArrayEntity(getBytesFromTestData(testPackage.filename)))),
             is(OK));
       }
 
-      return names.length;
+      return packages.length;
     }
     catch (Exception e) {
       log.error("", e);
