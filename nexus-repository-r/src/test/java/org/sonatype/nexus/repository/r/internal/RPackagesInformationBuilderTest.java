@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import org.sonatype.goodies.testsupport.TestSupport;
@@ -32,6 +35,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPI
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
+import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extractDescriptionFromArchive;
 
 /**
  * {@link RPackagesInformationBuilder} unit tests.
@@ -41,7 +45,7 @@ public class RPackagesInformationBuilderTest
 {
 
   @Test
-  public void buildPackages() {
+  public void shouldAppendPackages() {
     RPackagesInformationBuilder underTest = new RPackagesInformationBuilder();
     underTest.append(createAsset("/foo/bar/b-4", "b", "4.0.0"));
     underTest.append(createAsset("/foo/bar/a-1", "a", "1.0.0"));
@@ -68,6 +72,26 @@ public class RPackagesInformationBuilderTest
     assertThat(packageB.get(P_SUGGESTS), is("Suggests:/foo/bar/b-4"));
     assertThat(packageB.get(P_LICENSE), is("License:/foo/bar/b-4"));
     assertThat(packageB.get(P_NEEDS_COMPILATION), is("NeedsCompilation:/foo/bar/b-4"));
+  }
+
+  @Test
+  public void shouldBuildPackages() throws IOException {
+    RPackagesInformationBuilder underTest = new RPackagesInformationBuilder();
+    underTest.append(createAsset("/foo/bar/a-3", "a", "3.0.0"));
+
+    Map<String, Map<String, String>> packageInformation = underTest.getPackageInformation();
+    assertThat(packageInformation.keySet(), contains("a"));
+
+    try (InputStream in = new ByteArrayInputStream(underTest.buildPackagesGz())) {
+      Map<String, String> attributes = extractDescriptionFromArchive("PACKAGES.gz", in);
+      assertThat(attributes.get(P_PACKAGE), is("a"));
+      assertThat(attributes.get(P_VERSION), is("3.0.0"));
+      assertThat(attributes.get(P_DEPENDS), is("Depends:/foo/bar/a-3"));
+      assertThat(attributes.get(P_IMPORTS), is("Imports:/foo/bar/a-3"));
+      assertThat(attributes.get(P_SUGGESTS), is("Suggests:/foo/bar/a-3"));
+      assertThat(attributes.get(P_LICENSE), is("License:/foo/bar/a-3"));
+      assertThat(attributes.get(P_NEEDS_COMPILATION), is("NeedsCompilation:/foo/bar/a-3"));
+    }
   }
 
   private Asset createAsset(final String assetName,

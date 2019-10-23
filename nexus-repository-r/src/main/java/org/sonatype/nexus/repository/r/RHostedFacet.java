@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Payload;
 
@@ -36,14 +35,6 @@ public interface RHostedFacet
   Content getStoredContent(String contentPath);
 
   /**
-   * Store a PACKAGES.gz file at a particular path.
-   *
-   * @param packagesGzPath the upload path
-   * @param content        the temp blob containing the PACKAGES.gz content
-   */
-  void putPackagesGz(String packagesGzPath, TempBlob content) throws IOException;
-
-  /**
    * Perform upload.
    *
    * @param path    the upload path
@@ -52,10 +43,9 @@ public interface RHostedFacet
   Asset upload(String path, Payload payload) throws IOException;
 
   /**
-   * Build metadata for path.
+   * Builds and stores PACKAGES.gz metadata for path.
    *
    * @param basePath the path to build the metadata for
-   * @return the metadata as a {@code TempBlob}
    */
-  TempBlob buildPackagesGz(String basePath) throws IOException;
+  void buildAndPutPackagesGz(String basePath) throws IOException;
 }

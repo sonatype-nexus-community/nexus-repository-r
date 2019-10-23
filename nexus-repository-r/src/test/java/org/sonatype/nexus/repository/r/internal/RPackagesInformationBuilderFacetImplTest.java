@@ -278,11 +278,8 @@ public class RPackagesInformationBuilderFacetImplTest
     when(invalidationEvent.getBasePath()).thenReturn(BASE_PATH);
     when(invalidationEvent.getRepositoryName()).thenReturn(REPOSITORY_NAME);
 
-    when(hostedFacet.buildPackagesGz(BASE_PATH)).thenReturn(tempBlob);
-
     underTest.on(invalidationEvent);
 
-    verify(hostedFacet).buildPackagesGz(BASE_PATH);
-    verify(hostedFacet).putPackagesGz(PACKAGES_GZ_PATH, tempBlob);
+    verify(hostedFacet).buildAndPutPackagesGz(BASE_PATH);
   }
 }

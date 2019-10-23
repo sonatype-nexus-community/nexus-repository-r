@@ -12,13 +12,26 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+
+import javax.mail.internet.InternetHeaders;
 
 import org.sonatype.nexus.repository.storage.Asset;
 
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorOutputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+
+import static com.google.common.base.Charsets.UTF_8;
 import static java.util.Collections.unmodifiableMap;
+import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
@@ -28,11 +41,13 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 
 /**
- * Builds the contents of a PACKAGES file based on the provided assets, taking into account the greatest version of a
+ * Builds the contents of a PACKAGES.gz file based on the provided assets, taking into account the greatest version of a
  * particular package that is available in a (hosted) repository.
  *
  * Note that this maintains all pertinent information for the "latest" version of each package in memory, though the
  * actual amount of information for each package is rather small.
+ *
+ * TODO: Add support for other metadata types (PACKAGES, PACKAGES.rds etc.)
  */
 public class RPackagesInformationBuilder
 {
@@ -71,6 +86,45 @@ public class RPackagesInformationBuilder
 
       packageVersions.put(packageName, newVersion);
       packageInformation.put(packageName, newInformation);
+    }
+  }
+
+  /**
+   * Using collected package details builds PACKAGES.gz file and returns it as byte array.
+   * <p>
+   * Call this method ONLY after all information about packages is appended to packageInformation map.
+   *
+   * @return PACKAGES.gz as byte array.
+   */
+  public byte[] buildPackagesGz() throws IOException {
+    try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+      CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
+      try (CompressorOutputStream cos = compressorStreamFactory.createCompressorOutputStream(GZIP, os)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(cos, UTF_8)) {
+          for (Entry<String, Map<String, String>> eachPackage : packageInformation.entrySet()) {
+            Map<String, String> packageInfo = eachPackage.getValue();
+            InternetHeaders headers = new InternetHeaders();
+            headers.addHeader(P_PACKAGE, packageInfo.get(P_PACKAGE));
+            headers.addHeader(P_VERSION, packageInfo.get(P_VERSION));
+            headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
+            headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
+            headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
+            headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
+            headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
+            Enumeration<String> headerLines = headers.getAllHeaderLines();
+            while (headerLines.hasMoreElements()) {
+              String line = headerLines.nextElement();
+              writer.write(line, 0, line.length());
+              writer.write('\n');
+            }
+            writer.write('\n');
+          }
+        }
+      }
+      return os.toByteArray();
+    }
+    catch (CompressorException e) {
+      throw new IOException("Error compressing metadata", e);
     }
   }
 

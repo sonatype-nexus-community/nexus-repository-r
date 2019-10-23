@@ -185,31 +185,6 @@ public class RHostedFacetImplTest
 
   @Test
   public void shouldBuildPackagesGz() throws Exception {
-    when(storageFacet.createTempBlob(any(InputStream.class), eq(RFacetUtils.HASH_ALGORITHMS))).thenAnswer(
-        invocation -> {
-          InputStream is = (InputStream) invocation.getArguments()[0];
-          byte[] content = ByteStreams.toByteArray(is);
-          when(tempBlob.get()).thenAnswer(i -> new ByteArrayInputStream(content));
-          return tempBlob;
-        });
-    assets.add(asset);
-    try (TempBlob metadataTempBlob = underTest.buildPackagesGz(BASE_PATH)) {
-      try (InputStream in = metadataTempBlob.get()) {
-        Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
-        assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
-        assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
-        assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
-        assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
-        assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
-        assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
-        assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
-      }
-    }
-  }
-
-  @Test
-  public void shouldPutPackagesGz() throws Exception {
-    List<Component> list = ImmutableList.of(component);
     when(tempBlob.get()).thenReturn(getClass().getResourceAsStream(PACKAGES_GZ));
     when(asset.name()).thenReturn(PACKAGES_GZ_PATH);
     when(assetBlob.getBlob())
@@ -222,9 +197,25 @@ public class RHostedFacetImplTest
         any(),
         any(),
         anyBoolean());
-    when(storageTx.findComponents(any(), any()))
-        .thenReturn(list);
-    underTest.putPackagesGz(PACKAGES_GZ_PATH, tempBlob);
+    when(storageFacet.createTempBlob(any(InputStream.class), eq(RFacetUtils.HASH_ALGORITHMS))).thenAnswer(
+        invocation -> {
+          InputStream is = (InputStream) invocation.getArguments()[0];
+          byte[] content = ByteStreams.toByteArray(is);
+          when(tempBlob.get()).thenAnswer(i -> new ByteArrayInputStream(content));
+          return tempBlob;
+        });
+    assets.add(asset);
+    underTest.buildAndPutPackagesGz(BASE_PATH);
+    try (InputStream in = tempBlob.get()) {
+      Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
+      assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
+      assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
+      assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
+      assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
+      assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
+      assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
+      assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
+    }
     verify(storageTx).saveAsset(asset);
   }
 }

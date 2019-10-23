@@ -30,7 +30,6 @@ import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
 import org.sonatype.nexus.repository.storage.AssetEvent;
 import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
-import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
 import com.google.common.eventbus.AllowConcurrentEvents;
@@ -39,8 +38,6 @@ import com.google.common.eventbus.Subscribe;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.common.stateguard.StateGuardLifecycleSupport.State.STARTED;
 import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.PACKAGES_GZ_FILENAME;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.buildPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
 
 /**
@@ -144,8 +141,8 @@ public class RPackagesBuilderFacetImpl
 
   /**
    * Listen for invalidation of the metadata, wait a configured time and then rebuild. The waiting allows throwing away
-   * of subsequent events to reduce the number of rebuilds if multiple RPMs are being uploaded. This method must NOT be
-   * allowed to process concurrent events as race conditions may result when rebuilding the data.
+   * of subsequent events to reduce the number of rebuilds if multiple archives are being uploaded. This method must NOT
+   * be allowed to process concurrent events as race conditions may result when rebuilding the data.
    */
   @Subscribe
   public void on(final RMetadataInvalidationEvent event) {
@@ -163,27 +160,15 @@ public class RPackagesBuilderFacetImpl
       log.info("Rebuilding R PACKAGES.gz metadata for repository {}", getRepository().getName());
       UnitOfWork.begin(getRepository().facet(StorageFacet.class).txSupplier());
       try {
-        rebuildMetadata(event.getBasePath());
+        RHostedFacet hostedFacet = getRepository().facet(RHostedFacet.class);
+        hostedFacet.buildAndPutPackagesGz(event.getBasePath());
+      }
+      catch (IOException e) {
+        throw new UncheckedIOException(e);
       }
       finally {
         UnitOfWork.end();
       }
-    }
-  }
-
-  /**
-   * Rebuilds the metadata within a particular transaction, overwriting the PACKAGES.gz content with the generated
-   * metadata once completed.
-   *
-   * @param basePath The base path to rebuild the metadata for.
-   */
-  protected void rebuildMetadata(final String basePath) {
-    RHostedFacet hostedFacet = getRepository().facet(RHostedFacet.class);
-    try (TempBlob packagesContent = hostedFacet.buildPackagesGz(basePath)) {
-      hostedFacet.putPackagesGz(buildPath(basePath, PACKAGES_GZ_FILENAME), packagesContent);
-    }
-    catch (IOException e) {
-      throw new UncheckedIOException(e);
     }
   }
 
