@@ -76,6 +76,14 @@ public class RITSupport
 
   public static final String CONTENT_TYPE_X_XZ = "application/x-xz";
 
+  public static final String TARGZ_EXT = ".tar.gz";
+
+  public static final String TGZ_EXT = ".tgz";
+
+  public static final String GZ_EXT = ".gz";
+
+  public static final String RDS_EXT = ".rds";
+
   public static final String RDS_METADATA_KIND = "RDS_METADATA";
 
   public static final String PACKAGES_KIND = "PACKAGES";
@@ -85,7 +93,7 @@ public class RITSupport
       PKG_BIN_PATH,
       "agricolae",
       "1.3-1",
-      ".tgz",
+      TGZ_EXT,
       CONTENT_TYPE_X_TGZ
   );
 
@@ -94,7 +102,7 @@ public class RITSupport
       PKG_SRC_PATH,
       "agricolae",
       "1.3-1",
-      ".tar.gz",
+      TARGZ_EXT,
       CONTENT_TYPE_X_GZIP
   );
 
@@ -103,7 +111,7 @@ public class RITSupport
       PKG_SRC_PATH,
       "agricolae",
       "1.2-1",
-      ".tar.gz",
+      TARGZ_EXT,
       CONTENT_TYPE_X_GZIP
   );
 
@@ -112,16 +120,16 @@ public class RITSupport
       PKG_SRC_PATH,
       "agricolae",
       "1.0-1",
-      ".tar.gz",
+      TARGZ_EXT,
       CONTENT_TYPE_X_GZIP
   );
 
   public static final TestPackage AGRICOLAE_131_XXX = new TestPackage(
-      "agricolae_1.3-1.xxx", // Wrong extension for R package
+      "agricolae_1.3-1.xxx",
       PKG_SRC_PATH,
       "agricolae",
       "1.3-1",
-      ".xxx",
+      ".xxx", // Wrong extension for R package
       CONTENT_TYPE_X_GZIP
   );
 
@@ -130,7 +138,7 @@ public class RITSupport
       PKG_SRC_PATH,
       null,
       null,
-      ".gz",
+      GZ_EXT,
       CONTENT_TYPE_X_GZIP
   );
 
@@ -139,7 +147,7 @@ public class RITSupport
       PKG_BIN_PATH,
       null,
       null,
-      ".gz",
+      GZ_EXT,
       CONTENT_TYPE_X_GZIP
   );
 
@@ -148,7 +156,7 @@ public class RITSupport
       PKG_SRC_PATH,
       null,
       null,
-      ".rds",
+      RDS_EXT,
       CONTENT_TYPE_X_XZ // PACKAGE.rds is compressed in xz
   );
 
@@ -157,7 +165,7 @@ public class RITSupport
       PKG_SRC_META_PATH,
       null,
       null,
-      ".rds",
+      RDS_EXT,
       CONTENT_TYPE_GZIP // archive.rds is compressed in gzip
   );
 
@@ -166,7 +174,7 @@ public class RITSupport
       PKG_BIN_PATH,
       null,
       null,
-      ".tgz",
+      TGZ_EXT,
       CONTENT_TYPE_X_TGZ
   );
 
