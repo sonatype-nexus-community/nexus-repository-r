@@ -256,7 +256,7 @@ public class RITSupport
   {
     public final String filename;
 
-    public final String path;
+    public final String basePath;
 
     public final String fullPath;
 
@@ -270,15 +270,15 @@ public class RITSupport
 
     public TestPackage(
         final String filename,
-        final String path,
+        final String basePath,
         final String packageName,
         final String packageVersion,
         final String extension,
         final String contentType)
     {
       this.filename = filename;
-      this.path = path;
-      this.fullPath = path + "/" + filename;
+      this.basePath = basePath;
+      this.fullPath = basePath + "/" + filename;
       this.packageName = packageName;
       this.packageVersion = packageVersion;
       this.extension = extension;
