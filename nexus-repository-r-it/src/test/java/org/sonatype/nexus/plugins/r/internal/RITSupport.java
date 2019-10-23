@@ -44,13 +44,9 @@ import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.nexus.repository.storage.ComponentEntityAdapter.P_VERSION;
-import static org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter.P_NAME;
-import static org.sonatype.nexus.repository.storage.Query.builder;
 
 /**
  * Support class for R ITs.
@@ -218,23 +214,6 @@ public class RITSupport
 
   private Path getFilePathByName(String fileName){
     return Paths.get(testData.resolveFile(fileName).getAbsolutePath());
-  }
-
-  protected Component findFirstComponentByNameAndVersion(
-      final Repository repository,
-      final String name,
-      final String version)
-  {
-    try (StorageTx tx = getStorageTx(repository)) {
-      tx.begin();
-      return tx.findComponents(
-          builder()
-              .where(P_NAME).eq(name)
-              .and(P_VERSION).eq(version)
-              .build(),
-          singletonList(repository)
-      ).iterator().next();
-    }
   }
 
   protected Component findComponentById(final Repository repository, final EntityId componentId) {
