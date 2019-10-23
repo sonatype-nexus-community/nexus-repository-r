@@ -41,6 +41,8 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfi
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_101_TARGZ;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_121_TARGZ;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_131_TARGZ;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.METADATA_PROCESSING_DELAY_MILLIS;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.METADATA_PROCESSING_WAIT_INTERVAL_MILLIS;
 import static org.sonatype.nexus.repository.http.HttpStatus.OK;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 
@@ -59,12 +61,13 @@ public class CleanupTaskRIT
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
         nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
-        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval", "1")
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
+            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
     );
   }
 
   @Before
-  public void setup() throws InterruptedException {
+  public void setup() {
     testData.addDirectory(NexusPaxExamSupport.resolveBaseFile("target/test-classes/r"));
     repository = repos.createRHosted(testName.getMethodName());
     deployArtifacts(NAMES);
@@ -123,10 +126,7 @@ public class CleanupTaskRIT
                 .putAndClose(testPackage.fullPath, new ByteArrayEntity(getBytesFromTestData(testPackage.filename)))),
             is(OK));
       }
-
-      // Wait till metadata is recreated
-      Thread.sleep(1000);
-
+      Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
       return packages.length;
     }
     catch (Exception e) {

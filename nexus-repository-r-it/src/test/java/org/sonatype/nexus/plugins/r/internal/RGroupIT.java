@@ -59,7 +59,8 @@ public class RGroupIT
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
         nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
-        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval", "1")
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
+            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
     );
   }
 
@@ -110,8 +111,7 @@ public class RGroupIT
     final String agricolae131Content =
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_FILENAME).toPath()));
 
-    // Wait till metadata is created
-    Thread.sleep(1000);
+    Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
 
     final InputStream content = groupClient.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), content);

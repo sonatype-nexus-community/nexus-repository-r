@@ -19,6 +19,8 @@ import org.sonatype.nexus.repository.Facet;
  * implementation will listen for changes to a repo and then rebuild the associated metadata.
  * <p>
  * TODO: Update this to support other PACKAGES files (not just PACKAGES.gz) when this work is done across the project.
+ *
+ * @since 1.1.next
  */
 @Facet.Exposed
 public interface RPackagesBuilderFacet

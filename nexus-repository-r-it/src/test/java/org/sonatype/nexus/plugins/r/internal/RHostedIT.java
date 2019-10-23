@@ -54,7 +54,8 @@ public class RHostedIT
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
         nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
-        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval", "1")
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
+            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
     );
   }
 
@@ -117,26 +118,29 @@ public class RHostedIT
     // Uploading package with same name and lower version that should be skipped in src metadata
     uploadSinglePackage(AGRICOLAE_101_TARGZ);
 
-    // Wait till metadata is created
-    Thread.sleep(1000);
+    Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
 
     final String agricolae121Content =
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_121_FILENAME).toPath()));
     final String agricolae131Content =
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_FILENAME).toPath()));
 
-    //Verify PACKAGES(metadata) contain appropriate content about R package.
-    final InputStream content = client.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
-    verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
-    assertNotNull(findAsset(repository, PACKAGES_GZ_PATH_FULL));
+    // Verify PACKAGES(metadata) contain appropriate content about source R package (version 1.0-1 is skipped)
+    final InputStream contentSrc = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
+    verifyTextGzipContent(is(equalTo(agricolae121Content)), contentSrc);
+    assertNotNull(findAsset(repository, PACKAGES_SRC_GZ.fullPath));
+
+    // Verify PACKAGES(metadata) contain appropriate content about bin R package
+    final InputStream contentBin = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
+    verifyTextGzipContent(is(equalTo(agricolae131Content)), contentBin);
+    assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
 
     // Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     components.forEach(component -> maintenanceFacet.deleteComponent(component.getEntityMetadata().getId()));
 
-    // Wait till metadata is created
-    Thread.sleep(1000);
+    Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
 
     final InputStream contentSrcAfterDelete = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo("")), contentSrcAfterDelete);

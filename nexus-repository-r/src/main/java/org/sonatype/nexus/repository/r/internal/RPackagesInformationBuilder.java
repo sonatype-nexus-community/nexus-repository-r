@@ -48,6 +48,8 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
  * actual amount of information for each package is rather small.
  *
  * TODO: Add support for other metadata types (PACKAGES, PACKAGES.rds etc.)
+ *
+ * @since 1.1.next
  */
 public class RPackagesInformationBuilder
 {
@@ -61,6 +63,16 @@ public class RPackagesInformationBuilder
    * used to maintain ordering by package name.
    */
   private final Map<String, Map<String, String>> packageInformation = new TreeMap<>();
+
+  /**
+   * Returns an unmodifiable map containing the package information to write to a PACKAGES file. The iteration order of
+   * the map's keys is such that the package names will be returned in sorted order.
+   *
+   * @return The map of package information, keyed by package name.
+   */
+  public Map<String, Map<String, String>> getPackageInformation() {
+    return unmodifiableMap(packageInformation);
+  }
 
   /**
    * Processes an asset, updating the greatest version and details for the package if appropriate.
@@ -99,26 +111,10 @@ public class RPackagesInformationBuilder
   public byte[] buildPackagesGz() throws IOException {
     try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
       CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
-      try (CompressorOutputStream cos = compressorStreamFactory.createCompressorOutputStream(GZIP, os)) {
-        try (OutputStreamWriter writer = new OutputStreamWriter(cos, UTF_8)) {
-          for (Entry<String, Map<String, String>> eachPackage : packageInformation.entrySet()) {
-            Map<String, String> packageInfo = eachPackage.getValue();
-            InternetHeaders headers = new InternetHeaders();
-            headers.addHeader(P_PACKAGE, packageInfo.get(P_PACKAGE));
-            headers.addHeader(P_VERSION, packageInfo.get(P_VERSION));
-            headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
-            headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
-            headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
-            headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
-            headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
-            Enumeration<String> headerLines = headers.getAllHeaderLines();
-            while (headerLines.hasMoreElements()) {
-              String line = headerLines.nextElement();
-              writer.write(line, 0, line.length());
-              writer.write('\n');
-            }
-            writer.write('\n');
-          }
+      try (CompressorOutputStream cos = compressorStreamFactory.createCompressorOutputStream(GZIP, os);
+           OutputStreamWriter writer = new OutputStreamWriter(cos, UTF_8)) {
+        for (Entry<String, Map<String, String>> eachPackage : packageInformation.entrySet()) {
+          writePackageInfo(writer, eachPackage.getValue());
         }
       }
       return os.toByteArray();
@@ -128,13 +124,23 @@ public class RPackagesInformationBuilder
     }
   }
 
-  /**
-   * Returns an unmodifiable map containing the package information to write to a PACKAGES file. The iteration order
-   * of the map's keys is such that the package names will be returned in sorted order.
-   *
-   * @return The map of package information, keyed by package name.
-   */
-  public Map<String, Map<String, String>> getPackageInformation() {
-    return unmodifiableMap(packageInformation);
+  private void writePackageInfo(final OutputStreamWriter writer, final Map<String, String> packageInfo)
+      throws IOException
+  {
+    InternetHeaders headers = new InternetHeaders();
+    headers.addHeader(P_PACKAGE, packageInfo.get(P_PACKAGE));
+    headers.addHeader(P_VERSION, packageInfo.get(P_VERSION));
+    headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
+    headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
+    headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
+    headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
+    headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
+    Enumeration<String> headerLines = headers.getAllHeaderLines();
+    while (headerLines.hasMoreElements()) {
+      String line = headerLines.nextElement();
+      writer.write(line, 0, line.length());
+      writer.write('\n');
+    }
+    writer.write('\n');
   }
 }

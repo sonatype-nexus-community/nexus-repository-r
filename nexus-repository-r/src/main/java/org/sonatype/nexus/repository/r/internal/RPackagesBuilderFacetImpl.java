@@ -44,6 +44,8 @@ import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
  * Implementation of {@link RPackagesBuilderFacet} targeted for use with hosted repositories. Uses event dispatching to
  * ensure that we do not have race conditions when processing and rebuilding metadata, and also imposes a waiting period
  * to batch metadata updates.
+ *
+ * @since 1.1.next
  */
 @Named
 public class RPackagesBuilderFacetImpl
