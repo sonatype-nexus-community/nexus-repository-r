@@ -25,10 +25,7 @@ import org.sonatype.nexus.repository.FacetSupport;
 import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.r.RPackagesBuilderFacet;
 import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.storage.AssetCreatedEvent;
-import org.sonatype.nexus.repository.storage.AssetDeletedEvent;
 import org.sonatype.nexus.repository.storage.AssetEvent;
-import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
@@ -83,47 +80,17 @@ public class RPackagesBuilderFacetImpl
   }
 
   /**
-   * Handles {@code AssetDeletedEvent} events concurrently, requesting a metadata invalidation and rebuild if warranted
+   * Handles {@link AssetEvent} events concurrently, requesting a metadata invalidation and rebuild if warranted
    * by the event contents.
    *
-   * @param deleted The deletion event to handle.
+   * @param event The event to handle.
    */
   @Subscribe
   @Guarded(by = STARTED)
   @AllowConcurrentEvents
-  public void on(final AssetDeletedEvent deleted) {
-    if (shouldInvalidate(deleted)) {
-      invalidateMetadata(getBasePath(deleted.getAsset().name()));
-    }
-  }
-
-  /**
-   * Handles {@code AssetCreatedEvent} events concurrently, requesting a metadata invalidation and rebuild if warranted
-   * by the event contents.
-   *
-   * @param created The creation event to handle.
-   */
-  @Subscribe
-  @Guarded(by = STARTED)
-  @AllowConcurrentEvents
-  public void on(final AssetCreatedEvent created) {
-    if (shouldInvalidate(created)) {
-      invalidateMetadata(getBasePath(created.getAsset().name()));
-    }
-  }
-
-  /**
-   * Handles {@code AssetUpdatedEvent} events concurrently, requesting a metadata invalidation and rebuild if warranted
-   * by the event contents.
-   *
-   * @param updated The update event to handle.
-   */
-  @Subscribe
-  @Guarded(by = STARTED)
-  @AllowConcurrentEvents
-  public void on(final AssetUpdatedEvent updated) {
-    if (shouldInvalidate(updated)) {
-      invalidateMetadata(getBasePath(updated.getAsset().name()));
+  public void on(final AssetEvent event) {
+    if (shouldInvalidate(event)) {
+      invalidateMetadata(getBasePath(event.getAsset().name()));
     }
   }
 
