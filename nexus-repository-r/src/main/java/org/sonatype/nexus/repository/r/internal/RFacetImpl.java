@@ -26,10 +26,10 @@ import org.sonatype.nexus.repository.storage.StorageTx;
 
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
-import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findAsset;
-import static org.sonatype.nexus.repository.r.internal.RFacetUtils.findComponent;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.getAssetKind;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.getBasePath;
+import static org.sonatype.nexus.repository.r.internal.util.RFacetUtils.findAsset;
+import static org.sonatype.nexus.repository.r.internal.util.RFacetUtils.findComponent;
+import static org.sonatype.nexus.repository.r.internal.util.RPathUtils.getAssetKind;
+import static org.sonatype.nexus.repository.r.internal.util.RPathUtils.getBasePath;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
 /**

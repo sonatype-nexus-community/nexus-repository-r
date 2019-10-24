@@ -41,8 +41,8 @@ import static org.junit.Assert.assertNull;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
-import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
-import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_PATH_ERROR_MESSAGE;
+import static org.sonatype.nexus.repository.r.internal.util.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
+import static org.sonatype.nexus.repository.r.internal.util.PackageValidator.NOT_VALID_PATH_ERROR_MESSAGE;
 
 public class RHostedIT
     extends RITSupport

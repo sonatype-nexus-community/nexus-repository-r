@@ -12,28 +12,21 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Priority;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.repository.cache.CacheControllerHolder;
-import org.sonatype.nexus.repository.cache.CacheControllerHolder.CacheType;
+import org.sonatype.nexus.rapture.UiPluginDescriptorSupport;
 
-/**
- * Asset kinds for R.
- */
-public enum AssetKind
+@Named
+@Singleton
+@Priority(Integer.MAX_VALUE - 200)
+public class UiPluginDescriptorImpl
+    extends UiPluginDescriptorSupport
 {
-  PACKAGES(CacheControllerHolder.METADATA),
-  RDS_METADATA(CacheControllerHolder.METADATA),
-  ARCHIVE(CacheControllerHolder.CONTENT);
-
-  private final CacheType cacheType;
-
-  AssetKind(final CacheType cacheType) {
-    this.cacheType = cacheType;
-  }
-
-  @Nonnull
-  public CacheType getCacheType() {
-    return cacheType;
+  public UiPluginDescriptorImpl() {
+    super("nexus-repository-r");
+    setNamespace("NX.r");
+    setConfigClassName("NX.r.app.PluginConfig");
   }
 }
