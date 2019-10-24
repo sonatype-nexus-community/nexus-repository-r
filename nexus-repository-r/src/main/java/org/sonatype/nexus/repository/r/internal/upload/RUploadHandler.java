@@ -39,12 +39,10 @@ import org.sonatype.nexus.repository.upload.UploadFieldDefinition.Type;
 import org.sonatype.nexus.repository.upload.UploadHandlerSupport;
 import org.sonatype.nexus.repository.upload.UploadResponse;
 import org.sonatype.nexus.repository.view.PartPayload;
-import org.sonatype.nexus.rest.ValidationErrorsException;
 import org.sonatype.nexus.transaction.UnitOfWork;
 
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.validateArchiveUploadPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.buildPath;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidArchiveExtension;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidRepoPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.removeInitialSlashFromPath;
 
 /**
@@ -84,7 +82,7 @@ public class RUploadHandler
     final String assetPath = buildPath(uploadPath, payload.getName());
 
     ensurePermitted(repository.getName(), RFormat.NAME, assetPath, Collections.emptyMap());
-    validateUploadRequest(assetPath);
+    validateArchiveUploadPath(assetPath);
 
     try {
       UnitOfWork.begin(repository.facet(StorageFacet.class).txSupplier());
@@ -114,15 +112,5 @@ public class RUploadHandler
   @Override
   public ContentPermissionChecker contentPermissionChecker() {
     return contentPermissionChecker;
-  }
-
-  private void validateUploadRequest(final String path) {
-    if (!isValidRepoPath(path)) {
-      throw new ValidationErrorsException(
-          "Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>.");
-    }
-    if (!isValidArchiveExtension(path)) {
-      throw new ValidationErrorsException("Extension not .zip, .tar.gz or .tgz.");
-    }
   }
 }

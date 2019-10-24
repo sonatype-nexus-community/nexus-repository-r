@@ -20,10 +20,10 @@ import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.rest.ValidationErrorsException;
 
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.validateArchiveUploadPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractRequestPath;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidArchiveExtension;
-import static org.sonatype.nexus.repository.r.internal.RPathUtils.isValidRepoPath;
 
 /**
  * R hosted handlers.
@@ -50,12 +50,11 @@ public final class HostedHandlers
    */
   final Handler putArchive = context -> {
     String path = extractRequestPath(context);
-    if (!isValidRepoPath(path)) {
-      return HttpResponses
-          .badRequest("Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>.");
+    try {
+      validateArchiveUploadPath(path);
     }
-    if (!isValidArchiveExtension(path)) {
-      return HttpResponses.badRequest("Extension not .zip, .tar.gz or .tgz.");
+    catch (ValidationErrorsException e) {
+      return HttpResponses.badRequest(e.getMessage());
     }
     context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();

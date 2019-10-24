@@ -39,6 +39,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_PATH_ERROR_MESSAGE;
 
 public class HostedHandlersTest
     extends TestSupport
@@ -119,8 +121,7 @@ public class HostedHandlersTest
     Response response = underTest.putArchive.handle(context);
     verify(rHostedFacet, times(0)).upload(WRONG_EXTENSION_FULL_PATH_VALUE, payload);
     assertThat(response.getStatus().getCode(), is(equalTo(BAD_REQUEST)));
-    assertThat(response.getStatus().getMessage(),
-        is(equalTo("Extension not .zip, .tar.gz or .tgz.")));
+    assertThat(response.getStatus().getMessage(), is(equalTo(NOT_VALID_EXTENSION_ERROR_MESSAGE)));
   }
 
   @Test
@@ -129,8 +130,7 @@ public class HostedHandlersTest
     Response response = underTest.putArchive.handle(context);
     verify(rHostedFacet, times(0)).upload(WRONG_PATH_FULL_PATH_VALUE, payload);
     assertThat(response.getStatus().getCode(), is(equalTo(BAD_REQUEST)));
-    assertThat(response.getStatus().getMessage(),
-        is(equalTo("Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>.")));
+    assertThat(response.getStatus().getMessage(), is(equalTo(NOT_VALID_PATH_ERROR_MESSAGE)));
   }
 
   private void assertStatus(final Handler handler, final int status) throws Exception {
