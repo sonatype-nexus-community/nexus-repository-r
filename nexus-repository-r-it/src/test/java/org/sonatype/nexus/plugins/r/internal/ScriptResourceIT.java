@@ -63,7 +63,7 @@ public class ScriptResourceIT
   public void createRProxyScript() {
     String repoName = "r-proxy-repository";
     String scriptName = "r-proxy-script";
-    String content = format("repository.createRProxy('%s','http://someurl')", repoName);
+    String content = format("repository_r.createRProxy('%s','http://someurl')", repoName);
 
     scriptClient.add(new ScriptXO(scriptName, content, "groovy"));
     scriptClient.run(scriptName, "");
@@ -77,7 +77,7 @@ public class ScriptResourceIT
   public void createRHostedScript() {
     String repoName = "r-hosted-repository";
     String scriptName = "r-hosted-script";
-    String content = format("repository.createRHosted('%s')", repoName);
+    String content = format("repository_r.createRHosted('%s')", repoName);
 
     scriptClient.add(new ScriptXO(scriptName, content, "groovy"));
     scriptClient.run(scriptName, "");
@@ -94,7 +94,7 @@ public class ScriptResourceIT
     String repoName = "r-script-group-repo";
     String scriptName = "r-group-script";
     String content =
-        format("repository.createRGroup('%s', Arrays.asList('%s', '%s'))", repoName, proxyName, hostedName);
+        format("repository_r.createRGroup('%s', Arrays.asList('%s', '%s'))", repoName, proxyName, hostedName);
 
     repos.createRProxy(proxyName, "http://someurl");
     repos.createRHosted(hostedName);
