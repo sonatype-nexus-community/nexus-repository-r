@@ -10,23 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.r.internal;
+package org.sonatype.nexus.repository.r.internal.security;
 
-import javax.annotation.Priority;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.sonatype.nexus.rapture.UiPluginDescriptorSupport;
+import org.sonatype.nexus.repository.security.ContentPermissionChecker;
+import org.sonatype.nexus.repository.security.SecurityFacetSupport;
+import org.sonatype.nexus.repository.security.VariableResolverAdapter;
 
+/**
+ * R format security facet.
+ */
 @Named
-@Singleton
-@Priority(Integer.MAX_VALUE - 200)
-public class UiPluginDescriptorImpl
-    extends UiPluginDescriptorSupport
+public class RSecurityFacet
+    extends SecurityFacetSupport
 {
-  public UiPluginDescriptorImpl() {
-    super("nexus-repository-r");
-    setNamespace("NX.r");
-    setConfigClassName("NX.r.app.PluginConfig");
+  @Inject
+  public RSecurityFacet(final RFormatSecurityContributor securityResource,
+                        @Named("simple") final VariableResolverAdapter variableResolverAdapter,
+                        final ContentPermissionChecker contentPermissionChecker)
+  {
+    super(securityResource, variableResolverAdapter, contentPermissionChecker);
   }
 }
