@@ -38,6 +38,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 
@@ -52,7 +53,9 @@ public class RHostedIT
   public static Option[] configureNexus() {
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
+        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
+            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
     );
   }
 
@@ -115,6 +118,8 @@ public class RHostedIT
     // Uploading package with same name and lower version that should be skipped in src metadata
     uploadSinglePackage(AGRICOLAE_101_TARGZ);
 
+    Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
+
     final String agricolae121Content =
         new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_121_FILENAME).toPath()));
     final String agricolae131Content =
@@ -123,21 +128,27 @@ public class RHostedIT
     // Verify PACKAGES(metadata) contain appropriate content about source R package (version 1.0-1 is skipped)
     final InputStream contentSrc = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae121Content)), contentSrc);
+    assertNotNull(findAsset(repository, PACKAGES_SRC_GZ.fullPath));
 
     // Verify PACKAGES(metadata) contain appropriate content about bin R package
     final InputStream contentBin = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), contentBin);
+    assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
 
     // Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     components.forEach(component -> maintenanceFacet.deleteComponent(component.getEntityMetadata().getId()));
 
+    Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
+
     final InputStream contentSrcAfterDelete = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo("")), contentSrcAfterDelete);
+    assertNotNull(findAsset(repository, PACKAGES_SRC_GZ.fullPath));
 
     final InputStream contentBinAfterDelete = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo("")), contentBinAfterDelete);
+    assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
   }
 
   @Test

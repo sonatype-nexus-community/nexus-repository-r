@@ -37,9 +37,12 @@ import org.ops4j.pax.exam.Option;
 import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_101_TARGZ;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_121_TARGZ;
 import static org.sonatype.nexus.plugins.r.internal.RITSupport.AGRICOLAE_131_TARGZ;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.METADATA_PROCESSING_DELAY_MILLIS;
+import static org.sonatype.nexus.plugins.r.internal.RITSupport.METADATA_PROCESSING_WAIT_INTERVAL_MILLIS;
 import static org.sonatype.nexus.repository.http.HttpStatus.OK;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
 
@@ -57,7 +60,9 @@ public class CleanupTaskRIT
   public static Option[] configureNexus() {
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
+        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
+            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
     );
   }
 
@@ -121,7 +126,7 @@ public class CleanupTaskRIT
                 .putAndClose(testPackage.fullPath, new ByteArrayEntity(getBytesFromTestData(testPackage.filename)))),
             is(OK));
       }
-
+      Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
       return packages.length;
     }
     catch (Exception e) {

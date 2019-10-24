@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.sonatype.nexus.repository.storage.TempBlob;
 import org.sonatype.nexus.repository.view.Content;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.io.ByteStreams;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -54,15 +56,19 @@ import static org.sonatype.nexus.repository.r.internal.RDescriptionUtils.extract
 public class RHostedFacetImplTest
     extends RepositoryFacetTestSupport<RHostedFacetImpl>
 {
-  static final String PACKAGE_NAME = "package.gz";
+  static final String PACKAGES_GZ = "PACKAGES.gz";
 
-  static final String BASE_PATH = "packages/base/path/";
+  static final String PACKAGE_NAME = "package.gz";
 
   static final String REAL_PACKAGE = "r-package.zip";
 
-  static final String PACKAGE_PATH = BASE_PATH + PACKAGE_NAME;
+  static final String BASE_PATH = "packages/base/path";
 
-  static final String REAL_PACKAGE_PATH = BASE_PATH + REAL_PACKAGE;
+  static final String PACKAGE_PATH = BASE_PATH + "/" + PACKAGE_NAME;
+
+  static final String REAL_PACKAGE_PATH = BASE_PATH + "/" + REAL_PACKAGE;
+
+  static final String PACKAGES_GZ_PATH = BASE_PATH + "/" + PACKAGES_GZ;
 
   static final String VERSION = "1.0.0";
 
@@ -107,64 +113,46 @@ public class RHostedFacetImplTest
     when(formatAttributes.get(P_NEEDS_COMPILATION, String.class)).thenReturn(NEEDS_COMPILATION);
     when(asset.name()).thenReturn(PACKAGE_PATH);
     when(repository.facet(RFacet.class)).thenReturn(rFacet);
+    when(rFacet.findOrCreateAsset(any(), any())).thenReturn(asset);
+    when(rFacet.findOrCreateAsset(any(), any(), any(), any())).thenReturn(asset);
   }
 
   @Test
-  public void getPackagesReturnsPackage() throws Exception {
-    assets.add(asset);
-    Content packages = underTest.getPackages(PACKAGE_PATH);
-    try (InputStream in = packages.openInputStream()) {
-      Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
-      assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
-      assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
-      assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
-      assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
-      assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
-      assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
-      assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
-    }
-  }
-
-  @Test
-  public void getPackagesReturnsCorrectContentType() throws Exception {
-    Content packages = underTest.getPackages(PACKAGE_PATH);
+  public void getContentReturnsCorrectContentType() throws Exception {
+    when(asset.requireContentType()).thenReturn("application/x-gzip");
+    Content packages = underTest.getStoredContent(PACKAGE_PATH);
     assertThat(packages.getContentType(), is(equalTo("application/x-gzip")));
   }
 
-  @Test(expected = NullPointerException.class)
-  public void failFastOnGetPackagesWithNull() throws Exception {
-    underTest.getPackages(null);
-  }
-
   @Test
-  public void getArchive() throws Exception {
-    Content archive = underTest.getArchive(PACKAGE_PATH);
+  public void getStoredContent() throws Exception {
+    Content archive = underTest.getStoredContent(PACKAGE_PATH);
     assertThat(archive, is(notNullValue()));
   }
 
   @Test(expected = NullPointerException.class)
-  public void failFastOnGetArchiveWithNull() throws Exception {
-    underTest.getArchive(null);
+  public void failFastOnGetContentWithNull() throws Exception {
+    underTest.getStoredContent(null);
   }
 
   @Test
-  public void nullWhenAssetNullOnGetArchive() throws Exception {
+  public void nullWhenAssetNullOnGetContent() throws Exception {
     when(storageTx.findAssetWithProperty(anyString(), anyString(), any(Bucket.class))).thenReturn(null);
-    Content archive = underTest.getArchive(PACKAGE_PATH);
+    Content archive = underTest.getStoredContent(PACKAGES_GZ_PATH);
     assertThat(archive, is(nullValue()));
   }
 
   @Test
-  public void markAssetAsDownloadedAndSaveOnGetArchive() throws Exception {
+  public void markAssetAsDownloadedAndSaveOnGetContent() throws Exception {
     when(asset.markAsDownloaded()).thenReturn(true);
-    underTest.getArchive(PACKAGE_PATH);
+    underTest.getStoredContent(PACKAGES_GZ_PATH);
     verify(storageTx).saveAsset(asset);
   }
 
   @Test
-  public void doNotSaveWhenNotMarkedAsDownloaded() throws Exception {
+  public void doNotSaveAssetWhenContentNotMarkedAsDownloaded() throws Exception {
     when(asset.markAsDownloaded()).thenReturn(false);
-    underTest.getArchive(PACKAGE_PATH);
+    underTest.getStoredContent(PACKAGES_GZ_PATH);
     verify(storageTx, never()).saveAsset(asset);
   }
 
@@ -192,6 +180,42 @@ public class RHostedFacetImplTest
         .thenReturn(asset);
 
     underTest.doPutArchive(REAL_PACKAGE_PATH, tempBlob, payload);
+    verify(storageTx).saveAsset(asset);
+  }
+
+  @Test
+  public void shouldBuildPackagesGz() throws Exception {
+    when(tempBlob.get()).thenReturn(getClass().getResourceAsStream(PACKAGES_GZ));
+    when(asset.name()).thenReturn(PACKAGES_GZ_PATH);
+    when(assetBlob.getBlob())
+        .thenReturn(blob);
+    doReturn(assetBlob)
+        .when(storageTx).setBlob(any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        any(),
+        anyBoolean());
+    when(storageFacet.createTempBlob(any(InputStream.class), eq(RFacetUtils.HASH_ALGORITHMS))).thenAnswer(
+        invocation -> {
+          InputStream is = (InputStream) invocation.getArguments()[0];
+          byte[] content = ByteStreams.toByteArray(is);
+          when(tempBlob.get()).thenAnswer(i -> new ByteArrayInputStream(content));
+          return tempBlob;
+        });
+    assets.add(asset);
+    underTest.buildAndPutPackagesGz(BASE_PATH);
+    try (InputStream in = tempBlob.get()) {
+      Map<String, String> attributes = extractDescriptionFromArchive(PACKAGE_NAME, in);
+      assertThat(attributes.get(P_PACKAGE), is(equalTo(PACKAGE_NAME)));
+      assertThat(attributes.get(P_VERSION), is(equalTo(VERSION)));
+      assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
+      assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
+      assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
+      assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
+      assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
+    }
     verify(storageTx).saveAsset(asset);
   }
 }
