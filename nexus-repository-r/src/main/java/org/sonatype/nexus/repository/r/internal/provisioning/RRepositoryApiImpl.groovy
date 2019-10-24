@@ -42,8 +42,7 @@ class RRepositoryApiImpl
                           final String blobStoreName = BlobStoreManager.DEFAULT_BLOBSTORE_NAME,
                           final boolean strictContentTypeValidation = false)
   {
-    def configuration = repositoryApi.
-        createProxy(name, 'r-proxy', remoteUrl, blobStoreName, strictContentTypeValidation)
+    def configuration = repositoryApi.createProxy(name, 'r-proxy', remoteUrl, blobStoreName, strictContentTypeValidation)
     repositoryApi.createRepository(configuration)
   }
 

@@ -19,6 +19,9 @@ import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.storage.WritePolicy;
 
+/**
+ * @since 1.1.0
+ */
 public interface RRepositoryApi
     extends ScriptApi
 {

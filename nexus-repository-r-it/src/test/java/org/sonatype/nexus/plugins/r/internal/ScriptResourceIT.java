@@ -96,6 +96,8 @@ public class ScriptResourceIT
     String content =
         format("repository_r.createRGroup('%s', Arrays.asList('%s', '%s'))", repoName, proxyName, hostedName);
 
+    log.info(content);
+
     repos.createRProxy(proxyName, "http://someurl");
     repos.createRHosted(hostedName);
 
