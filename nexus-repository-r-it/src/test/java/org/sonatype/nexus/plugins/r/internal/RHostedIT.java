@@ -41,6 +41,8 @@ import static org.junit.Assert.assertNull;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_PATH_ERROR_MESSAGE;
 
 public class RHostedIT
     extends RITSupport
@@ -85,9 +87,19 @@ public class RHostedIT
   @Test
   public void testUploadFailedWrongPackageExtension() throws Exception
   {
-    assertThat(uploadSinglePackage(AGRICOLAE_131_XXX).getStatusLine().getStatusCode(),
-        is(BAD_REQUEST));
+    HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_XXX);
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
+    assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(NOT_VALID_EXTENSION_ERROR_MESSAGE));
     assertNull(findAsset(repository, AGRICOLAE_131_XXX.fullPath));
+  }
+
+  @Test
+  public void testUploadFailedWrongPackagePath() throws Exception
+  {
+    HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_TARGZ_WRONG_PATH);
+    assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
+    assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(NOT_VALID_PATH_ERROR_MESSAGE));
+    assertNull(findAsset(repository, AGRICOLAE_131_TARGZ_WRONG_PATH.fullPath));
   }
 
   @Test

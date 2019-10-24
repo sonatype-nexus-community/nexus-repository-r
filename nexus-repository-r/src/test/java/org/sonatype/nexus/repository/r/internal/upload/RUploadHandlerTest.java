@@ -54,6 +54,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_PATH_ERROR_MESSAGE;
 import static org.sonatype.nexus.repository.upload.UploadFieldDefinition.Type.STRING;
 
 public class RUploadHandlerTest
@@ -151,13 +153,13 @@ public class RUploadHandlerTest
   @Test
   public void testHandleValidationExceptionWrongPath() throws IOException {
     ComponentUpload component = createComponentUpload(WRONG_PACKAGE_PATH, PACKAGE_NAME);
-    checkValidationFailed(component, "Extension not zip, tar.gz or tgz, or wrong upload path.");
+    checkValidationFailed(component, NOT_VALID_PATH_ERROR_MESSAGE);
   }
 
   @Test
-  public void testHandleValidationExceptionWrongName() throws IOException {
+  public void testHandleValidationExceptionWrongExtension() throws IOException {
     ComponentUpload component = createComponentUpload(PACKAGE_PATH, WRONG_PACKAGE_NAME);
-    checkValidationFailed(component, "Extension not zip, tar.gz or tgz, or wrong upload path.");
+    checkValidationFailed(component, NOT_VALID_EXTENSION_ERROR_MESSAGE);
   }
 
   private void checkValidationFailed(final ComponentUpload component, final String expectedErrorMessage)
