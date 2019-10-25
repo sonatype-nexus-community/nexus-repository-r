@@ -20,7 +20,9 @@ import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.r.RHostedFacet;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Handler;
+import org.sonatype.nexus.rest.ValidationErrorsException;
 
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.validateArchiveUploadPath;
 import static org.sonatype.nexus.repository.r.internal.RPathUtils.extractRequestPath;
 
 /**
@@ -32,23 +34,11 @@ public final class HostedHandlers
     extends ComponentSupport
 {
   /**
-   * Handle request for packages.
-   */
-  final Handler getPackagesGz = context -> {
-    String path = extractRequestPath(context);
-    Content content = context.getRepository().facet(RHostedFacet.class).getPackages(path);
-    if (content != null) {
-      return HttpResponses.ok(content);
-    }
-    return HttpResponses.notFound();
-  };
-
-  /**
    * Handle request for archive.
    */
-  final Handler getArchive = context -> {
+  final Handler getContent = context -> {
     String path = extractRequestPath(context);
-    Content content = context.getRepository().facet(RHostedFacet.class).getArchive(path);
+    Content content = context.getRepository().facet(RHostedFacet.class).getStoredContent(path);
     if (content != null) {
       return HttpResponses.ok(content);
     }
@@ -60,15 +50,15 @@ public final class HostedHandlers
    */
   final Handler putArchive = context -> {
     String path = extractRequestPath(context);
+    try {
+      validateArchiveUploadPath(path);
+    }
+    catch (ValidationErrorsException e) {
+      return HttpResponses.badRequest(e.getMessage());
+    }
     context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();
   };
-
-  /**
-   * Handle upload non-R file request.
-   */
-  final Handler nonRArchiveUpload =
-      context -> HttpResponses.badRequest("Extension not zip, tar.gz or tgz, or wrong upload path.");
 
   /**
    * Handle request of currently not supported metadata

@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.mockito.Mock;
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
@@ -26,8 +23,13 @@ import org.sonatype.nexus.repository.Facet;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Bucket;
+import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.transaction.UnitOfWork;
+
+import org.junit.After;
+import org.junit.Before;
+import org.mockito.Mock;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -40,6 +42,9 @@ public abstract class RepositoryFacetTestSupport<T extends Facet>
 
   @Mock
   StorageTx storageTx;
+
+  @Mock
+  StorageFacet storageFacet;
 
   @Mock
   Bucket bucket;
@@ -66,9 +71,11 @@ public abstract class RepositoryFacetTestSupport<T extends Facet>
     assets = new ArrayList<>();
     UnitOfWork.beginBatch(storageTx);
     when(storageTx.browseAssets(any(Bucket.class))).thenReturn(assets);
+    when(storageTx.browseAssets(any(), any(Bucket.class))).thenReturn(assets);
     when(storageTx.findAssetWithProperty(anyString(), anyString(), any(Bucket.class))).thenReturn(asset);
     when(storageTx.findBucket(repository)).thenReturn(bucket);
     when(storageTx.requireBlob(any())).thenReturn(blob);
+    when(repository.facet(StorageFacet.class)).thenReturn(storageFacet);
     when(asset.formatAttributes()).thenReturn(formatAttributes);
     when(asset.attributes()).thenReturn(attributes);
     when(attributes.get("last_modified", Date.class)).thenReturn(new Date());

@@ -35,17 +35,29 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
+import static org.sonatype.nexus.repository.r.internal.PackageValidator.NOT_VALID_PATH_ERROR_MESSAGE;
 
 public class HostedHandlersTest
     extends TestSupport
 {
-  public static final String PATH_VALUE = "Path-value";
+  public static final String PATH_VALUE = "part1/part2";
 
-  public static final String FILENAME_VALUE = "Filename-value";
+  public static final String FILENAME_VALUE = "Filename.tgz";
+
+  public static final String WRONG_PATH_VALUE = "part1only";
+
+  public static final String WRONG_FILENAME_VALUE = "Filename.xxx";
 
   public static final String FULL_PATH_VALUE = PATH_VALUE + "/" + FILENAME_VALUE;
+
+  public static final String WRONG_PATH_FULL_PATH_VALUE = WRONG_PATH_VALUE + "/" + FILENAME_VALUE;
+
+  public static final String WRONG_EXTENSION_FULL_PATH_VALUE = PATH_VALUE + "/" + WRONG_FILENAME_VALUE;
 
   @Mock
   Context context;
@@ -78,30 +90,18 @@ public class HostedHandlersTest
     underTest = new HostedHandlers();
     initialiseTestFixtures();
     initialiseMockBehaviour();
-    setupForGetPackagesTest();
-    setupForGetArchiveTest();
+    setupForGetContentTest();
   }
 
   @Test
-  public void okWhenPackagesFound() throws Exception {
-    assertStatus(underTest.getPackagesGz, 200);
+  public void okWhenContentFound() throws Exception {
+    assertStatus(underTest.getContent, 200);
   }
 
   @Test
-  public void notFoundWhenPackagesNotFound() throws Exception {
-    when(rHostedFacet.getPackages(anyString())).thenReturn(null);
-    assertStatus(underTest.getPackagesGz, 404);
-  }
-
-  @Test
-  public void okWhenArchiveFound() throws Exception {
-    assertStatus(underTest.getArchive, 200);
-  }
-
-  @Test
-  public void notFoundWhenArchiveNotFound() throws Exception {
-    when(rHostedFacet.getArchive(anyString())).thenReturn(null);
-    assertStatus(underTest.getArchive, 404);
+  public void notFoundWhenContentNotFound() throws Exception {
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
+    assertStatus(underTest.getContent, 404);
   }
 
   @Test
@@ -113,6 +113,24 @@ public class HostedHandlersTest
   public void repositoryUploadWhenPut() throws Exception {
     underTest.putArchive.handle(context);
     verify(rHostedFacet).upload(FULL_PATH_VALUE, payload);
+  }
+
+  @Test
+  public void repositoryUploadFailedWrongExtension() throws Exception {
+    when(request.getPath()).thenReturn(WRONG_EXTENSION_FULL_PATH_VALUE);
+    Response response = underTest.putArchive.handle(context);
+    verify(rHostedFacet, times(0)).upload(WRONG_EXTENSION_FULL_PATH_VALUE, payload);
+    assertThat(response.getStatus().getCode(), is(equalTo(BAD_REQUEST)));
+    assertThat(response.getStatus().getMessage(), is(equalTo(NOT_VALID_EXTENSION_ERROR_MESSAGE)));
+  }
+
+  @Test
+  public void repositoryUploadFailedWrongPath() throws Exception {
+    when(request.getPath()).thenReturn(WRONG_PATH_FULL_PATH_VALUE);
+    Response response = underTest.putArchive.handle(context);
+    verify(rHostedFacet, times(0)).upload(WRONG_PATH_FULL_PATH_VALUE, payload);
+    assertThat(response.getStatus().getCode(), is(equalTo(BAD_REQUEST)));
+    assertThat(response.getStatus().getMessage(), is(equalTo(NOT_VALID_PATH_ERROR_MESSAGE)));
   }
 
   private void assertStatus(final Handler handler, final int status) throws Exception {
@@ -136,14 +154,9 @@ public class HostedHandlersTest
     when(repository.facet(RHostedFacet.class)).thenReturn(rHostedFacet);
   }
 
-  private void setupForGetPackagesTest() {
-    tokens.put("path", PATH_VALUE);
-    when(rHostedFacet.getPackages(anyString())).thenReturn(content);
-  }
-
-  private void setupForGetArchiveTest() {
+  private void setupForGetContentTest() {
     tokens.put("filename", FILENAME_VALUE);
-    when(rHostedFacet.getArchive(anyString())).thenReturn(content);
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(content);
   }
 
   class TestState

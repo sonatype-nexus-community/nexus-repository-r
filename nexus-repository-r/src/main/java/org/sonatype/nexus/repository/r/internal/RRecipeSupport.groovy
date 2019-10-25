@@ -170,7 +170,7 @@ abstract class RRecipeSupport
     new Builder().matcher(
         and(
             new ActionMatcher(PUT),
-            archivePathMatcher()
+            allFilesTokenMatcher()
         ))
   }
 
@@ -220,7 +220,7 @@ abstract class RRecipeSupport
    * Token matcher for all files
    */
   static TokenMatcher allFilesTokenMatcher() {
-    return new TokenMatcher('/{path:.+}/{filename:.+}')
+    return new TokenMatcher('/{pathAndFilename:.+}')
   }
 
   /**

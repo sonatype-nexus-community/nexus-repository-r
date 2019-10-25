@@ -17,12 +17,6 @@ import java.util.Properties;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.blobstore.api.Blob;
 import org.sonatype.nexus.blobstore.api.BlobStoreManager;
@@ -39,6 +33,13 @@ import org.sonatype.nexus.repository.storage.AssetEntityAdapter;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 import org.sonatype.nexus.testsuite.testsupport.blobstore.restore.BlobstoreRestoreTestHelper;
+
+import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -88,16 +89,16 @@ public class RRestoreBlobIT
     hostedClient = createRClient(hostedRepository);
 
     proxyServer = Server.withPort(0)
-        .serve("/" + AGRICOLAE_PATH_FULL_131_TARGZ)
-        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_131_TARGZ)))
+        .serve("/" + AGRICOLAE_131_TARGZ.fullPath)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_131_TARGZ.filename)))
         .start();
 
     proxyRepository = repos.createRProxy(PROXY_REPO_NAME, "http://localhost:" + proxyServer.getPort() + "/");
     proxyClient = createRClient(proxyRepository);
 
-    assertThat(hostedClient.put(AGRICOLAE_PATH_FULL_131_TARGZ,
-        fileToHttpEntity(AGRICOLAE_PKG_FILE_NAME_131_TARGZ)).getStatusLine().getStatusCode(), is(HttpStatus.OK));
-    assertThat(proxyClient.fetch(AGRICOLAE_PATH_FULL_131_TARGZ).getStatusLine().getStatusCode(), is(HttpStatus.OK));
+    assertThat(hostedClient.put(AGRICOLAE_131_TARGZ.fullPath,
+        fileToHttpEntity(AGRICOLAE_131_TARGZ.filename)).getStatusLine().getStatusCode(), is(HttpStatus.OK));
+    assertThat(proxyClient.fetch(AGRICOLAE_131_TARGZ.fullPath).getStatusLine().getStatusCode(), is(HttpStatus.OK));
   }
 
   @After
@@ -126,14 +127,14 @@ public class RRestoreBlobIT
   public void testNotDryRunRestore()
   {
     runBlobRestore(false);
-    testHelper.assertAssetInRepository(proxyRepository, AGRICOLAE_PATH_FULL_131_TARGZ);
+    testHelper.assertAssetInRepository(proxyRepository, AGRICOLAE_131_TARGZ.fullPath);
   }
 
   @Test
   public void testDryRunRestore()
   {
     runBlobRestore(true);
-    testHelper.assertAssetNotInRepository(proxyRepository, AGRICOLAE_PATH_FULL_131_TARGZ);
+    testHelper.assertAssetNotInRepository(proxyRepository, AGRICOLAE_131_TARGZ.fullPath);
   }
 
   private void runBlobRestore(final boolean isDryRun) {
@@ -141,7 +142,7 @@ public class RRestoreBlobIT
     Blob blob;
     try (StorageTx tx = getStorageTx(proxyRepository)) {
       tx.begin();
-      asset = tx.findAssetWithProperty(AssetEntityAdapter.P_NAME, AGRICOLAE_PATH_FULL_131_TARGZ,
+      asset = tx.findAssetWithProperty(AssetEntityAdapter.P_NAME, AGRICOLAE_131_TARGZ.fullPath,
           tx.findBucket(proxyRepository));
       assertThat(asset, Matchers.notNullValue());
       blob = tx.getBlob(asset.blobRef());
@@ -160,16 +161,18 @@ public class RRestoreBlobIT
 
     testHelper.runRestoreMetadataTask();
 
-    testHelper.assertComponentInRepository(hostedRepository, AGRICOLAE_PKG_NAME);
-    testHelper.assertComponentInRepository(proxyRepository, AGRICOLAE_PKG_NAME);
+    testHelper.assertComponentInRepository(hostedRepository, AGRICOLAE_131_TARGZ.packageName);
+    testHelper.assertComponentInRepository(proxyRepository, AGRICOLAE_131_TARGZ.packageName);
 
-    testHelper.assertAssetMatchesBlob(hostedRepository, AGRICOLAE_PATH_FULL_131_TARGZ);
-    testHelper.assertAssetMatchesBlob(proxyRepository, AGRICOLAE_PATH_FULL_131_TARGZ);
+    testHelper.assertAssetMatchesBlob(hostedRepository, AGRICOLAE_131_TARGZ.fullPath);
+    testHelper.assertAssetMatchesBlob(proxyRepository, AGRICOLAE_131_TARGZ.fullPath);
 
-    testHelper.assertAssetAssociatedWithComponent(hostedRepository, AGRICOLAE_PKG_NAME, AGRICOLAE_PATH_FULL_131_TARGZ);
-    testHelper.assertAssetAssociatedWithComponent(proxyRepository, AGRICOLAE_PKG_NAME, AGRICOLAE_PATH_FULL_131_TARGZ);
+    testHelper.assertAssetAssociatedWithComponent(hostedRepository, AGRICOLAE_131_TARGZ.packageName,
+        AGRICOLAE_131_TARGZ.fullPath);
+    testHelper.assertAssetAssociatedWithComponent(proxyRepository, AGRICOLAE_131_TARGZ.packageName,
+        AGRICOLAE_131_TARGZ.fullPath);
 
-    assertThat(hostedClient.get(AGRICOLAE_PATH_FULL_131_TARGZ).getStatusLine().getStatusCode(), is(HttpStatus.OK));
-    assertThat(proxyClient.get(AGRICOLAE_PATH_FULL_131_TARGZ).getStatusLine().getStatusCode(), is(HttpStatus.OK));
+    assertThat(hostedClient.get(AGRICOLAE_131_TARGZ.fullPath).getStatusLine().getStatusCode(), is(HttpStatus.OK));
+    assertThat(proxyClient.get(AGRICOLAE_131_TARGZ.fullPath).getStatusLine().getStatusCode(), is(HttpStatus.OK));
   }
 }

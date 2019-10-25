@@ -23,6 +23,7 @@ import org.sonatype.nexus.repository.Repository
 import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.r.RHostedFacet
+import org.sonatype.nexus.repository.r.RPackagesBuilderFacet
 import org.sonatype.nexus.repository.types.HostedType
 import org.sonatype.nexus.repository.view.ConfigurableViewFacet
 import org.sonatype.nexus.repository.view.Route
@@ -55,6 +56,9 @@ class RHostedRecipe
   Provider<RHostedFacet> hostedFacet
 
   @Inject
+  Provider<RPackagesBuilderFacet> packagesBuilderFacet
+
+  @Inject
   HostedHandlers hostedHandlers
 
   @Inject
@@ -69,6 +73,7 @@ class RHostedRecipe
     repository.attach(httpClientFacet.get())
     repository.attach(componentMaintenanceFacet.get())
     repository.attach(hostedFacet.get())
+    repository.attach(packagesBuilderFacet.get())
     repository.attach(rFacet.get())
     repository.attach(rRestoreFacet.get())
     repository.attach(storageFacet.get())
@@ -84,37 +89,37 @@ class RHostedRecipe
 
     // PACKAGES.gz is the only supported metadata in hosted for now
     builder.route(packagesGzMatcher()
-        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(PACKAGES))
         .handler(securityHandler)
+        .handler(highAvailabilitySupportHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
-        .handler(hostedHandlers.getPackagesGz)
+        .handler(hostedHandlers.getContent)
         .create())
 
     builder.route(archiveMatcher()
-        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
+        .handler(highAvailabilitySupportHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(conditionalRequestHandler)
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
-        .handler(hostedHandlers.getArchive)
+        .handler(hostedHandlers.getContent)
         .create())
 
     builder.route(uploadMatcher()
-        .handler(highAvailabilitySupportHandler)
         .handler(timingHandler)
         .handler(assetKindHandler.rcurry(ARCHIVE))
         .handler(securityHandler)
+        .handler(highAvailabilitySupportHandler)
         .handler(exceptionHandler)
         .handler(handlerContributor)
         .handler(conditionalRequestHandler)
@@ -127,11 +132,6 @@ class RHostedRecipe
     builder.route(notSupportedMetadataMatcher()
         .handler(securityHandler)
         .handler(hostedHandlers.notSupportedMetadataRequest)
-        .create())
-
-    builder.route(nonRArchiveUploadMatcher()
-        .handler(securityHandler)
-        .handler(hostedHandlers.nonRArchiveUpload)
         .create())
 
     addBrowseUnsupportedRoute(builder)

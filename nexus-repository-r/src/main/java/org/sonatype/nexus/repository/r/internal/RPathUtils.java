@@ -27,11 +27,15 @@ import static org.sonatype.nexus.repository.r.internal.AssetKind.RDS_METADATA;
  */
 public final class RPathUtils
 {
-  public static final Pattern PATTERN_PACKAGES = Pattern.compile(".*/.+/PACKAGES.*");
+  public static final Pattern PATTERN_PACKAGES_EXTENSION = Pattern.compile(".*PACKAGES.*");
 
-  public static final Pattern PATTERN_METADATA_RDS = Pattern.compile(".*/.+/.+.rds");
+  public static final Pattern PATTERN_METADATA_RDS_EXTENSION = Pattern.compile(".+.rds");
 
-  public static final Pattern PATTERN_ARCHIVE = Pattern.compile(".*/.+/.+(.zip|.tgz|.tar.gz)");
+  public static final Pattern PATTERN_ARCHIVE_EXTENSION = Pattern.compile(".+(.zip|.tgz|.tar.gz)");
+
+  public static final Pattern PATTERN_PATH = Pattern.compile(".+/.+/.+");
+
+  public static final String PACKAGES_GZ_FILENAME = "PACKAGES.gz";
 
   /**
    * Builds a path to an asset for a particular path and filename.
@@ -55,9 +59,9 @@ public final class RPathUtils
   }
 
   /**
-   * Removes filename from path
+   * Returns base path of the package (without filename)
    */
-  public static String cutFilenameFromPath(final String path) {
+  public static String getBasePath(final String path) {
     final int pathEndCharIndex = StringUtils.stripEnd(path, "/").lastIndexOf('/');
     return path.substring(0, pathEndCharIndex);
   }
@@ -67,10 +71,10 @@ public final class RPathUtils
    */
   public static AssetKind getAssetKind(final String path) {
     AssetKind assetKind = ARCHIVE;
-    if (PATTERN_PACKAGES.matcher(path).matches()) {
+    if (PATTERN_PACKAGES_EXTENSION.matcher(path).matches()) {
       assetKind = PACKAGES;
     }
-    else if (PATTERN_METADATA_RDS.matcher(path).matches()) {
+    else if (PATTERN_METADATA_RDS_EXTENSION.matcher(path).matches()) {
       assetKind = RDS_METADATA;
     }
 
@@ -78,10 +82,17 @@ public final class RPathUtils
   }
 
   /**
-   * Determines if it's a valid path for archive
+   * Determines if it's a valid extension for archive
    */
-  public static boolean isValidArchivePath(final String path) {
-    return PATTERN_ARCHIVE.matcher(path).matches();
+  public static boolean isValidArchiveExtension(final String nameWithExtension) {
+    return PATTERN_ARCHIVE_EXTENSION.matcher(nameWithExtension).matches();
+  }
+
+  /**
+   * Determines if it's a valid repository path
+   */
+  public static boolean isValidRepoPath(final String path) {
+    return PATTERN_PATH.matcher(path).matches();
   }
 
   private RPathUtils() {

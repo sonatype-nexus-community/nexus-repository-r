@@ -12,40 +12,24 @@
  */
 package org.sonatype.nexus.repository.r;
 
-import java.io.IOException;
-
 import org.sonatype.nexus.repository.Facet;
-import org.sonatype.nexus.repository.storage.Asset;
-import org.sonatype.nexus.repository.view.Content;
-import org.sonatype.nexus.repository.view.Payload;
 
 /**
- * Persistence for R hosted.
+ * Facet implementing behavior for generating R PACKAGES metadata (not the actual R packages themselves). A typical
+ * implementation will listen for changes to a repo and then rebuild the associated metadata.
+ * <p>
+ * TODO: Update this to support other PACKAGES files (not just PACKAGES.gz) when this work is done across the project.
+ *
+ * @since 1.1.next
  */
 @Facet.Exposed
-public interface RHostedFacet
+public interface RPackagesBuilderFacet
     extends Facet
 {
   /**
-   * Retrieve stored content
+   * Invalidates the metadata for this particular repository's PACKAGES.gz file at the specified path.
    *
-   * @param contentPath the full path to stored content
-   * @return the package content
+   * @param basePath The base path of the PACKAGES.gz file to invalidate.
    */
-  Content getStoredContent(String contentPath);
-
-  /**
-   * Perform upload.
-   *
-   * @param path    the upload path
-   * @param payload uploaded file content
-   */
-  Asset upload(String path, Payload payload) throws IOException;
-
-  /**
-   * Builds and stores PACKAGES.gz metadata for path.
-   *
-   * @param basePath the path to build the metadata for
-   */
-  void buildAndPutPackagesGz(String basePath) throws IOException;
+  void invalidateMetadata(String basePath);
 }

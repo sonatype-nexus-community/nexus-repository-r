@@ -32,6 +32,7 @@ import org.ops4j.pax.exam.Option;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
@@ -57,7 +58,9 @@ public class RGroupIT
   public static Option[] configureNexus() {
     return NexusPaxExamSupport.options(
         NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
+        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
+        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
+            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
     );
   }
 
@@ -66,8 +69,8 @@ public class RGroupIT
     ThreadContext.bind(FakeAlmightySubject.forUserId("disabled-security"));
     remote = Server.withPort(0)
         .serve("/*").withBehaviours(error(NOT_FOUND))
-        .serve("/" + AGRICOLAE_PATH_FULL_121_TARGZ)
-        .withBehaviours(file(testData.resolveFile(AGRICOLAE_PKG_FILE_NAME_121_TARGZ)))
+        .serve("/" + AGRICOLAE_121_TARGZ.fullPath)
+        .withBehaviours(file(testData.resolveFile(AGRICOLAE_121_TARGZ.filename)))
         .start();
 
     repoProxy = repos.createRProxy(testName.getMethodName() + "-proxy", remote.getUrl().toExternalForm());
@@ -77,8 +80,8 @@ public class RGroupIT
     hostedClient = createRClient(repoHosted);
     groupClient = createRClient(repoGroup);
 
-    assertThat(status(hostedClient.putAndClose(AGRICOLAE_PATH_FULL_131_TARGZ,
-        fileToHttpEntity(AGRICOLAE_PKG_FILE_NAME_131_TARGZ))), is(OK));
+    assertThat(status(hostedClient.putAndClose(AGRICOLAE_131_TARGZ.fullPath,
+        fileToHttpEntity(AGRICOLAE_131_TARGZ.filename))), is(OK));
   }
 
   @After
@@ -88,27 +91,29 @@ public class RGroupIT
 
   @Test
   public void whenRequestUnknownR_ShouldReturnError() throws Exception {
-    assertThat(status(groupClient.fetch(DOES_NOT_EXIST_PKG_TGZ)), is(NOT_FOUND));
+    assertThat(status(groupClient.fetch(DOES_NOT_EXIST_TGZ.fullPath)), is(NOT_FOUND));
   }
 
   @Test
   public void whenRequestValidRPackageFromProxy_ShouldReturnSuccess() throws Exception {
-    final HttpResponse response = groupClient.fetch(AGRICOLAE_PATH_FULL_121_TARGZ);
-    assertSuccessResponseMatches(response, AGRICOLAE_PKG_FILE_NAME_121_TARGZ);
+    final HttpResponse response = groupClient.fetch(AGRICOLAE_121_TARGZ.fullPath);
+    assertSuccessResponseMatches(response, AGRICOLAE_121_TARGZ.filename);
   }
 
   @Test
   public void whenRequestValidRPackageFromHosted_ShouldReturnSuccess() throws Exception {
-    final HttpResponse response = groupClient.fetch(AGRICOLAE_PATH_FULL_131_TARGZ);
-    assertSuccessResponseMatches(response, AGRICOLAE_PKG_FILE_NAME_131_TARGZ);
+    final HttpResponse response = groupClient.fetch(AGRICOLAE_131_TARGZ.fullPath);
+    assertSuccessResponseMatches(response, AGRICOLAE_131_TARGZ.filename);
   }
 
   @Test
   public void whenRequestMetadataFromGroup_ShouldReturnSuccess() throws Exception {
     final String agricolae131Content =
-        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_NAME).toPath()));
+        new String(Files.readAllBytes(testData.resolveFile(PACKAGES_AGRICOLAE_131_FILENAME).toPath()));
 
-    final InputStream content = groupClient.fetch(PACKAGES_GZ_PATH_FULL).getEntity().getContent();
+    Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
+
+    final InputStream content = groupClient.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), content);
   }
 }
