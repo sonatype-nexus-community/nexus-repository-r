@@ -15,12 +15,12 @@ package org.sonatype.nexus.repository.r.internal;
 /**
  * RException now with more R Exceptions
  */
-class RException
+public class RException
     extends RuntimeException
 {
   private String url;
 
-  RException(final String url, final Throwable cause) {
+  public RException(final String url, final Throwable cause) {
     super(cause);
     this.url = url;
   }

@@ -10,30 +10,27 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.repository.r.internal;
+package org.sonatype.nexus.repository.r.internal.security;
 
-import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.sonatype.nexus.repository.cache.CacheControllerHolder;
-import org.sonatype.nexus.repository.cache.CacheControllerHolder.CacheType;
+import org.sonatype.nexus.repository.security.ContentPermissionChecker;
+import org.sonatype.nexus.repository.security.SecurityFacetSupport;
+import org.sonatype.nexus.repository.security.VariableResolverAdapter;
 
 /**
- * Asset kinds for R.
+ * R format security facet.
  */
-public enum AssetKind
+@Named
+public class RSecurityFacet
+    extends SecurityFacetSupport
 {
-  PACKAGES(CacheControllerHolder.METADATA),
-  RDS_METADATA(CacheControllerHolder.METADATA),
-  ARCHIVE(CacheControllerHolder.CONTENT);
-
-  private final CacheType cacheType;
-
-  AssetKind(final CacheType cacheType) {
-    this.cacheType = cacheType;
-  }
-
-  @Nonnull
-  public CacheType getCacheType() {
-    return cacheType;
+  @Inject
+  public RSecurityFacet(final RFormatSecurityContributor securityResource,
+                        @Named("simple") final VariableResolverAdapter variableResolverAdapter,
+                        final ContentPermissionChecker contentPermissionChecker)
+  {
+    super(securityResource, variableResolverAdapter, contentPermissionChecker);
   }
 }
