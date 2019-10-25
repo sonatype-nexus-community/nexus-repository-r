@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.r.internal;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -19,8 +20,13 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.goodies.common.ComponentSupport;
+import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.entity.EntityMetadata;
+import org.sonatype.nexus.common.event.EventManager;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.AssetUpdatedEvent;
 import org.sonatype.nexus.repository.storage.Bucket;
 import org.sonatype.nexus.repository.storage.BucketStore;
 import org.sonatype.nexus.repository.storage.Component;
@@ -41,11 +47,18 @@ public class RComponentDirector
 
   private final RepositoryManager repositoryManager;
 
+  private final EventManager eventManager;
+
+  private String sourceRepositoryName;
+
   @Inject
   public RComponentDirector(final BucketStore bucketStore,
-                            final RepositoryManager repositoryManager) {
+                            final RepositoryManager repositoryManager,
+                            final EventManager eventManager)
+  {
     this.bucketStore = checkNotNull(bucketStore);
     this.repositoryManager = checkNotNull(repositoryManager);
+    this.eventManager = checkNotNull(eventManager);
   }
 
   @Override
@@ -69,5 +82,29 @@ public class RComponentDirector
         .map(bucketStore::getById)
         .map(Bucket::getRepositoryName)
         .map(repositoryManager::get);
+  }
+
+  @Override
+  public Component beforeMove(final Component component,
+                              final List<Asset> assets,
+                              final Repository source,
+                              final Repository destination)
+  {
+    sourceRepositoryName = source.getName();
+    return component;
+  }
+
+  @Override
+  public Component afterMove(final Component component, final Repository destination) {
+    EntityMetadata entityMetadata = component.getEntityMetadata();
+    assert entityMetadata != null;
+    EntityId componentId = entityMetadata.getId();
+
+    if (sourceRepositoryName != null) {
+      eventManager.post(new AssetUpdatedEvent(entityMetadata, sourceRepositoryName, componentId));
+      sourceRepositoryName = null;
+    }
+    eventManager.post(new AssetUpdatedEvent(entityMetadata, destination.getName(),componentId));
+    return component;
   }
 }
