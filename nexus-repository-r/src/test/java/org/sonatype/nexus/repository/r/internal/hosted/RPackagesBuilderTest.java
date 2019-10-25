@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.collect.NestedAttributesMap;
-import org.sonatype.nexus.repository.r.internal.hosted.RPackagesInformationBuilder;
 import org.sonatype.nexus.repository.storage.Asset;
 
 import org.junit.Test;
@@ -32,23 +31,23 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LINKINGTO;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPILATION;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
-import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LINKINGTO;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.util.RDescriptionUtils.extractDescriptionFromArchive;
 
 /**
- * {@link RPackagesInformationBuilder} unit tests.
+ * {@link RPackagesBuilder} unit tests.
  */
-public class RPackagesInformationBuilderTest
+public class RPackagesBuilderTest
     extends TestSupport
 {
 
   @Test
   public void shouldAppendPackages() {
-    RPackagesInformationBuilder underTest = new RPackagesInformationBuilder();
+    RPackagesBuilder underTest = new RPackagesBuilder();
     underTest.append(createAsset("/foo/bar/b-4", "b", "4.0.0"));
     underTest.append(createAsset("/foo/bar/a-1", "a", "1.0.0"));
     underTest.append(createAsset("/foo/bar/a-3", "a", "3.0.0"));
@@ -80,7 +79,7 @@ public class RPackagesInformationBuilderTest
 
   @Test
   public void shouldBuildPackages() throws IOException {
-    RPackagesInformationBuilder underTest = new RPackagesInformationBuilder();
+    RPackagesBuilder underTest = new RPackagesBuilder();
     underTest.append(createAsset("/foo/bar/a-3", "a", "3.0.0"));
 
     Map<String, Map<String, String>> packageInformation = underTest.getPackageInformation();
@@ -93,6 +92,7 @@ public class RPackagesInformationBuilderTest
       assertThat(attributes.get(P_DEPENDS), is("Depends:/foo/bar/a-3"));
       assertThat(attributes.get(P_IMPORTS), is("Imports:/foo/bar/a-3"));
       assertThat(attributes.get(P_SUGGESTS), is("Suggests:/foo/bar/a-3"));
+      assertThat(attributes.get(P_LINKINGTO), is("LinkingTo:/foo/bar/a-3"));
       assertThat(attributes.get(P_LICENSE), is("License:/foo/bar/a-3"));
       assertThat(attributes.get(P_NEEDS_COMPILATION), is("NeedsCompilation:/foo/bar/a-3"));
     }
