@@ -35,6 +35,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPILATION;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LINKINGTO;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
 import static org.sonatype.nexus.repository.r.internal.util.RDescriptionUtils.extractDescriptionFromArchive;
 
@@ -62,6 +63,7 @@ public class RPackagesInformationBuilderTest
     assertThat(packageA.get(P_DEPENDS), is("Depends:/foo/bar/a-3"));
     assertThat(packageA.get(P_IMPORTS), is("Imports:/foo/bar/a-3"));
     assertThat(packageA.get(P_SUGGESTS), is("Suggests:/foo/bar/a-3"));
+    assertThat(packageA.get(P_LINKINGTO), is("LinkingTo:/foo/bar/a-3"));
     assertThat(packageA.get(P_LICENSE), is("License:/foo/bar/a-3"));
     assertThat(packageA.get(P_NEEDS_COMPILATION), is("NeedsCompilation:/foo/bar/a-3"));
 
@@ -71,6 +73,7 @@ public class RPackagesInformationBuilderTest
     assertThat(packageB.get(P_DEPENDS), is("Depends:/foo/bar/b-4"));
     assertThat(packageB.get(P_IMPORTS), is("Imports:/foo/bar/b-4"));
     assertThat(packageB.get(P_SUGGESTS), is("Suggests:/foo/bar/b-4"));
+    assertThat(packageB.get(P_LINKINGTO), is("LinkingTo:/foo/bar/b-4"));
     assertThat(packageB.get(P_LICENSE), is("License:/foo/bar/b-4"));
     assertThat(packageB.get(P_NEEDS_COMPILATION), is("NeedsCompilation:/foo/bar/b-4"));
   }
@@ -105,6 +108,7 @@ public class RPackagesInformationBuilderTest
     when(formatAttributes.get(P_DEPENDS, String.class)).thenReturn("Depends:" + assetName);
     when(formatAttributes.get(P_IMPORTS, String.class)).thenReturn("Imports:" + assetName);
     when(formatAttributes.get(P_SUGGESTS, String.class)).thenReturn("Suggests:" + assetName);
+    when(formatAttributes.get(P_LINKINGTO, String.class)).thenReturn("LinkingTo:" + assetName);
     when(formatAttributes.get(P_LICENSE, String.class)).thenReturn("License:" + assetName);
     when(formatAttributes.get(P_NEEDS_COMPILATION, String.class)).thenReturn("NeedsCompilation:" + assetName);
 
