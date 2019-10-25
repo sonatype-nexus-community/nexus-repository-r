@@ -38,33 +38,33 @@ import static org.mockito.Mockito.when;
 public abstract class RepositoryFacetTestSupport<T extends Facet>
     extends TestSupport
 {
-  List<Asset> assets;
+  protected List<Asset> assets;
 
   @Mock
-  StorageTx storageTx;
+  protected StorageTx storageTx;
 
   @Mock
-  StorageFacet storageFacet;
+  protected StorageFacet storageFacet;
 
   @Mock
-  Bucket bucket;
+  protected Bucket bucket;
 
   @Mock
-  Repository repository;
+  protected Repository repository;
 
   @Mock
-  Asset asset;
+  protected Asset asset;
 
   @Mock
-  NestedAttributesMap formatAttributes;
+  protected NestedAttributesMap formatAttributes;
 
   @Mock
-  NestedAttributesMap attributes;
+  protected NestedAttributesMap attributes;
 
   @Mock
-  Blob blob;
+  protected Blob blob;
 
-  T underTest;
+  protected T underTest;
 
   @Before
   public void initialiseFacetMocksAndSetupTransaction() throws Exception {

@@ -28,6 +28,8 @@ public final class RAttributes
 
   public static final String P_SUGGESTS = "Suggests";
 
+  public static final String P_LINKINGTO = "LinkingTo";
+
   public static final String P_LICENSE = "License";
 
   public static final String P_NEEDS_COMPILATION = "NeedsCompilation";

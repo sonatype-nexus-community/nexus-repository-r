@@ -13,6 +13,9 @@
 package org.sonatype.nexus.repository.r.internal;
 
 import org.sonatype.goodies.testsupport.TestSupport;
+import org.sonatype.nexus.repository.r.internal.group.RGroupRecipe;
+import org.sonatype.nexus.repository.r.internal.hosted.RHostedRecipe;
+import org.sonatype.nexus.repository.r.internal.proxy.RProxyRecipe;
 import org.sonatype.nexus.repository.types.GroupType;
 import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
