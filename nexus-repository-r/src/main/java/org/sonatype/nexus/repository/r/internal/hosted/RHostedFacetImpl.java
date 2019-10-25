@@ -41,6 +41,7 @@ import static org.sonatype.nexus.repository.r.internal.AssetKind.ARCHIVE;
 import static org.sonatype.nexus.repository.r.internal.util.RDescriptionUtils.extractDescriptionFromArchive;
 import static org.sonatype.nexus.repository.r.internal.util.RFacetUtils.browseAllAssetsByKind;
 import static org.sonatype.nexus.repository.r.internal.util.RFacetUtils.findAsset;
+import static org.sonatype.nexus.repository.r.internal.util.RFacetUtils.saveAsset;
 import static org.sonatype.nexus.repository.r.internal.util.RFacetUtils.toContent;
 import static org.sonatype.nexus.repository.r.internal.util.RPathUtils.PACKAGES_GZ_FILENAME;
 import static org.sonatype.nexus.repository.r.internal.util.RPathUtils.buildPath;
@@ -96,7 +97,7 @@ public class RHostedFacetImpl
 
     Component component = rFacet.findOrCreateComponent(tx, path, attributes);
     Asset asset = rFacet.findOrCreateAsset(tx, component, path, attributes);
-    RFacetUtils.saveAsset(tx, asset, archiveContent, payload);
+    saveAsset(tx, asset, archiveContent, payload);
 
     return asset;
   }
@@ -125,6 +126,6 @@ public class RHostedFacetImpl
   {
     RFacet rFacet = facet(RFacet.class);
     Asset asset = rFacet.findOrCreateAsset(tx, buildPath(basePath, PACKAGES_GZ_FILENAME));
-    RFacetUtils.saveAsset(tx, asset, tempPackagesGz, "", null);
+    saveAsset(tx, asset, tempPackagesGz, "", null);
   }
 }
