@@ -35,6 +35,7 @@ import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZ
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LINKINGTO;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPILATION;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
@@ -51,7 +52,7 @@ import static org.sonatype.nexus.repository.r.internal.RAttributes.P_VERSION;
  *
  * @since 1.1.next
  */
-public class RPackagesInformationBuilder
+public class RPackagesBuilder
 {
   /**
    * The greatest version of each package currently encountered during this run.
@@ -93,6 +94,7 @@ public class RPackagesInformationBuilder
       newInformation.put(P_DEPENDS, asset.formatAttributes().get(P_DEPENDS, String.class));
       newInformation.put(P_IMPORTS, asset.formatAttributes().get(P_IMPORTS, String.class));
       newInformation.put(P_SUGGESTS, asset.formatAttributes().get(P_SUGGESTS, String.class));
+      newInformation.put(P_LINKINGTO, asset.formatAttributes().get(P_LINKINGTO, String.class));
       newInformation.put(P_LICENSE, asset.formatAttributes().get(P_LICENSE, String.class));
       newInformation.put(P_NEEDS_COMPILATION, asset.formatAttributes().get(P_NEEDS_COMPILATION, String.class));
 
@@ -133,6 +135,7 @@ public class RPackagesInformationBuilder
     headers.addHeader(P_DEPENDS, packageInfo.get(P_DEPENDS));
     headers.addHeader(P_IMPORTS, packageInfo.get(P_IMPORTS));
     headers.addHeader(P_SUGGESTS, packageInfo.get(P_SUGGESTS));
+    headers.addHeader(P_LINKINGTO, packageInfo.get(P_LINKINGTO));
     headers.addHeader(P_LICENSE, packageInfo.get(P_LICENSE));
     headers.addHeader(P_NEEDS_COMPILATION, packageInfo.get(P_NEEDS_COMPILATION));
     Enumeration<String> headerLines = headers.getAllHeaderLines();

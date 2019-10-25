@@ -107,7 +107,7 @@ public class RHostedFacetImpl
   public void buildAndPutPackagesGz(final String basePath) throws IOException {
     checkNotNull(basePath);
     StorageTx tx = UnitOfWork.currentTx();
-    RPackagesInformationBuilder packagesBuilder = new RPackagesInformationBuilder();
+    RPackagesBuilder packagesBuilder = new RPackagesBuilder();
     Iterable<Asset> archiveAssets = browseAllAssetsByKind(tx, tx.findBucket(getRepository()), ARCHIVE);
     StreamSupport.stream(archiveAssets.spliterator(), false) // packageInfoBuilder doesn't support multithreading
         .filter(asset -> basePath.equals(getBasePath(asset.name())))

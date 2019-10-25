@@ -49,6 +49,7 @@ import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_DEPENDS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_IMPORTS;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LICENSE;
+import static org.sonatype.nexus.repository.r.internal.RAttributes.P_LINKINGTO;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_NEEDS_COMPILATION;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_PACKAGE;
 import static org.sonatype.nexus.repository.r.internal.RAttributes.P_SUGGESTS;
@@ -79,6 +80,8 @@ public class RHostedFacetImplTest
   static final String IMPORTS = "d,e,f";
 
   static final String SUGGESTS = "g,h,i";
+
+  static final String LINKINGTO = "Rcpp";
 
   static final String LICENSE = "MIT";
 
@@ -111,6 +114,7 @@ public class RHostedFacetImplTest
     when(formatAttributes.get(P_DEPENDS, String.class)).thenReturn(DEPENDS);
     when(formatAttributes.get(P_IMPORTS, String.class)).thenReturn(IMPORTS);
     when(formatAttributes.get(P_SUGGESTS, String.class)).thenReturn(SUGGESTS);
+    when(formatAttributes.get(P_LINKINGTO, String.class)).thenReturn(LINKINGTO);
     when(formatAttributes.get(P_LICENSE, String.class)).thenReturn(LICENSE);
     when(formatAttributes.get(P_NEEDS_COMPILATION, String.class)).thenReturn(NEEDS_COMPILATION);
     when(asset.name()).thenReturn(PACKAGE_PATH);
@@ -216,6 +220,7 @@ public class RHostedFacetImplTest
       assertThat(attributes.get(P_DEPENDS), is(equalTo(DEPENDS)));
       assertThat(attributes.get(P_IMPORTS), is(equalTo(IMPORTS)));
       assertThat(attributes.get(P_SUGGESTS), is(equalTo(SUGGESTS)));
+      assertThat(attributes.get(P_LINKINGTO), is(equalTo(LINKINGTO)));
       assertThat(attributes.get(P_LICENSE), is(equalTo(LICENSE)));
       assertThat(attributes.get(P_NEEDS_COMPILATION), is(equalTo(NEEDS_COMPILATION)));
     }
