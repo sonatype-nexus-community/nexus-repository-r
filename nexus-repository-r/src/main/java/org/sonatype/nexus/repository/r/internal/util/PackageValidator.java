@@ -25,9 +25,9 @@ import static org.sonatype.nexus.repository.r.internal.util.RPathUtils.isValidRe
 public final class PackageValidator
 {
   public static final String NOT_VALID_PATH_ERROR_MESSAGE =
-      "Not a valid upload path. Should be e.g. src/contrib or bin/<os>/contrib/<R_version>.";
+      "Provided path is not valid and is expecting src/contrib or bin/<os>/contrib/<R_version>";
 
-  public static final String NOT_VALID_EXTENSION_ERROR_MESSAGE = "Extension not .zip, .tar.gz or .tgz.";
+  public static final String NOT_VALID_EXTENSION_ERROR_MESSAGE = "Provided extension is not .zip, .tar.gz or .tgz";
 
   private PackageValidator() {
     // Empty
