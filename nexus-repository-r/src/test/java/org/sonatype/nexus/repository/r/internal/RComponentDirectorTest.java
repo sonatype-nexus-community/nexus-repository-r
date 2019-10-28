@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.entity.EntityId;
+import org.sonatype.nexus.common.event.EventManager;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.manager.RepositoryManager;
 import org.sonatype.nexus.repository.storage.Bucket;
@@ -47,9 +48,12 @@ public class RComponentDirectorTest
   @Mock
   private Repository destination;
 
+  @Mock
+  private EventManager eventManager;
+
   @Test
   public void allowMoveTest() {
-    RComponentDirector director = new RComponentDirector(bucketStore, repositoryManager);
+    RComponentDirector director = new RComponentDirector(bucketStore, repositoryManager, eventManager);
     assertTrue(director.allowMoveTo(destination));
     assertTrue(director.allowMoveFrom(source));
 
