@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   github-maven-deploy: github-maven-deploy/github-maven-deploy@1.0.5
+  circleci-maven-release-orb: sonatype-nexus-community/circleci-maven-release-orb@0.0.5
 
 mvn-build-test-command: &mvn-build-test-command
   mvn-build-test-command: mvn clean verify -PbuildKar -Dit
@@ -15,6 +16,11 @@ mvn-collect-artifacts-command: &mvn-collect-artifacts-command
     mkdir -p ~/project/artifacts/junit/
     find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
 
+mvn-release-perform-command: &mvn-release-perform-command-dryRun
+  mvn-release-perform-command: mvn --batch-mode release:perform -DdryRun=true -s .circleci/.maven.xml
+  context: rso-base
+
+
 workflows:
   workflow:
     jobs:
@@ -22,45 +28,17 @@ workflows:
           <<: *mvn-build-test-command
           <<: *mvn-collect-artifacts-command
 
-      - github-maven-deploy/approve-deploy-patch-version:
+      - approve-release:
           type: approval
           requires:
             - github-maven-deploy/build-and-test
           filters:
             branches:
               only: master
-      - github-maven-deploy/approve-deploy-minor-version:
-          type: approval
+      - circleci-maven-release-orb/run-maven-release:
           requires:
-            - github-maven-deploy/build-and-test
-          filters:
-            branches:
-              only: master
-      - github-maven-deploy/approve-deploy-major-version:
-          type: approval
-          requires:
-            - github-maven-deploy/build-and-test
-          filters:
-            branches:
-              only: master
-      - github-maven-deploy/deploy-patch-version:
-          requires:
-            - github-maven-deploy/approve-deploy-patch-version
-          <<: *mvn-deploy-command
-          filters:
-            branches:
-              only: master
-      - github-maven-deploy/deploy-minor-version:
-          requires:
-            - github-maven-deploy/approve-deploy-minor-version
-          <<: *mvn-deploy-command
-          filters:
-            branches:
-              only: master
-      - github-maven-deploy/deploy-major-version:
-          requires:
-            - github-maven-deploy/approve-deploy-major-version
-          <<: *mvn-deploy-command
+            - approve-release
+          <<: *mvn-release-perform-command-dryRun
           filters:
             branches:
               only: master
