@@ -16,8 +16,8 @@ mvn-collect-artifacts-command: &mvn-collect-artifacts-command
     mkdir -p ~/project/artifacts/junit/
     find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
 
-mvn-release-perform-command: &mvn-release-perform-command-dryRun
-  mvn-release-perform-command: mvn --batch-mode release:perform -DdryRun=true -s .maven.xml
+mvn-release-perform-command: &mvn-release-perform-command-custom-maven-settings-file
+  mvn-release-perform-command: mvn --batch-mode release:perform -s .maven.xml
   context: rso-base
 
 
@@ -38,7 +38,7 @@ workflows:
       - circleci-maven-release-orb/run-maven-release:
           requires:
             - approve-release
-          <<: *mvn-release-perform-command-dryRun
+          <<: *mvn-release-perform-command-custom-maven-settings-file
           filters:
             branches:
               only: master
