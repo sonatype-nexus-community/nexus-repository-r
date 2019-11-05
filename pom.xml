@@ -23,7 +23,7 @@
   </parent>
 
   <artifactId>nexus-repository-r</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.8-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -31,7 +31,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:sonatype-nexus-community/nexus-repository-r.git</developerConnection>
-    <tag>nexus-repository-r-1.0.7</tag>
+    <tag>HEAD</tag>
   </scm>
   <distributionManagement>
     <snapshotRepository>
