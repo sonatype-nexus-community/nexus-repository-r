@@ -38,6 +38,7 @@ workflows:
       - circleci-maven-release-orb/run-maven-release:
           requires:
             - approve-release
+          ssh-fingerprints: "5a:a3:77:19:94:32:f9:28:21:df:10:f3:e4:fc:5d:ff"
           <<: *mvn-release-perform-command-custom-maven-settings-file
           filters:
             branches:
