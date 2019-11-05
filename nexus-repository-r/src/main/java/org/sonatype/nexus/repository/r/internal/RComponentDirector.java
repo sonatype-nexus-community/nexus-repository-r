@@ -93,18 +93,4 @@ public class RComponentDirector
     sourceRepositoryName = source.getName();
     return component;
   }
-
-  @Override
-  public Component afterMove(final Component component, final Repository destination) {
-    EntityMetadata entityMetadata = component.getEntityMetadata();
-    checkNotNull(entityMetadata);
-    EntityId componentId = entityMetadata.getId();
-
-    if (sourceRepositoryName != null) {
-      eventManager.post(new AssetUpdatedEvent(entityMetadata, sourceRepositoryName, componentId));
-      sourceRepositoryName = null;
-    }
-    eventManager.post(new AssetUpdatedEvent(entityMetadata, destination.getName(),componentId));
-    return component;
-  }
 }
