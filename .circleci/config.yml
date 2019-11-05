@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   github-maven-deploy: github-maven-deploy/github-maven-deploy@1.0.5
-  circleci-maven-release-orb: sonatype-nexus-community/circleci-maven-release-orb@dev:36db1ae
+  circleci-maven-release-orb: sonatype-nexus-community/circleci-maven-release-orb@0.0.6
 
 mvn-build-test-command: &mvn-build-test-command
   mvn-build-test-command: mvn clean verify -PbuildKar -Dit
