@@ -17,7 +17,7 @@ mvn-collect-artifacts-command: &mvn-collect-artifacts-command
     find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
 
 mvn-release-perform-command: &mvn-release-perform-command-custom-maven-settings-file
-  mvn-release-perform-command: mvn --batch-mode release:perform -s .maven.xml
+  mvn-release-perform-command: mvn --batch-mode release:perform -PbuildKar -s .maven.xml
   context: rso-base
 
 
