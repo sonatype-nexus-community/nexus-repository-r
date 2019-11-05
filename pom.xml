@@ -147,6 +147,8 @@
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
+          <!-- Something in the pom hierarchy overrides the default 'pushChanges == true', so we reset that here. -->
+          <pushChanges>true</pushChanges>
           <releaseProfiles>gpg-sign</releaseProfiles>
         </configuration>
       </plugin>
