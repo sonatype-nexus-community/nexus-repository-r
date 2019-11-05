@@ -35,7 +35,7 @@ import org.sonatype.nexus.repository.storage.ComponentDirector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @since 1.next
+ * @since 1.1.next
  */
 @Named(RFormat.NAME)
 @Singleton
@@ -97,7 +97,7 @@ public class RComponentDirector
   @Override
   public Component afterMove(final Component component, final Repository destination) {
     EntityMetadata entityMetadata = component.getEntityMetadata();
-    assert entityMetadata != null;
+    checkNotNull(entityMetadata);
     EntityId componentId = entityMetadata.getId();
 
     if (sourceRepositoryName != null) {

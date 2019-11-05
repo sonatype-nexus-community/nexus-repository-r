@@ -20,7 +20,7 @@ import org.sonatype.nexus.testsuite.testsupport.NexusClientFactory;
 
 /**
  * IT Client factory
- * @since 1.next
+ * @since 1.1.next
  */
 public class RClientFactory
     extends NexusClientFactory<RClient>

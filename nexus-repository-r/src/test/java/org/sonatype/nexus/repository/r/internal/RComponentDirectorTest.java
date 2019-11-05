@@ -27,9 +27,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * @since 1.next
- */
 public class RComponentDirectorTest
     extends TestSupport
 {
