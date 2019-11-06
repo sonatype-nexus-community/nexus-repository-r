@@ -19,24 +19,26 @@ mvn-release-perform-command: &mvn-release-perform-command-custom-maven-settings-
 
 
 workflows:
-  workflow:
+  build-and-test:
     jobs:
       - github-maven-deploy/build-and-test:
           <<: *mvn-build-test-command
           <<: *mvn-collect-artifacts-command
 
-#      - approve-release:
-#          type: approval
-#          requires:
-#            - github-maven-deploy/build-and-test
-#          filters:
-#            branches:
-#              only: master
-#      - circleci-maven-release-orb/run-maven-release:
-#          requires:
-#            - approve-release
-#          ssh-fingerprints: "5a:a3:77:19:94:32:f9:28:21:df:10:f3:e4:fc:5d:ff"
-#          <<: *mvn-release-perform-command-custom-maven-settings-file
-#          filters:
-#            branches:
-#              only: master
+  run-release:
+    jobs:
+      - approve-release:
+          type: approval
+          requires:
+            - github-maven-deploy/build-and-test
+          filters:
+            branches:
+              only: master
+      - circleci-maven-release-orb/run-maven-release:
+          requires:
+            - approve-release
+          ssh-fingerprints: "5a:a3:77:19:94:32:f9:28:21:df:10:f3:e4:fc:5d:ff"
+          <<: *mvn-release-perform-command-custom-maven-settings-file
+          filters:
+            branches:
+              only: master
