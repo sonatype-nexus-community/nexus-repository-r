@@ -13,7 +13,7 @@ mvn-collect-artifacts-command: &mvn-collect-artifacts-command
     find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
 
 mvn-release-perform-command: &mvn-release-perform-command-custom-maven-settings-file
-  # todo After IT modules are added, this .maven.xml file will likely migration down into the .circleci directory, so change -s path below
+  # @TODO After IT modules are added, this .maven.xml file will likely migration down into the .circleci directory, so change -s path below
   mvn-release-perform-command: mvn --batch-mode release:perform -PbuildKar -s .maven.xml
   context: rso-base
 
