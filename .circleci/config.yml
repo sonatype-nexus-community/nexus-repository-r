@@ -29,8 +29,6 @@ workflows:
     jobs:
       - approve-release:
           type: approval
-          requires:
-            - github-maven-deploy/build-and-test
           filters:
             branches:
               only: master
