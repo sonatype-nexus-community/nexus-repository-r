@@ -4,26 +4,14 @@ orbs:
   github-maven-deploy: github-maven-deploy/github-maven-deploy@1.0.5
   circleci-maven-release-orb: sonatype-nexus-community/circleci-maven-release-orb@0.0.7
 
-mvn-build-test-command: &mvn-build-test-command
-  mvn-build-test-command: mvn clean verify -PbuildKar -Dit
-
-mvn-collect-artifacts-command: &mvn-collect-artifacts-command
-  mvn-collect-artifacts-command: |
-    mkdir -p ~/project/artifacts/junit/
-    find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
-
-mvn-release-perform-command: &mvn-release-perform-command-custom-maven-settings-file
-  # @TODO After IT modules are added, this .maven.xml file will likely migration down into the .circleci directory, so change -s path below
-  mvn-release-perform-command: mvn --batch-mode release:perform -PbuildKar -s .maven.xml
-  context: rso-base
-
-
 workflows:
   build-and-test:
     jobs:
       - github-maven-deploy/build-and-test:
-          <<: *mvn-build-test-command
-          <<: *mvn-collect-artifacts-command
+          mvn-build-test-command: mvn clean verify -PbuildKar -Dit
+          mvn-collect-artifacts-command: |
+            mkdir -p ~/project/artifacts/junit/
+            find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
 
   run-release:
     jobs:
@@ -36,7 +24,9 @@ workflows:
           requires:
             - approve-release
           ssh-fingerprints: "5a:a3:77:19:94:32:f9:28:21:df:10:f3:e4:fc:5d:ff"
-          <<: *mvn-release-perform-command-custom-maven-settings-file
+          # @TODO After IT modules are added, this .maven.xml file will likely migration down into the .circleci directory, so change -s path below
+          mvn-release-perform-command: mvn --batch-mode release:perform -PbuildKar -s .maven.xml
+          context: rso-base
           filters:
             branches:
               only: master
