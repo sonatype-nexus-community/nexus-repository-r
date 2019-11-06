@@ -21,7 +21,6 @@ import java.util.Arrays;
 import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.plugins.r.internal.RClient;
 import org.sonatype.nexus.plugins.r.internal.RITSupport.TestPackage;
-import org.sonatype.nexus.plugins.r.internal.RClientFactory;
 import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Component;
@@ -51,8 +50,6 @@ public class CleanupTaskRIT
     extends CleanupITSupport
 {
   public static final TestPackage[] NAMES = {AGRICOLAE_101_TARGZ};
-
-  private RClientFactory rClientFactory = new RClientFactory();
 
   public Repository repository;
 
@@ -118,7 +115,7 @@ public class CleanupTaskRIT
 
   private int deployArtifacts(final TestPackage... packages) {
     try {
-      RClient client = rClientFactory.createClient(clientBuilder().build(),
+      RClient client = new RClient(clientBuilder().build(),
           clientContext(),
           resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()
       );

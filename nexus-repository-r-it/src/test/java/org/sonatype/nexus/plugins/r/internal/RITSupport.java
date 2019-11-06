@@ -30,7 +30,6 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
@@ -193,8 +192,6 @@ public class RITSupport
       CONTENT_TYPE_X_TGZ
   );
 
-  private RClientFactory rClientFactory = new RClientFactory();
-
   @Rule
   public RepositoryRuleR repos = new RepositoryRuleR(() -> repositoryManager);
 
@@ -211,7 +208,7 @@ public class RITSupport
 
   @Nonnull
   protected RClient createRClient(final Repository repository) throws Exception {
-    return rClientFactory.createClient(
+    return new RClient(
         clientBuilder().build(),
         clientContext(),
         resolveUrl(nexusUrl, format("/repository/%s/", repository.getName())).toURI()
@@ -219,7 +216,7 @@ public class RITSupport
   }
 
   protected RClient rClient(final URL repositoryUrl) throws Exception {
-    return rClientFactory.createClient(
+    return new RClient(
         clientBuilder(repositoryUrl).build(),
         clientContext(),
         repositoryUrl.toURI()
@@ -237,7 +234,7 @@ public class RITSupport
     }
   }
 
-  private Path getFilePathByName(String fileName){
+  private Path getFilePathByName(String fileName) {
     return Paths.get(testData.resolveFile(fileName).getAbsolutePath());
   }
 
