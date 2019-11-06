@@ -45,12 +45,9 @@ public class RComponentDirectorTest
   @Mock
   private Repository destination;
 
-  @Mock
-  private EventManager eventManager;
-
   @Test
   public void allowMoveTest() {
-    RComponentDirector director = new RComponentDirector(bucketStore, repositoryManager, eventManager);
+    RComponentDirector director = new RComponentDirector(bucketStore, repositoryManager);
     assertTrue(director.allowMoveTo(destination));
     assertTrue(director.allowMoveFrom(source));
 
