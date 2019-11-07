@@ -30,7 +30,6 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
@@ -235,7 +234,7 @@ public class RITSupport
     }
   }
 
-  private Path getFilePathByName(String fileName){
+  private Path getFilePathByName(String fileName) {
     return Paths.get(testData.resolveFile(fileName).getAbsolutePath());
   }
 
