@@ -1,6 +1,6 @@
 # Nexus Repository R plugin
 
-## [v1.1.0](https://github.com/sonatype-nexus-community/nexus-repository-r/blob/nexus-repository-r-1.1.0/README.md)
+## [v1.1.0](/.github/README.md)
 
 > **What's New** R is now part of Nexus Repository Manager. Version 3.20+ includes the R plugin by default. The source code for the R plugin continues to live in this community project.
 
