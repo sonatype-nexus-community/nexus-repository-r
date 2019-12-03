@@ -30,6 +30,10 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <inceptionYear>2017</inceptionYear>
 
+  <scm>
+    <developerConnection>scm:git:git@github.com:sonatype-nexus-community/nexus-repository-r.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
   <modules>
     <module>nexus-repository-r</module>
     <module>nexus-repository-r-it</module>
@@ -64,7 +68,16 @@
         <configuration>
           <serverId>rso</serverId>
           <nexusUrl>https://repository.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <!-- Something in the pom hierarchy overrides the default 'pushChanges == true', so we reset that here. -->
+          <pushChanges>true</pushChanges>
+          <releaseProfiles>gpg-sign</releaseProfiles>
         </configuration>
       </plugin>
     </plugins>
@@ -72,16 +85,10 @@
 
   <profiles>
     <profile>
-      <id>deploy</id>
+      <id>gpg-sign</id>
       <!--
       only sign during deploy phase
       -->
-      <activation>
-        <property>
-          <name>performRelease</name>
-          <value>true</value>
-        </property>
-      </activation>
       <build>
         <plugins>
           <plugin>
@@ -106,6 +113,9 @@
           </plugin>
         </plugins>
       </build>
+      <properties>
+        <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+      </properties>
     </profile>
   </profiles>
 </project>
