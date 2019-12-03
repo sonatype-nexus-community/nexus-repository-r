@@ -18,7 +18,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
 # Table Of Contents
-* [Release notes](https://github.com/sonatype-nexus-community/nexus-repository-r/blob/master/RELEASE-NOTES.md)
+* [Release notes](/.github/RELEASE-NOTES.md)
 * [Developing](#developing)
    * [Requirements](#requirements)
    * [Building](#building)
