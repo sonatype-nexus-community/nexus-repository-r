@@ -21,10 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.sonatype.goodies.httpfixture.server.api.Behaviour;
-import org.sonatype.nexus.common.entity.EntityHelper;
 import org.sonatype.nexus.common.entity.EntityId;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.repository.routing.RoutingRule;
 import org.sonatype.nexus.repository.routing.RoutingRuleStore;
 import org.sonatype.nexus.testsuite.testsupport.fixtures.RoutingRuleRule;
 
@@ -45,8 +43,7 @@ public class RRoutingRuleITSupport
   public RoutingRuleRule routingRules = new RoutingRuleRule(() -> ruleStore);
 
   protected EntityId createBlockedRoutingRule(final String name, final String matcher) {
-    RoutingRule rule = routingRules.create(name, matcher);
-    return EntityHelper.id(rule);
+    return routingRules.create(name, matcher).id();
   }
 
   protected void attachRuleToRepository(final Repository repository, final EntityId routingRuleId) throws Exception {
