@@ -13,18 +13,19 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins</artifactId>
-    <version>3.18.0-01</version>
+    <version>3.20.0-02</version>
   </parent>
 
-  <artifactId>nexus-repository-r</artifactId>
-  <version>1.0.7-SNAPSHOT</version>
-  <packaging>bundle</packaging>
+  <artifactId>nexus-repository-base</artifactId>
+  <version>1.1.0</version>
+  <packaging>pom</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
   <inceptionYear>2017</inceptionYear>
@@ -33,6 +34,12 @@
     <developerConnection>scm:git:git@github.com:sonatype-nexus-community/nexus-repository-r.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
+  <modules>
+    <module>nexus-repository-r</module>
+    <module>nexus-repository-r-it</module>
+    <module>nexus-restore-r</module>
+  </modules>
+
   <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
@@ -40,99 +47,20 @@
     </snapshotRepository>
   </distributionManagement>
 
-  <dependencies>
+  <properties>
+    <nxrm-version>3.20.0-02</nxrm-version>
+  </properties>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-repository</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>se.sawano.java</groupId>
-      <artifactId>alphanumeric-comparator</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.goodies</groupId>
-      <artifactId>goodies-testsupport</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.spockframework</groupId>
-      <artifactId>spock-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rapture</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-  </dependencies>
+  <repositories>
+    <!-- ensure we can find the parent pom when starting from an empty local .m2 repository -->
+    <repository>
+      <id>rso-snapshots</id>
+      <url>https://repository.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.8</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
-      <plugin>
-        <groupId>org.sonatype.nexus.buildsupport</groupId>
-        <artifactId>extjs-maven-plugin</artifactId>
-        <configuration>
-          <namespace>NX.r</namespace>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>karaf-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.20</version>
-        <configuration>
-          <useSystemClassLoader>false</useSystemClassLoader>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>alphanumeric-comparator</Embed-Dependency>
-          </instructions>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
