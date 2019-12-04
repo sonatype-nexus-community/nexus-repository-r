@@ -13,8 +13,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -30,16 +29,16 @@
   <name>${project.groupId}:${project.artifactId}</name>
   <inceptionYear>2017</inceptionYear>
 
-  <scm>
-    <developerConnection>scm:git:git@github.com:sonatype-nexus-community/nexus-repository-r.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
   <modules>
     <module>nexus-repository-r</module>
     <module>nexus-repository-r-it</module>
     <module>nexus-restore-r</module>
   </modules>
 
+  <scm>
+    <developerConnection>scm:git:git@github.com:sonatype-nexus-community/nexus-repository-r.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
   <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
