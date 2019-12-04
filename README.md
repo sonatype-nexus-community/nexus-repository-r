@@ -18,7 +18,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
 # Table Of Contents
-* [Release notes](#release-notes)
+* [Release notes](https://help.sonatype.com/display/NXRM3/2019+Release+Notes)
 * [Developing](#developing)
    * [Requirements](#requirements)
    * [Building](#building)
@@ -29,11 +29,6 @@
    * [Easiest Install](#easiest-install)
 * [The Fine Print](#the-fine-print)
 * [Getting Help](#getting-help)
-
-## Release notes
-* [1.1.0](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.1.0)
-* [1.0.5](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.0.5) 
-* [1.0.4](https://github.com/sonatype-nexus-community/nexus-repository-r/releases/tag/1.0.4) 
 
 ## Developing
 
