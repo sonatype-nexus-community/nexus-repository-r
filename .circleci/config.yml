@@ -24,8 +24,6 @@ workflows:
           requires:
             - approve-release
           ssh-fingerprints: "5a:a3:77:19:94:32:f9:28:21:df:10:f3:e4:fc:5d:ff"
-          # @TODO After IT modules are added, this .maven.xml file will likely migration down into the .circleci directory, so change -s path below
-          mvn-release-perform-command: mvn --batch-mode release:perform -PbuildKar -s .maven.xml
           context: rso-base
           filters:
             branches:
