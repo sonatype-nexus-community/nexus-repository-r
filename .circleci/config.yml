@@ -23,7 +23,7 @@ workflows:
       - circleci-maven-release-orb/run-maven-release:
           requires:
             - approve-release
-          ssh-fingerprints: "5a:a3:77:19:94:32:f9:28:21:df:10:f3:e4:fc:5d:ff"
+          ssh-fingerprints: "6c:c6:0a:9e:6a:1e:5d:bb:34:1a:6f:0d:a7:87:55:d1"
           context: rso-base
           filters:
             branches:
