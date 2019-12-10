@@ -24,6 +24,7 @@ import org.sonatype.nexus.repository.Type
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.r.RHostedFacet
 import org.sonatype.nexus.repository.r.RPackagesBuilderFacet
+import org.sonatype.nexus.repository.r.internal.RCommonHandlers
 import org.sonatype.nexus.repository.r.internal.RFormat
 import org.sonatype.nexus.repository.r.internal.RRecipeSupport
 import org.sonatype.nexus.repository.types.HostedType
@@ -62,6 +63,9 @@ class RHostedRecipe
 
   @Inject
   HostedHandlers hostedHandlers
+
+  @Inject
+  RCommonHandlers commonHandlers
 
   @Inject
   RHostedRecipe(@Named(HostedType.NAME) final Type type, @Named(RFormat.NAME) final Format format) {
@@ -133,7 +137,7 @@ class RHostedRecipe
 
     builder.route(notSupportedMetadataMatcher()
         .handler(securityHandler)
-        .handler(hostedHandlers.notSupportedMetadataRequest)
+        .handler(commonHandlers.notSupportedMetadataRequest)
         .create())
 
     addBrowseUnsupportedRoute(builder)

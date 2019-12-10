@@ -25,6 +25,7 @@ import org.sonatype.nexus.repository.group.GroupFacetImpl
 import org.sonatype.nexus.repository.group.GroupHandler
 import org.sonatype.nexus.repository.http.HttpHandlers
 import org.sonatype.nexus.repository.r.internal.AssetKind
+import org.sonatype.nexus.repository.r.internal.RCommonHandlers
 import org.sonatype.nexus.repository.r.internal.RFormat
 import org.sonatype.nexus.repository.r.internal.RRecipeSupport
 import org.sonatype.nexus.repository.types.GroupType
@@ -52,6 +53,9 @@ class RGroupRecipe
   GroupHandler standardGroupHandler
 
   @Inject
+  RCommonHandlers commonHandlers;
+
+  @Inject
   RGroupRecipe(@Named(GroupType.NAME) final Type type, @Named(RFormat.NAME) final Format format) {
     super(type, format)
   }
@@ -70,6 +74,11 @@ class RGroupRecipe
    */
   private ViewFacet configure(final ConfigurableViewFacet facet) {
     Builder builder = new Builder()
+
+    builder.route(metadataPackagesRdsMatcher()
+        .handler(securityHandler)
+        .handler(commonHandlers.notSupportedMetadataRequest)
+        .create())
 
     builder.route(packagesMatcher()
         .handler(timingHandler)
