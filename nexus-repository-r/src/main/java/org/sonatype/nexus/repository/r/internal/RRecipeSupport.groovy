@@ -143,7 +143,7 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Matcher for all PACKAGES.rds metadata mapping.
+   * Matcher for PACKAGES.rds metadata mapping.
    *
    * This matcher should be removed after ticket fix: NEXUS-22119
    */
@@ -231,7 +231,7 @@ abstract class RRecipeSupport
   }
 
   /**
-   * Token matcher for all PACKAGES.rds files.
+   * Token matcher for PACKAGES.rds files.
    *
    * This matcher should be removed after ticket fix: NEXUS-22119
    */
