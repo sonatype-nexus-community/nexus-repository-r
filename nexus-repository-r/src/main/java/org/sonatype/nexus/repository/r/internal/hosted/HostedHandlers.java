@@ -59,10 +59,4 @@ public final class HostedHandlers
     context.getRepository().facet(RHostedFacet.class).upload(path, context.getRequest().getPayload());
     return HttpResponses.ok();
   };
-
-  /**
-   * Handle request of currently not supported metadata
-   */
-  final Handler notSupportedMetadataRequest =
-      context -> HttpResponses.notFound("This metadata type is not supported for now.");
 }

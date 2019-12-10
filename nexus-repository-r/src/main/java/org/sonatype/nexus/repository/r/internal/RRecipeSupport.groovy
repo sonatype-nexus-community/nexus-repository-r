@@ -143,6 +143,19 @@ abstract class RRecipeSupport
   }
 
   /**
+   * Matcher for PACKAGES.rds metadata mapping.
+   *
+   * This matcher should be removed after ticket fix: NEXUS-22119
+   */
+  static Builder metadataPackagesRdsMatcher() {
+    new Builder().matcher(
+        and(
+            new ActionMatcher(GET, HEAD),
+            packagesRdsTokenMatcher()
+        ))
+  }
+
+  /**
    * Matcher for all .rds metadata mapping.
    */
   static Builder metadataRdsMatcher() {
@@ -215,6 +228,15 @@ abstract class RRecipeSupport
    */
   static TokenMatcher packagesTokenMatcher() {
     return new TokenMatcher('/{path:.+}/PACKAGES{extension:.*}')
+  }
+
+  /**
+   * Token matcher for PACKAGES.rds files.
+   *
+   * This matcher should be removed after ticket fix: NEXUS-22119
+   */
+  static TokenMatcher packagesRdsTokenMatcher() {
+    return new TokenMatcher('/{path:.+}/PACKAGES.rds')
   }
 
   /**
