@@ -24,6 +24,8 @@ Sonatype internal people:
 * [@mhansen-sonatype](https://github.com/mhansen-sonatype/) (Mike Hansen)
 * [@kellyrob99](https://github.com/kellyrob99/) (Kelly Robinson)
 * [@DarthHater](https://github.com/darthhater/) (Jeffry Hesse)
+* [@aornatovskyy](https://github.com/aornatovskyy/) (Anatoliy Ornatovskyy)
+* [@chernikovmaksym](https://github.com/chernikovmaksym) (Maksym Chernikov)
 
 External contributors:
 
