@@ -104,7 +104,7 @@ public class RHostedFacetImpl
 
   @Override
   @TransactionalTouchMetadata
-  public void buildAndPutPackagesGz(final String basePath) throws IOException {
+  public Content buildAndPutPackagesGz(final String basePath) throws IOException {
     checkNotNull(basePath);
     StorageTx tx = UnitOfWork.currentTx();
     RPackagesBuilder packagesBuilder = new RPackagesBuilder();
@@ -116,16 +116,16 @@ public class RHostedFacetImpl
     StorageFacet storageFacet = getRepository().facet(StorageFacet.class);
     try (InputStream is = new ByteArrayInputStream(packagesBytes)) {
       TempBlob tempPackagesGz = storageFacet.createTempBlob(is, RFacetUtils.HASH_ALGORITHMS);
-      doPutPackagesGz(tx, basePath, tempPackagesGz);
+      return doPutPackagesGz(tx, basePath, tempPackagesGz);
     }
   }
 
   @TransactionalStoreBlob
-  protected void doPutPackagesGz(final StorageTx tx, final String basePath, final TempBlob tempPackagesGz)
+  protected Content doPutPackagesGz(final StorageTx tx, final String basePath, final TempBlob tempPackagesGz)
       throws IOException
   {
     RFacet rFacet = facet(RFacet.class);
     Asset asset = rFacet.findOrCreateAsset(tx, buildPath(basePath, PACKAGES_GZ_FILENAME));
-    saveAsset(tx, asset, tempPackagesGz, "", null);
+    return saveAsset(tx, asset, tempPackagesGz, "", null);
   }
 }

@@ -47,5 +47,5 @@ public interface RHostedFacet
    *
    * @param basePath the path to build the metadata for
    */
-  void buildAndPutPackagesGz(String basePath) throws IOException;
+  Content buildAndPutPackagesGz(String basePath) throws IOException;
 }
