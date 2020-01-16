@@ -19,7 +19,6 @@ import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.r.RHostedFacet;
-import org.sonatype.nexus.repository.r.internal.hosted.HostedHandlers;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -96,13 +95,13 @@ public class HostedHandlersTest
 
   @Test
   public void okWhenContentFound() throws Exception {
-    assertStatus(underTest.getContent, 200);
+    assertStatus(underTest.getArchive, 200);
   }
 
   @Test
   public void notFoundWhenContentNotFound() throws Exception {
     when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
-    assertStatus(underTest.getContent, 404);
+    assertStatus(underTest.getArchive, 404);
   }
 
   @Test

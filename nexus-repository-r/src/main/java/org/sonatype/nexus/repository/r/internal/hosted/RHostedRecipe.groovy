@@ -118,7 +118,7 @@ class RHostedRecipe
         .handler(partialFetchHandler)
         .handler(contentHeadersHandler)
         .handler(unitOfWorkHandler)
-        .handler(hostedHandlers.getContent)
+        .handler(hostedHandlers.getArchive)
         .create())
 
     builder.route(uploadMatcher()

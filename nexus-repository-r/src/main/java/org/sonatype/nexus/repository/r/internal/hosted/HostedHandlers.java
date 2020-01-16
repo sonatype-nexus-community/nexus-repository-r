@@ -18,7 +18,6 @@ import javax.inject.Singleton;
 import org.sonatype.goodies.common.ComponentSupport;
 import org.sonatype.nexus.repository.http.HttpResponses;
 import org.sonatype.nexus.repository.r.RHostedFacet;
-import org.sonatype.nexus.repository.r.internal.util.RPathUtils;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Handler;
 import org.sonatype.nexus.rest.ValidationErrorsException;
@@ -54,7 +53,7 @@ public final class HostedHandlers
   /**
    * Handle request for archive.
    */
-  final Handler getContent = context -> {
+  final Handler getArchive = context -> {
     String path = extractRequestPath(context);
     Content content = context.getRepository().facet(RHostedFacet.class).getStoredContent(path);
     if (content != null) {

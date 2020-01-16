@@ -39,6 +39,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
+import static org.sonatype.nexus.repository.http.HttpStatus.OK;
 import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 import static org.sonatype.nexus.repository.r.internal.util.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
@@ -147,9 +148,16 @@ public class RHostedIT
     verifyTextGzipContent(is(equalTo(agricolae131Content)), contentBin);
     assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
 
+    //test packages can be recreated of the fly.
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteAsset(findAsset(repository, PACKAGES_BIN_GZ.fullPath).getEntityMetadata().getId());
+    assertNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
+    HttpResponse resp = client.fetch(PACKAGES_BIN_GZ.fullPath);
+    assertThat(resp.getStatusLine().getStatusCode(), is(OK));
+    assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
+
     // Verify PACKAGES(metadata) is clean if component has been deleted
     List<Component> components = getAllComponents(repository);
-    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     components.forEach(component -> maintenanceFacet.deleteComponent(component.getEntityMetadata().getId()));
 
     Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
