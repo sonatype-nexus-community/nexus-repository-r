@@ -99,6 +99,21 @@ public class HostedHandlersTest
   }
 
   @Test
+  public void okWhenPackagesFound() throws Exception {
+    assertStatus(underTest.getArchive, 200);
+  }
+
+  @Test
+  public void rebuildsLostPackages() throws Exception {
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
+    when(rHostedFacet.buildAndPutPackagesGz(anyString())).thenReturn(content);
+
+    assertStatus(underTest.getPackages, 200);
+    verify(rHostedFacet, times(1)).getStoredContent(anyString());
+    verify(rHostedFacet, times(1)).buildAndPutPackagesGz(anyString());
+  }
+
+  @Test
   public void notFoundWhenContentNotFound() throws Exception {
     when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
     assertStatus(underTest.getArchive, 404);
