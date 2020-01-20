@@ -94,7 +94,7 @@ public class HostedHandlersTest
   }
 
   @Test
-  public void okWhenContentFound() throws Exception {
+  public void okWhenArchiveFound() throws Exception {
     assertStatus(underTest.getArchive, 200);
   }
 
@@ -114,7 +114,15 @@ public class HostedHandlersTest
   }
 
   @Test
-  public void notFoundWhenContentNotFound() throws Exception {
+  public void notFoundWhenPackagesNotFound() throws Exception {
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
+    when(rHostedFacet.buildAndPutPackagesGz(anyString())).thenReturn(null);
+
+    assertStatus(underTest.getPackages, 404);
+  }
+
+  @Test
+  public void notFoundWhenArchiveNotFound() throws Exception {
     when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
     assertStatus(underTest.getArchive, 404);
   }
