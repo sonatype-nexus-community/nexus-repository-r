@@ -19,7 +19,6 @@ import org.sonatype.goodies.testsupport.TestSupport;
 import org.sonatype.nexus.common.collect.AttributesMap;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.r.RHostedFacet;
-import org.sonatype.nexus.repository.r.internal.hosted.HostedHandlers;
 import org.sonatype.nexus.repository.view.Content;
 import org.sonatype.nexus.repository.view.Context;
 import org.sonatype.nexus.repository.view.Handler;
@@ -95,14 +94,37 @@ public class HostedHandlersTest
   }
 
   @Test
-  public void okWhenContentFound() throws Exception {
-    assertStatus(underTest.getContent, 200);
+  public void okWhenArchiveFound() throws Exception {
+    assertStatus(underTest.getArchive, 200);
   }
 
   @Test
-  public void notFoundWhenContentNotFound() throws Exception {
+  public void okWhenPackagesFound() throws Exception {
+    assertStatus(underTest.getArchive, 200);
+  }
+
+  @Test
+  public void rebuildsLostPackages() throws Exception {
     when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
-    assertStatus(underTest.getContent, 404);
+    when(rHostedFacet.buildAndPutPackagesGz(anyString())).thenReturn(content);
+
+    assertStatus(underTest.getPackages, 200);
+    verify(rHostedFacet, times(1)).getStoredContent(anyString());
+    verify(rHostedFacet, times(1)).buildAndPutPackagesGz(anyString());
+  }
+
+  @Test
+  public void notFoundWhenPackagesNotFound() throws Exception {
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
+    when(rHostedFacet.buildAndPutPackagesGz(anyString())).thenReturn(null);
+
+    assertStatus(underTest.getPackages, 404);
+  }
+
+  @Test
+  public void notFoundWhenArchiveNotFound() throws Exception {
+    when(rHostedFacet.getStoredContent(anyString())).thenReturn(null);
+    assertStatus(underTest.getArchive, 404);
   }
 
   @Test

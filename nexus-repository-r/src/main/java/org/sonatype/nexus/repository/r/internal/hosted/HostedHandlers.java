@@ -24,6 +24,7 @@ import org.sonatype.nexus.rest.ValidationErrorsException;
 
 import static org.sonatype.nexus.repository.r.internal.util.PackageValidator.validateArchiveUploadPath;
 import static org.sonatype.nexus.repository.r.internal.util.RPathUtils.extractRequestPath;
+import static org.sonatype.nexus.repository.r.internal.util.RPathUtils.getBasePath;
 
 /**
  * R hosted handlers.
@@ -34,9 +35,25 @@ public final class HostedHandlers
     extends ComponentSupport
 {
   /**
+   * Handle request for packages.
+   */
+  final Handler getPackages = context -> {
+    String path = extractRequestPath(context);
+    RHostedFacet hostedFacet = context.getRepository().facet(RHostedFacet.class);
+
+    Content content;
+    if ((content = hostedFacet.getStoredContent(path)) != null
+        || (content = hostedFacet.buildAndPutPackagesGz(getBasePath(path))) != null) {
+      return HttpResponses.ok(content);
+    }
+
+    return HttpResponses.notFound();
+  };
+
+  /**
    * Handle request for archive.
    */
-  final Handler getContent = context -> {
+  final Handler getArchive = context -> {
     String path = extractRequestPath(context);
     Content content = context.getRepository().facet(RHostedFacet.class).getStoredContent(path);
     if (content != null) {
