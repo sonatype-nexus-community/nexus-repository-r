@@ -69,7 +69,7 @@ The table below outlines what version of Nexus Repository the plugin was built a
 | v1.0.3         | >=3.15.2-01              |
 | v1.0.4         | >=3.18.0-01              |
 | v1.1.1 In product | >=3.20.0              |
-| v1.1.2 In product | >=3.21.0              |
+| v1.1.2 In product | >=3.21.0-05              |
 All released versions can be found [here](https://github.com/sonatype-nexus-community/nexus-repository-r/tags).
 
 ## Installing the plugin
