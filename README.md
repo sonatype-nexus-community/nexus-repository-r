@@ -81,7 +81,7 @@ In Nexus Repository Manager 3.20+ `R` format is already included. So there is no
 
    ```
          <feature version="1.a.b">nexus-repository-p2</feature>
-         <feature version="1.1.1.SNAPSHOT" prerequisite="false" dependency="false">nexus-repository-r</feature>
+         <feature version="1.1.1.SNAPSHOT">nexus-repository-r</feature>
          <feature version="3.x.y.xy">nexus-repository-raw</feature>
    ```
    And
