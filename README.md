@@ -77,24 +77,26 @@ In Nexus Repository Manager 3.20+ `R` format is already included. So there is no
 ### Permanent Reinstall
 
 * Copy the new bundle into `<nexus_dir>/system/org/sonatype/nexus/plugins/nexus-repository-r/1.1.1-SNAPSHOT/nexus-repository-r-1.1.1-SNAPSHOT.jar`
-* If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
-* If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
+* Edit `<nexus_dir>/system/org/sonatype/nexus/assemblies/nexus-cma-feature/3.x.y/nexus-cma-feature-3.x.y-features.xml` changing R to your snapshot version (examples, the actual lines surrounding may vary):
 
    ```
-         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-rubygems</feature>
-   +     <feature version="1.1.1.SNAPSHOT" prerequisite="false" dependency="false">nexus-repository-r</feature>
-         <feature version="3.x.y.xy" prerequisite="false" dependency="false">nexus-repository-yum</feature>
-     </feature>
+         <feature version="1.a.b">nexus-repository-p2</feature>
+         <feature version="1.1.1.SNAPSHOT" prerequisite="false" dependency="false">nexus-repository-r</feature>
+         <feature version="3.x.y.xy">nexus-repository-raw</feature>
    ```
    And
    ```
-   + <feature name="nexus-repository-r" description="org.sonatype.nexus.plugins:nexus-repository-r" version="1.1.1.SNAPSHOT">
-   +     <details>org.sonatype.nexus.plugins:nexus-repository-r</details>
+   + <feature name="nexus-repository-r" description="nexus-repository-r" version="1.1.1.SNAPSHOT">
+   ...
    +     <bundle>mvn:org.sonatype.nexus.plugins/nexus-repository-r/1.1.1-SNAPSHOT</bundle>
    + </feature>
-    </features>
    ```
 This will cause the plugin to be loaded and started with each startup of Nexus Repository.
+
+NOTE: The file location changed in version 3.21.  For older versions, edit these files:
+* If you are using OSS edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-oss-feature/3.x.y/nexus-oss-feature-3.x.y-features.xml`
+* If you are using PRO edition, make these mods in: `<nexus_dir>/system/com/sonatype/nexus/assemblies/nexus-pro-feature/3.x.y/nexus-pro-feature-3.x.y-features.xml`
+Additionally, prior to 3.21 the lines did not exist so they'd need added instead of edited.
 
 ### Easiest Install for version  
 Nexus Repository Manager 3.20+ already includes the R plugin. If you want to install an old R plugin in an old Nexus Repository Manager, the instructions below may be useful. However, we strongly recommend you update to the latest Nexus Repository version. If you are developing new features for R plugin and want to install your new R plugin, then follow the instructions below.
