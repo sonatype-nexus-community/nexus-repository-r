@@ -65,10 +65,9 @@ For further information like how to persist volumes check out [the GitHub repo f
 
 After allowing some time to spin up, the application will be available from your browser at http://localhost:8081.
 
-To read the generated admin password for your first login to the web UI, you can use the commands below against the running docker container:
+To read the generated admin password for your first login to the web UI, you can use the command below against the running docker container:
 
-    docker exec -it nexus-repository-r /bin/bash
-    $ cat /nexus-data/admin.password
+    docker exec -it nexus-repository-r cat /nexus-data/admin.password && echo
 
 For simplicity, you should check `Enable anonymous access` in the prompts following your first login.   
 
