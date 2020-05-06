@@ -26,6 +26,7 @@ import org.sonatype.nexus.repository.types.HostedType;
 import org.sonatype.nexus.repository.types.ProxyType;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -36,7 +37,9 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
+@Ignore("Needs nexus-exclude-features from Nexus Repository Manager 3.24")
 public class RResourceIT
   extends RResourceITSupport
 {
@@ -44,6 +47,7 @@ public class RResourceIT
   public static Option[] configureNexus() {
     return options(
         configureNexusBase(),
+        systemProperty("nexus-exclude-features").value("nexus-cma-community"),
         nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
     );
   }

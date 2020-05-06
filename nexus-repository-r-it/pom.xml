@@ -88,6 +88,17 @@
       <version>${nxrm-version}</version>
       <type>zip</type>
       <scope>test</scope>
+      <exclusions>
+        <!-- Avoid leaking older r plugins from distro -->
+        <exclusion>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-repository-r</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.nexus.plugins</groupId>
+          <artifactId>nexus-restore-r</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
