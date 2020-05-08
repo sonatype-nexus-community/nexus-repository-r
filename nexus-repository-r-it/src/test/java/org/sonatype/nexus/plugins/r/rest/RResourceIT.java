@@ -39,7 +39,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 
-@Ignore("Needs nexus-exclude-features from Nexus Repository Manager 3.24")
 public class RResourceIT
   extends RResourceITSupport
 {

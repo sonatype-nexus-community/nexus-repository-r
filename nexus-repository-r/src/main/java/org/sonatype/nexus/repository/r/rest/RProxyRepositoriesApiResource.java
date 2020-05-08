@@ -43,7 +43,7 @@ import static org.sonatype.nexus.rest.ApiDocConstants.REPOSITORY_NOT_FOUND;
 import static org.sonatype.nexus.rest.ApiDocConstants.REPOSITORY_UPDATED;
 
 /**
- * @since 1.1.5
+ * @since 1.1.8
  */
 @Named
 @Api(value = API_REPOSITORY_MANAGEMENT)
