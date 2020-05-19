@@ -35,7 +35,6 @@ import org.sonatype.nexus.repository.rest.api.model.GroupAttributes;
 import org.sonatype.nexus.repository.rest.api.model.HostedStorageAttributes;
 import org.sonatype.nexus.repository.rest.api.model.HttpClientAttributes;
 import org.sonatype.nexus.repository.rest.api.model.HttpClientConnectionAttributes;
-import org.sonatype.nexus.repository.rest.api.model.HttpClientConnectionAuthenticationAttributes;
 import org.sonatype.nexus.repository.rest.api.model.NegativeCacheAttributes;
 import org.sonatype.nexus.repository.rest.api.model.ProxyAttributes;
 import org.sonatype.nexus.repository.rest.api.model.StorageAttributes;
@@ -105,10 +104,10 @@ public class RResourceITSupport
     CleanupPolicyAttributes cleanup = new CleanupPolicyAttributes(Collections.emptyList());
     ProxyAttributes proxy = new ProxyAttributes(REMOTE_URL, 1, 2);
     NegativeCacheAttributes negativeCache = new NegativeCacheAttributes(false, 1440);
-    HttpClientConnectionAuthenticationAttributes authentication = new HttpClientConnectionAuthenticationAttributes(
-        "username", null, null, null, null);
+   // HttpClientConnectionAuthenticationAttributes authentication = new HttpClientConnectionAuthenticationAttributes(
+   //     "username", null, null, null, null);
     HttpClientConnectionAttributes connection = new HttpClientConnectionAttributes(1, null, 5, false, false);
-    HttpClientAttributes httpClient = new HttpClientAttributes(false, true, connection, authentication);
+    HttpClientAttributes httpClient = new HttpClientAttributes(false, true, connection, null);
 
     return new RProxyRepositoryApiRequest(PROXY_NAME, true, storage, cleanup,
         proxy, negativeCache,
