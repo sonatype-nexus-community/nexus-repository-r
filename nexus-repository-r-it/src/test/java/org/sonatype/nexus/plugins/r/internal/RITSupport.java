@@ -30,6 +30,7 @@ import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
+
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
@@ -55,7 +56,6 @@ import static org.hamcrest.Matchers.is;
 public class RITSupport
     extends RepositoryITSupport
 {
-
   // Interval to wait for metadata is processed
   public static final long METADATA_PROCESSING_WAIT_INTERVAL_MILLIS = 1000L;
 
