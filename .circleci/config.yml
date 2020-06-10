@@ -12,7 +12,7 @@ build-and-test-commands: &build-and-test-commands
     find . -type f -regex ".*/target/failsafe-reports/.*xml" -exec cp {} ~/project/artifacts/junit/ \;
 
 release-args: &release-args
-  mvn-release-perform-command: mvn --batch-mode release:perform -s .circleci/.maven.xml -PbuildKar
+  mvn-release-perform-command: mvn --batch-mode release:perform -s .circleci/.maven.xml -PbuildKar,circle-ci-release
   ssh-fingerprints: "6c:c6:0a:9e:6a:1e:5d:bb:34:1a:6f:0d:a7:87:55:d1"
   context: rso-base
   filters:
