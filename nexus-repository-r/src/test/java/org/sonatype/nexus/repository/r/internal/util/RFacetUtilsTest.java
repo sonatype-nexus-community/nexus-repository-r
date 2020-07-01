@@ -107,7 +107,7 @@ public class RFacetUtilsTest
   @Test
   public void content() throws Exception {
     Content content = toContent(asset, blob);
-    assertThat(content.getAttributes().get("lastModified"), is(notNullValue()));
+    assertThat(content.getAttributes().get("last_modified"), is(notNullValue()));
   }
 
   @Test

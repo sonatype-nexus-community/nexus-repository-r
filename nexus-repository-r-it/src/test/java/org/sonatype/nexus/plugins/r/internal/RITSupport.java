@@ -28,6 +28,7 @@ import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 import org.apache.commons.collections.IteratorUtils;
@@ -298,5 +299,9 @@ public class RITSupport
       this.extension = extension;
       this.contentType = contentType;
     }
+  }
+
+  protected static StorageTx getStorageTx(final Repository repository) {
+    return repository.facet(StorageFacet.class).txSupplier().get();
   }
 }

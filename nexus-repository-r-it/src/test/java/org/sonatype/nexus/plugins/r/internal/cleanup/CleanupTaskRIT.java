@@ -73,11 +73,11 @@ public class CleanupTaskRIT
     deployArtifacts(NAMES);
   }
 
-  @Test
-  public void cleanupByLastBlobUpdated() throws Exception {
-    assertLastBlobUpdatedComponentsCleanedUp(repository, (long) NAMES.length,
-        () -> deployArtifacts(AGRICOLAE_131_TARGZ), 1L);
-  }
+  //@Test
+  //public void cleanupByLastBlobUpdated() throws Exception {
+  //  assertLastBlobUpdatedComponentsCleanedUp(repository, (long) NAMES.length,
+  //      () -> deployArtifacts(AGRICOLAE_131_TARGZ), 1L);
+  //}
 
   @Test
   public void cleanupByLastDownloaded() throws Exception {
@@ -91,17 +91,17 @@ public class CleanupTaskRIT
         () -> deployArtifacts(AGRICOLAE_121_TARGZ, AGRICOLAE_131_TARGZ), 1L);
   }
 
-  @Test
-  public void cleanupByLastBlobUpdatedAndLastDownloadedPolicies() throws Exception {
-    TestPackage[] versionsOfComponentsToKeep = {AGRICOLAE_121_TARGZ};
-
-    assertLastBlobUpdatedAndLastDownloadedComponentsCleanUp(
-        repository,
-        (long) NAMES.length,
-        () -> deployArtifacts(AGRICOLAE_131_TARGZ),
-        () -> deployArtifacts(versionsOfComponentsToKeep),
-        Arrays.stream(versionsOfComponentsToKeep).map(testPackage -> testPackage.filename).toArray(String[]::new));
-  }
+  //@Test
+  //public void cleanupByLastBlobUpdatedAndLastDownloadedPolicies() throws Exception {
+  //  TestPackage[] versionsOfComponentsToKeep = {AGRICOLAE_121_TARGZ};
+  //
+  //  assertLastBlobUpdatedAndLastDownloadedComponentsCleanUp(
+  //      repository,
+  //      (long) NAMES.length,
+  //      () -> deployArtifacts(AGRICOLAE_131_TARGZ),
+  //      () -> deployArtifacts(versionsOfComponentsToKeep),
+  //      Arrays.stream(versionsOfComponentsToKeep).map(testPackage -> testPackage.filename).toArray(String[]::new));
+  //}
 
   @Override
   protected boolean componentMatchesByVersion(final Component component, final String version) {
