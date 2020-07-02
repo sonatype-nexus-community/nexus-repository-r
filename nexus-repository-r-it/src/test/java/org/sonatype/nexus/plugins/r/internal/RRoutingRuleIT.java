@@ -19,9 +19,7 @@ import java.util.Map;
 import org.sonatype.goodies.httpfixture.server.fluent.Behaviours;
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.common.entity.EntityId;
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.junit.After;
 import org.junit.Before;
@@ -31,6 +29,7 @@ import org.ops4j.pax.exam.Option;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.sonatype.nexus.plugins.r.internal.RITConfig.configureRBase;
 
 /**
  * @since 1.1.0
@@ -44,10 +43,7 @@ public class RRoutingRuleIT
 
   @Configuration
   public static Option[] configureNexus() {
-    return NexusPaxExamSupport.options(
-        NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
-    );
+    return configureRBase();
   }
 
   @Before

@@ -15,9 +15,7 @@ package org.sonatype.nexus.plugins.r.internal;
 import java.io.IOException;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.apache.http.HttpResponse;
 import org.junit.Before;
@@ -28,7 +26,7 @@ import org.ops4j.pax.exam.Option;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
+import static org.sonatype.nexus.plugins.r.internal.RITConfig.configureRWithMetadataProcessingInterval;
 import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 import static org.sonatype.nexus.repository.r.internal.util.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
@@ -43,12 +41,7 @@ public class RHostedIT
 
   @Configuration
   public static Option[] configureNexus() {
-    return NexusPaxExamSupport.options(
-        NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
-        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
-            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
-    );
+    return configureRWithMetadataProcessingInterval();
   }
 
   @Before

@@ -16,9 +16,7 @@ import java.io.IOException;
 
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
-import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
+import static org.sonatype.nexus.plugins.r.internal.RITConfig.configureRBase;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 
 public class RProxyIT
@@ -43,10 +42,7 @@ public class RProxyIT
 
   @Configuration
   public static Option[] configureNexus() {
-    return NexusPaxExamSupport.options(
-        NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
-    );
+    return configureRBase();
   }
 
   @Before

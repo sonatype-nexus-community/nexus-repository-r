@@ -56,9 +56,6 @@ import static org.hamcrest.Matchers.is;
 public class RITSupport
     extends RepositoryITSupport
 {
-  // Immediately start metadata processing
-  public static final long METADATA_PROCESSING_DELAY_MILLIS = 0L;
-
   // Interval to wait for metadata is processed
   public static final long METADATA_PROCESSING_WAIT_INTERVAL_MILLIS = 1000L;
 
