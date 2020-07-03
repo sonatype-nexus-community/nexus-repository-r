@@ -17,6 +17,9 @@ import java.io.IOException;
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
 import org.sonatype.nexus.repository.Repository;
+import org.sonatype.nexus.repository.storage.Asset;
+import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.ComponentMaintenance;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +28,8 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
@@ -133,7 +138,6 @@ public class RProxyIT
     assertThat(componentAssetTestHelper
         .componentExists(repository, AGRICOLAE_131_TGZ.packageName, AGRICOLAE_131_TGZ.packageVersion), is(true));
 
-
     componentAssetTestHelper.removeAsset(repository, AGRICOLAE_131_TGZ.fullPath);
 
     assertThat(componentAssetTestHelper
@@ -142,21 +146,21 @@ public class RProxyIT
         .componentExists(repository, AGRICOLAE_131_TGZ.packageName, AGRICOLAE_131_TGZ.packageVersion), is(false));
   }
 
-  //@Test
-  //public void testDeletingComponentDeletesAllAssociatedAssets() throws IOException {
-  //  client.fetch(AGRICOLAE_131_TGZ.fullPath);
-  //
-  //  assertThat(componentAssetTestHelper
-  //      .assetExists(repository, AGRICOLAE_131_TGZ.fullPath), is(true));
-  //  assertThat(componentAssetTestHelper
-  //      .componentExists(repository, AGRICOLAE_131_TGZ.packageName, AGRICOLAE_131_TGZ.packageVersion), is(true));
-  //
-  //
-  //  componentAssetTestHelper.deleteComponent(repository, AGRICOLAE_131_TGZ.basePath, AGRICOLAE_131_TGZ.packageName,AGRICOLAE_131_TGZ.packageVersion);
-  //
-  //  assertThat(componentAssetTestHelper
-  //      .assetExists(repository, AGRICOLAE_131_TGZ.fullPath), is(false));
-  //  assertThat(componentAssetTestHelper
-  //      .componentExists(repository, AGRICOLAE_131_TGZ.packageName, AGRICOLAE_131_TGZ.packageVersion), is(false));
-  //}
+  @Test
+  public void testDeletingComponentDeletesAllAssociatedAssets() throws IOException {
+    client.fetch(AGRICOLAE_131_TGZ.fullPath);
+
+    final Asset asset = findAsset(repository, AGRICOLAE_131_TGZ.fullPath);
+    assertNotNull(asset);
+    assertNotNull(asset.componentId());
+
+    final Component component = findComponentById(repository, asset.componentId());
+    assertNotNull(component);
+
+    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
+    maintenanceFacet.deleteComponent(component.getEntityMetadata().getId(), true);
+
+    assertNull(findAsset(repository, AGRICOLAE_131_TGZ.fullPath));
+    assertNull(findComponentById(repository, asset.componentId()));
+  }
 }

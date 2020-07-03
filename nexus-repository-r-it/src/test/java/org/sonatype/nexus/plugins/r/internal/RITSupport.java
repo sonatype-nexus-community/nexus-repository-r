@@ -28,10 +28,11 @@ import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
-import org.apache.commons.collections.IteratorUtils;
+
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -43,6 +44,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.String.format;
 import static org.apache.commons.compress.compressors.CompressorStreamFactory.GZIP;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -243,13 +245,6 @@ public class RITSupport
     }
   }
 
-  protected List<Asset> findAssetsByComponent(final Repository repository, final Component component) {
-    try (StorageTx tx = getStorageTx(repository)) {
-      tx.begin();
-      return IteratorUtils.toList(tx.browseAssets(component).iterator());
-    }
-  }
-
   protected void assertGetResponseStatus(
       final RClient client,
       final Repository repository,
@@ -261,6 +256,20 @@ public class RITSupport
       Assert.assertThat("Repository:" + repository.getName() + " Path:" + path,
           statusLine.getStatusCode(),
           is(responseCode));
+    }
+  }
+
+  public static Asset findAsset(Repository repository, String path) {
+    try (StorageTx tx = getStorageTx(repository)) {
+      tx.begin();
+      return tx.findAssetWithProperty(MetadataNodeEntityAdapter.P_NAME, path, tx.findBucket(repository));
+    }
+  }
+
+  protected static List<Component> getAllComponents(final Repository repository) {
+    try (StorageTx tx = getStorageTx(repository)) {
+      tx.begin();
+      return newArrayList(tx.browseComponents(tx.findBucket(repository)));
     }
   }
 
