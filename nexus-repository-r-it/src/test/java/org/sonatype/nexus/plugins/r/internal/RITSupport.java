@@ -34,6 +34,7 @@ import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
 import org.sonatype.nexus.testsuite.testsupport.RepositoryITSupport;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -278,6 +279,13 @@ public class RITSupport
     try (StorageTx tx = getStorageTx(repo)) {
       tx.begin();
       return tx.findComponentWithProperty(ComponentEntityAdapter.P_NAME, name, tx.findBucket(repo));
+    }
+  }
+
+  protected List<Asset> findAssetsByComponent(final Repository repository, final Component component) {
+    try (StorageTx tx = getStorageTx(repository)) {
+      tx.begin();
+      return IteratorUtils.toList(tx.browseAssets(component).iterator());
     }
   }
 

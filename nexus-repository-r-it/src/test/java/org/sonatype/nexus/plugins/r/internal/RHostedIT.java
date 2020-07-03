@@ -166,11 +166,14 @@ public class RHostedIT
     assertNotNull(asset);
     assertNotNull(asset.componentId());
 
+    final Component component = findComponentById(repository, asset.componentId());
+    assertNotNull(component);
+    assertThat(findAssetsByComponent(repository, component).size(), is(1));
+
     componentAssetTestHelper.removeAsset(repository,  AGRICOLAE_121_TARGZ.fullPath);
 
     assertThat(componentAssetTestHelper
         .assetExists(repository, AGRICOLAE_121_TARGZ.fullPath), is(false));
-
     assertThat(componentAssetTestHelper
         .componentExists(repository, AGRICOLAE_121_TARGZ.packageName, AGRICOLAE_121_TARGZ.packageVersion), is(false));
   }
