@@ -64,12 +64,14 @@ public class RHostedIT
   public void testPackageUpload() throws Exception
   {
     //Verify DB contains data about uploaded component and asset
-    assertThat(componentAssetTestHelper
-        .componentExists(repository, AGRICOLAE_121_TARGZ.packageName, AGRICOLAE_121_TARGZ.packageVersion), is(true));
-
+    Component component = findComponent(repository, AGRICOLAE_121_TARGZ.packageName);
+    assertThat(component.name(), is(equalTo(AGRICOLAE_121_TARGZ.packageName)));
+    assertThat(component.version(), is(equalTo(AGRICOLAE_121_TARGZ.packageVersion)));
+    assertThat(component.group(), is(equalTo(AGRICOLAE_121_TARGZ.basePath)));
     //Verify Asset is created.
-    assertThat( componentAssetTestHelper
-        .assetExists(repository, AGRICOLAE_121_TARGZ.fullPath), is(true));
+    Asset asset = findAsset(repository, AGRICOLAE_121_TARGZ.fullPath);
+    assertThat(asset.name(), is(equalTo(AGRICOLAE_121_TARGZ.fullPath)));
+    assertThat(asset.format(), is(equalTo(R_FORMAT_NAME)));
   }
 
   @Test
@@ -159,10 +161,9 @@ public class RHostedIT
 
   @Test
   public void testDeletingRemainingAssetAlsoDeletesComponent() {
-    assertThat(componentAssetTestHelper
-          .assetExists(repository, AGRICOLAE_121_TARGZ.fullPath), is(true));
-    assertThat(componentAssetTestHelper
-        .componentExists(repository, AGRICOLAE_121_TARGZ.packageName, AGRICOLAE_121_TARGZ.packageVersion), is(true));
+    final Asset asset = findAsset(repository, AGRICOLAE_121_TARGZ.fullPath);
+    assertNotNull(asset);
+    assertNotNull(asset.componentId());
 
     componentAssetTestHelper.removeAsset(repository,  AGRICOLAE_121_TARGZ.fullPath);
 
