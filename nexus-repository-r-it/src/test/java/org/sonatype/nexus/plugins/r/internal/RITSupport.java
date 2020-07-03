@@ -28,6 +28,7 @@ import org.sonatype.nexus.plugins.r.internal.fixtures.RepositoryRuleR;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
+import org.sonatype.nexus.repository.storage.ComponentEntityAdapter;
 import org.sonatype.nexus.repository.storage.MetadataNodeEntityAdapter;
 import org.sonatype.nexus.repository.storage.StorageFacet;
 import org.sonatype.nexus.repository.storage.StorageTx;
@@ -270,6 +271,13 @@ public class RITSupport
     try (StorageTx tx = getStorageTx(repository)) {
       tx.begin();
       return newArrayList(tx.browseComponents(tx.findBucket(repository)));
+    }
+  }
+
+  protected static Component findComponent(final Repository repo, final String name) {
+    try (StorageTx tx = getStorageTx(repo)) {
+      tx.begin();
+      return tx.findComponentWithProperty(ComponentEntityAdapter.P_NAME, name, tx.findBucket(repo));
     }
   }
 
