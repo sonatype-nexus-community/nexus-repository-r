@@ -273,6 +273,10 @@ public class RITSupport
     }
   }
 
+  protected static StorageTx getStorageTx(final Repository repository) {
+    return repository.facet(StorageFacet.class).txSupplier().get();
+  }
+
   public static class TestPackage
   {
     public final String filename;
@@ -305,9 +309,5 @@ public class RITSupport
       this.extension = extension;
       this.contentType = contentType;
     }
-  }
-
-  protected static StorageTx getStorageTx(final Repository repository) {
-    return repository.facet(StorageFacet.class).txSupplier().get();
   }
 }
