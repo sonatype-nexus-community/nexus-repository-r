@@ -31,7 +31,6 @@ import org.sonatype.nexus.repository.r.internal.RFormat;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.AssetEntityAdapter;
 import org.sonatype.nexus.repository.storage.StorageTx;
-import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 import org.sonatype.nexus.testsuite.testsupport.blobstore.restore.BlobstoreRestoreTestHelper;
 
 import org.hamcrest.Matchers;
@@ -47,6 +46,7 @@ import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
 import static org.sonatype.nexus.blobstore.api.BlobAttributesConstants.HEADER_PREFIX;
 import static org.sonatype.nexus.blobstore.api.BlobStore.BLOB_NAME_HEADER;
 import static org.sonatype.nexus.blobstore.api.BlobStore.CONTENT_TYPE_HEADER;
+import static org.sonatype.nexus.plugins.r.internal.RITConfig.configureRBase;
 import static org.sonatype.nexus.repository.storage.Bucket.REPO_NAME_HEADER;
 
 public class RRestoreBlobIT
@@ -76,8 +76,7 @@ public class RRestoreBlobIT
   @Configuration
   public static Option[] configureNexus() {
     return NexusPaxExamSupport.options(
-        NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
+        configureRBase(),
         nexusFeature("org.sonatype.nexus.plugins", "nexus-restore-r")
     );
   }

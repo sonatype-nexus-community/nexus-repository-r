@@ -18,12 +18,10 @@ import java.nio.file.Files;
 import java.util.List;
 
 import org.sonatype.nexus.common.app.BaseUrlHolder;
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentMaintenance;
-import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.apache.http.HttpResponse;
 import org.junit.Before;
@@ -32,13 +30,11 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
+import static org.sonatype.nexus.plugins.r.internal.RITConfig.configureRWithMetadataProcessingInterval;
 import static org.sonatype.nexus.repository.http.HttpStatus.BAD_REQUEST;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 import static org.sonatype.nexus.repository.r.internal.util.PackageValidator.NOT_VALID_EXTENSION_ERROR_MESSAGE;
@@ -53,12 +49,7 @@ public class RHostedIT
 
   @Configuration
   public static Option[] configureNexus() {
-    return NexusPaxExamSupport.options(
-        NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
-        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
-            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
-    );
+    return configureRWithMetadataProcessingInterval();
   }
 
   @Before
@@ -90,7 +81,8 @@ public class RHostedIT
     HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_XXX);
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
     assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(NOT_VALID_EXTENSION_ERROR_MESSAGE));
-    assertNull(findAsset(repository, AGRICOLAE_131_XXX.fullPath));
+    assertThat(componentAssetTestHelper
+        .assetExists(repository,  AGRICOLAE_131_XXX.fullPath), is(false));
   }
 
   @Test
@@ -99,7 +91,8 @@ public class RHostedIT
     HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_TARGZ_WRONG_PATH);
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
     assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(NOT_VALID_PATH_ERROR_MESSAGE));
-    assertNull(findAsset(repository, AGRICOLAE_131_TARGZ_WRONG_PATH.fullPath));
+    assertThat( componentAssetTestHelper
+        .assetExists(repository,  AGRICOLAE_131_TARGZ_WRONG_PATH.fullPath), is(false));
   }
 
   @Test
@@ -140,27 +133,31 @@ public class RHostedIT
     // Verify PACKAGES(metadata) contain appropriate content about source R package (version 1.0-1 is skipped)
     final InputStream contentSrc = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae121Content)), contentSrc);
-    assertNotNull(findAsset(repository, PACKAGES_SRC_GZ.fullPath));
+    assertThat(componentAssetTestHelper
+        .assetExists(repository, PACKAGES_SRC_GZ.fullPath), is(true));
 
     // Verify PACKAGES(metadata) contain appropriate content about bin R package
     final InputStream contentBin = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo(agricolae131Content)), contentBin);
-    assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
+    assertThat(componentAssetTestHelper
+        .assetExists(repository, PACKAGES_BIN_GZ.fullPath), is(true));
 
     // Verify PACKAGES(metadata) is clean if component has been deleted
-    List<Component> components = getAllComponents(repository);
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
-    components.forEach(component -> maintenanceFacet.deleteComponent(component.getEntityMetadata().getId()));
+    final List<Component> allComponents = RITSupport.getAllComponents(repository);
+    allComponents.stream().forEach(component ->  maintenanceFacet.deleteComponent(component.getEntityMetadata().getId(), true));
 
     Thread.sleep(METADATA_PROCESSING_WAIT_INTERVAL_MILLIS);
 
     final InputStream contentSrcAfterDelete = client.fetch(PACKAGES_SRC_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo("")), contentSrcAfterDelete);
-    assertNotNull(findAsset(repository, PACKAGES_SRC_GZ.fullPath));
+    assertThat(componentAssetTestHelper
+        .assetExists(repository, PACKAGES_SRC_GZ.fullPath), is(true));
 
     final InputStream contentBinAfterDelete = client.fetch(PACKAGES_BIN_GZ.fullPath).getEntity().getContent();
     verifyTextGzipContent(is(equalTo("")), contentBinAfterDelete);
-    assertNotNull(findAsset(repository, PACKAGES_BIN_GZ.fullPath));
+    assertThat(componentAssetTestHelper
+        .assetExists(repository, PACKAGES_BIN_GZ.fullPath), is(true));
   }
 
   @Test
@@ -171,13 +168,14 @@ public class RHostedIT
 
     final Component component = findComponentById(repository, asset.componentId());
     assertNotNull(component);
-    assertEquals(1, findAssetsByComponent(repository, component).size());
+    assertThat(findAssetsByComponent(repository, component).size(), is(1));
 
-    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
-    maintenanceFacet.deleteAsset(asset.getEntityMetadata().getId(), true);
+    componentAssetTestHelper.removeAsset(repository,  AGRICOLAE_121_TARGZ.fullPath);
 
-    assertNull(findAsset(repository, AGRICOLAE_121_TARGZ.fullPath));
-    assertNull(findComponentById(repository, asset.componentId()));
+    assertThat(componentAssetTestHelper
+        .assetExists(repository, AGRICOLAE_121_TARGZ.fullPath), is(false));
+    assertThat(componentAssetTestHelper
+        .componentExists(repository, AGRICOLAE_121_TARGZ.packageName, AGRICOLAE_121_TARGZ.packageVersion), is(false));
   }
 
   @Test
@@ -192,16 +190,16 @@ public class RHostedIT
     ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
     maintenanceFacet.deleteComponent(component.getEntityMetadata().getId(), true);
 
-    assertNull(findAsset(repository, AGRICOLAE_121_TARGZ.fullPath));
+    assertThat(componentAssetTestHelper.assetExists(repository, AGRICOLAE_121_TARGZ.fullPath), is(false));
     assertNull(findComponentById(repository, asset.componentId()));
   }
 
   private void uploadPackages(TestPackage... packages) throws IOException {
-    assertThat(getAllComponents(repository), hasSize(0));
+    assertThat(componentAssetTestHelper.countComponents(repository), is(0));
     for (TestPackage testPackage : packages) {
       uploadSinglePackage(testPackage);
     }
-    assertThat(getAllComponents(repository), hasSize(packages.length));
+    assertThat(componentAssetTestHelper.countComponents(repository), is(packages.length));
   }
 
   private HttpResponse uploadSinglePackage(TestPackage testPackage) throws IOException {

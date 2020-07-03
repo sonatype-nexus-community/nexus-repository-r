@@ -16,10 +16,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.security.subject.FakeAlmightySubject;
-import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.apache.http.HttpResponse;
 import org.apache.shiro.util.ThreadContext;
@@ -32,9 +30,9 @@ import org.ops4j.pax.exam.Option;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
+import static org.sonatype.nexus.plugins.r.internal.RITConfig.configureRWithMetadataProcessingInterval;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 import static org.sonatype.nexus.repository.http.HttpStatus.OK;
 import static org.sonatype.nexus.testsuite.testsupport.FormatClientSupport.status;
@@ -56,12 +54,7 @@ public class RGroupIT
 
   @Configuration
   public static Option[] configureNexus() {
-    return NexusPaxExamSupport.options(
-        NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r"),
-        editConfigurationFileExtend(NEXUS_PROPERTIES_FILE, "nexus.r.packagesBuilder.interval",
-            String.valueOf(METADATA_PROCESSING_DELAY_MILLIS))
-    );
+    return configureRWithMetadataProcessingInterval();
   }
 
   @Before

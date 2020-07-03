@@ -16,12 +16,10 @@ import java.io.IOException;
 
 import org.sonatype.goodies.httpfixture.server.fluent.Server;
 import org.sonatype.nexus.common.app.BaseUrlHolder;
-import org.sonatype.nexus.pax.exam.NexusPaxExamSupport;
 import org.sonatype.nexus.repository.Repository;
 import org.sonatype.nexus.repository.storage.Asset;
 import org.sonatype.nexus.repository.storage.Component;
 import org.sonatype.nexus.repository.storage.ComponentMaintenance;
-import org.sonatype.nexus.testsuite.testsupport.NexusITSupport;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -33,11 +31,11 @@ import org.ops4j.pax.exam.Option;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.error;
 import static org.sonatype.goodies.httpfixture.server.fluent.Behaviours.file;
+import static org.sonatype.nexus.plugins.r.internal.RITConfig.configureRBase;
 import static org.sonatype.nexus.repository.http.HttpStatus.NOT_FOUND;
 import static org.sonatype.nexus.repository.storage.AssetEntityAdapter.P_ASSET_KIND;
 
@@ -52,10 +50,7 @@ public class RProxyIT
 
   @Configuration
   public static Option[] configureNexus() {
-    return NexusPaxExamSupport.options(
-        NexusITSupport.configureNexusBase(),
-        nexusFeature("org.sonatype.nexus.plugins", "nexus-repository-r")
-    );
+    return configureRBase();
   }
 
   @Before
@@ -162,12 +157,7 @@ public class RProxyIT
     assertNotNull(asset);
     assertNotNull(asset.componentId());
 
-    final Component component = findComponentById(repository, asset.componentId());
-    assertNotNull(component);
-    assertEquals(1, findAssetsByComponent(repository, component).size());
-
-    ComponentMaintenance maintenanceFacet = repository.facet(ComponentMaintenance.class);
-    maintenanceFacet.deleteAsset(asset.getEntityMetadata().getId(), true);
+    componentAssetTestHelper.removeAsset(repository, AGRICOLAE_131_TGZ.fullPath);
 
     assertNull(findAsset(repository, AGRICOLAE_131_TGZ.fullPath));
     assertNull(findComponentById(repository, asset.componentId()));
