@@ -48,6 +48,7 @@
 
   <properties>
     <nxrm-version>3.25.0-02</nxrm-version>
+    <project.build.outputTimestamp>2019-10-02T08:04:00Z</project.build.outputTimestamp>
   </properties>
 
   <repositories>
@@ -70,7 +71,25 @@
           <artifactId>nexus-staging-maven-plugin</artifactId>
           <version>1.6.8</version>
         </plugin>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>5.1.1</version>
+          <configuration>
+            <instructions>
+              <Embed-Dependency>alphanumeric-comparator</Embed-Dependency>
+              <!-- https://stackoverflow.com/a/29853163/49505 -->
+              <_removeheaders>Bnd-LastModified</_removeheaders>
+              <_reproducible>true</_reproducible>
+            </instructions>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.2.1</version>
+        </plugin>
       </plugins>
+
     </pluginManagement>
     <plugins>
       <plugin>

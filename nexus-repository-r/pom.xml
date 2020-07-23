@@ -120,16 +120,6 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Embed-Dependency>alphanumeric-comparator</Embed-Dependency>
-          </instructions>
-        </configuration>
-      </plugin>
-
       <!--
 during 'verify' phase, ensure the new repository format plugin is installed locally, for use by ITs.
 -->
