@@ -56,7 +56,7 @@ public class RBrowseNodeGenerator
     checkNotNull(asset);
     checkNotNull(component);
     List<BrowsePaths> browsePaths = super.computeComponentPaths(asset, null);
-    if (!browsePaths.get(browsePaths.size() - 1).getBrowsePath().equals(component.name())) {
+    if (!browsePaths.get(browsePaths.size() - 1).getDisplayName().equals(component.name())) {
       BrowsePaths.appendPath(browsePaths, component.name(), computeRequestPath(browsePaths, component.name()));
     }
     BrowsePaths.appendPath(browsePaths, component.version(), computeRequestPath(browsePaths, component.version()));
