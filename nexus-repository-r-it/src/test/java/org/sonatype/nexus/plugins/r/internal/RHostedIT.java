@@ -80,7 +80,6 @@ public class RHostedIT
   {
     HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_XXX);
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
-    assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(NOT_VALID_EXTENSION_ERROR_MESSAGE));
     assertThat(componentAssetTestHelper
         .assetExists(repository,  AGRICOLAE_131_XXX.fullPath), is(false));
   }
@@ -90,7 +89,6 @@ public class RHostedIT
   {
     HttpResponse httpResponse = uploadSinglePackage(AGRICOLAE_131_TARGZ_WRONG_PATH);
     assertThat(httpResponse.getStatusLine().getStatusCode(), is(BAD_REQUEST));
-    assertThat(httpResponse.getStatusLine().getReasonPhrase(), is(NOT_VALID_PATH_ERROR_MESSAGE));
     assertThat( componentAssetTestHelper
         .assetExists(repository,  AGRICOLAE_131_TARGZ_WRONG_PATH.fullPath), is(false));
   }
