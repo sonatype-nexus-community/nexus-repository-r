@@ -13,8 +13,6 @@
 package org.sonatype.nexus.repository.r.rest;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -26,7 +24,6 @@ import org.sonatype.nexus.repository.r.api.RGroupRepositoryApiRequest;
 import org.sonatype.nexus.repository.rest.GroupRepositoryApiRequestToConfigurationConverter;
 import org.sonatype.nexus.repository.rest.api.AbstractGroupRepositoriesApiResource;
 import org.sonatype.nexus.repository.rest.api.AuthorizingRepositoryManager;
-import org.sonatype.nexus.repository.rest.api.RepositoriesApiResource;
 import org.sonatype.nexus.validation.ConstraintViolationFactory;
 import org.sonatype.nexus.validation.Validate;
 
@@ -47,10 +44,7 @@ import static org.sonatype.nexus.rest.ApiDocConstants.REPOSITORY_UPDATED;
  * @since 1.1.8
  */
 @Api(value = API_REPOSITORY_MANAGEMENT)
-@Named
-@Singleton
-@Path(RepositoriesApiResource.RESOURCE_URI + "/r/group")
-public class RGroupRepositoriesApiResource
+public abstract class RGroupRepositoriesApiResource
     extends AbstractGroupRepositoriesApiResource<RGroupRepositoryApiRequest>
 {
   @Inject
