@@ -22,9 +22,16 @@ import org.sonatype.nexus.repository.rest.api.AbstractRepositoryApiRequestToConf
 import org.sonatype.nexus.repository.rest.api.AuthorizingRepositoryManager;
 import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceBeta;
 
+import io.swagger.annotations.Api;
+
+/**
+ * @since 1.1.17
+ */
 @Named
 @Singleton
 @Path(RepositoriesApiResourceBeta.RESOURCE_URI + "/r/hosted")
+@Api(hidden = true)
+@Deprecated
 public class RHostedRepositoriesApiResourceBeta
     extends RHostedRepositoriesApiResource
 {

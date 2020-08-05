@@ -24,9 +24,16 @@ import org.sonatype.nexus.repository.rest.api.AuthorizingRepositoryManager;
 import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceBeta;
 import org.sonatype.nexus.validation.ConstraintViolationFactory;
 
+import io.swagger.annotations.Api;
+
+/**
+ * @since 1.1.17
+ */
 @Named
 @Singleton
 @Path(RepositoriesApiResourceBeta.RESOURCE_URI + "/r/group")
+@Deprecated
+@Api(hidden = true)
 public class RGroupRepositoriesApiResourceBeta
     extends RGroupRepositoriesApiResource
 {
