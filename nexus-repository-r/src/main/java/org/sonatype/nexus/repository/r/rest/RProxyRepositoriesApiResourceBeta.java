@@ -26,6 +26,7 @@ import io.swagger.annotations.Api;
 
 /**
  * @since 1.1.17
+ * @deprecated - prefer to use {@link RProxyRepositoriesApiResourceV1 } instead of Beta.
  */
 @Named
 @Singleton
