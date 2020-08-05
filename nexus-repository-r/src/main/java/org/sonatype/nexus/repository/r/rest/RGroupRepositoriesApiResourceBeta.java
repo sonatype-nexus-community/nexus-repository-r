@@ -12,11 +12,17 @@
  */
 package org.sonatype.nexus.repository.r.rest;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
+import org.sonatype.nexus.repository.manager.RepositoryManager;
+import org.sonatype.nexus.repository.r.api.RGroupRepositoryApiRequest;
+import org.sonatype.nexus.repository.rest.GroupRepositoryApiRequestToConfigurationConverter;
+import org.sonatype.nexus.repository.rest.api.AuthorizingRepositoryManager;
 import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceBeta;
+import org.sonatype.nexus.validation.ConstraintViolationFactory;
 
 import io.swagger.annotations.Api;
 
@@ -32,4 +38,12 @@ import io.swagger.annotations.Api;
 public class RGroupRepositoriesApiResourceBeta
     extends RGroupRepositoriesApiResource
 {
+  @Inject
+  public RGroupRepositoriesApiResourceBeta(final AuthorizingRepositoryManager authorizingRepositoryManager,
+                                           final GroupRepositoryApiRequestToConfigurationConverter<RGroupRepositoryApiRequest> configurationAdapter,
+                                           final ConstraintViolationFactory constraintViolationFactory,
+                                           final RepositoryManager repositoryManager)
+  {
+    super(authorizingRepositoryManager, configurationAdapter, constraintViolationFactory, repositoryManager);
+  }
 }

@@ -12,10 +12,14 @@
  */
 package org.sonatype.nexus.repository.r.rest;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.Path;
 
+import org.sonatype.nexus.repository.r.api.RProxyRepositoryApiRequest;
+import org.sonatype.nexus.repository.rest.api.AbstractRepositoryApiRequestToConfigurationConverter;
+import org.sonatype.nexus.repository.rest.api.AuthorizingRepositoryManager;
 import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceV1;
 
 /**
@@ -27,4 +31,10 @@ import org.sonatype.nexus.repository.rest.api.RepositoriesApiResourceV1;
 public class RProxyRepositoriesApiResourceV1
     extends RProxyRepositoriesApiResource
 {
+  @Inject
+  public RProxyRepositoriesApiResourceV1(final AuthorizingRepositoryManager authorizingRepositoryManager,
+                                         final AbstractRepositoryApiRequestToConfigurationConverter<RProxyRepositoryApiRequest> configurationAdapter)
+  {
+    super(authorizingRepositoryManager, configurationAdapter);
+  }
 }

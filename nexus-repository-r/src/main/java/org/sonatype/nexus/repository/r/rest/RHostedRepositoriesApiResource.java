@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.repository.r.rest;
 
+import javax.inject.Inject;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -20,6 +21,8 @@ import javax.ws.rs.core.Response;
 
 import org.sonatype.nexus.repository.r.api.RHostedRepositoryApiRequest;
 import org.sonatype.nexus.repository.rest.api.AbstractRepositoriesApiResource;
+import org.sonatype.nexus.repository.rest.api.AbstractRepositoryApiRequestToConfigurationConverter;
+import org.sonatype.nexus.repository.rest.api.AuthorizingRepositoryManager;
 import org.sonatype.nexus.validation.Validate;
 
 import io.swagger.annotations.Api;
@@ -42,6 +45,14 @@ import static org.sonatype.nexus.rest.ApiDocConstants.REPOSITORY_UPDATED;
 public abstract class RHostedRepositoriesApiResource
     extends AbstractRepositoriesApiResource<RHostedRepositoryApiRequest>
 {
+  @Inject
+  public RHostedRepositoriesApiResource(
+      final AuthorizingRepositoryManager authorizingRepositoryManager,
+      final AbstractRepositoryApiRequestToConfigurationConverter<RHostedRepositoryApiRequest> configurationAdapter)
+  {
+    super(authorizingRepositoryManager, configurationAdapter);
+  }
+
   @ApiOperation("Create R hosted repository")
   @ApiResponses(value = {
       @ApiResponse(code = 201, message = REPOSITORY_CREATED),
