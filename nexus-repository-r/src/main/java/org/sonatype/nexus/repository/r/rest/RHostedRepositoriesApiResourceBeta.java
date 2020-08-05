@@ -36,10 +36,4 @@ import io.swagger.annotations.Api;
 public class RHostedRepositoriesApiResourceBeta
     extends RHostedRepositoriesApiResource
 {
-  @Inject
-  public RHostedRepositoriesApiResourceBeta(final AuthorizingRepositoryManager authorizingRepositoryManager,
-                                            final AbstractRepositoryApiRequestToConfigurationConverter<RHostedRepositoryApiRequest> configurationAdapter)
-  {
-    super(authorizingRepositoryManager, configurationAdapter);
-  }
 }
