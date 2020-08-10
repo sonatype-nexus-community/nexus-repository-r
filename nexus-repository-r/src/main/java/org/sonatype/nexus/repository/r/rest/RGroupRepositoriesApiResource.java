@@ -47,16 +47,6 @@ import static org.sonatype.nexus.rest.ApiDocConstants.REPOSITORY_UPDATED;
 public abstract class RGroupRepositoriesApiResource
     extends AbstractGroupRepositoriesApiResource<RGroupRepositoryApiRequest>
 {
-  @Inject
-  public RGroupRepositoriesApiResource(
-      final AuthorizingRepositoryManager authorizingRepositoryManager,
-      final GroupRepositoryApiRequestToConfigurationConverter<RGroupRepositoryApiRequest> configurationAdapter,
-      final ConstraintViolationFactory constraintViolationFactory,
-      final RepositoryManager repositoryManager)
-  {
-    super(authorizingRepositoryManager, configurationAdapter, constraintViolationFactory, repositoryManager);
-  }
-
   @ApiOperation("Create R group repository")
   @ApiResponses(value = {
       @ApiResponse(code = 201, message = REPOSITORY_CREATED),
