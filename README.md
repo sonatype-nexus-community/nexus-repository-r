@@ -17,6 +17,14 @@
 [![CircleCI](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r.svg?style=shield)](https://circleci.com/gh/sonatype-nexus-community/nexus-repository-r) [![Join the chat at https://gitter.im/sonatype/nexus-developers](https://badges.gitter.im/sonatype/nexus-developers.svg)](https://gitter.im/sonatype/nexus-developers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![DepShield Badge](https://depshield.sonatype.org/badges/sonatype-nexus-community/nexus-repository-r/depshield.svg)](https://depshield.github.io)
 [![Maven Central](https://img.shields.io/maven-central/v/org.sonatype.nexus.plugins/nexus-repository-r.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.sonatype.nexus.plugins%22%20AND%20a:%22nexus-repository-r%22)
 
+> **Huzzah!** R is now part of Nexus Repository Manager. Version 3.20 includes the R plugin by default. 
+>The plugin source code is now in [nexus-public](https://github.com/sonatype/nexus-public) in [nexus-repository-r](https://github.com/sonatype/nexus-public/tree/master/plugins/nexus-repository-r).
+
+> **Filing issues:** Upgrade to the latest version of Nexus Repository Manager 3, to get the latest fixes and improvements, before filing any issues or feature requests at https://issues.sonatype.org/.
+
+> **Upgrading:** If you are using a version prior to 3.20 and upgrade to a newer version you will not be able to install the community plugin. 
+>No other changes are required, and your existing data will remain intact.
+
 # Table Of Contents
 * [Release notes](https://help.sonatype.com/display/NXRM3/2019+Release+Notes)
 * [Developing](#developing)
